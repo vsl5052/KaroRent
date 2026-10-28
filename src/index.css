@@ -1,0 +1,137 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Theme 3: Terracotta Hearth — Light Mode ("Warm Alabaster Linen") */
+  --bg-surface-0: #FAF8F5;
+  --bg-surface-1: #FFFFFF;
+  --bg-surface-2: #F5F2EB;
+  --bg-surface-3: #FFFCF7;
+  --border-sandstone: #E7E5E4;
+  --text-ink: #1C1917;
+  --text-umber: #44403C;
+  --text-taupe: #78716C;
+  --bg-apricot: #FFF7ED;
+  --bg-sage-tint: #EFF6F0;
+}
+
+.dark {
+  /* Theme 3: Terracotta Hearth — Dark Mode ("Espresso Hearth") */
+  --bg-surface-0: #141210;
+  --bg-surface-1: #1C1917;
+  --bg-surface-2: #262320;
+  --bg-surface-3: #221F1D;
+  --border-sandstone: #38332E;
+  --text-ink: #FAF8F5;
+  --text-umber: #D6D3D1;
+  --text-taupe: #A8A29E;
+  --bg-apricot: #2E1A12;
+  --bg-sage-tint: #18281B;
+}
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-surface-0);
+    color: var(--text-ink);
+    transition: background-color 280ms cubic-bezier(0.22, 1, 0.36, 1),
+                color 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  h1, h2, h3, .font-editorial {
+    font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
+    letter-spacing: -0.015em;
+  }
+
+  .font-ledger {
+    font-family: 'IBM Plex Mono', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Soft organic spring transitions (Theme 3 specification: 250ms–320ms gentle spring) */
+.spring-card {
+  transition: transform 280ms cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 280ms cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 220ms ease;
+}
+
+.spring-card:hover {
+  transform: translateY(-3px);
+}
+
+.spring-btn {
+  transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1),
+              background-color 200ms ease,
+              box-shadow 200ms ease;
+}
+
+.spring-btn:hover:not(:disabled) {
+  transform: scale(1.015);
+}
+
+.spring-btn:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
+/* Stationery Parchment Texture & Sage-Green Seal Stamp */
+.parchment-sheet {
+  background-color: var(--bg-surface-3);
+  background-image: radial-gradient(rgba(194, 65, 12, 0.03) 1px, transparent 0);
+  background-size: 20px 20px;
+}
+
+@keyframes stampSeal {
+  0% {
+    opacity: 0;
+    transform: scale(1.6) rotate(-14deg);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(0.95) rotate(-6deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(-8deg);
+  }
+}
+
+.animate-stamp {
+  animation: stampSeal 420ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Custom Range Slider for Rental Tenure (3 / 6 / 12 / 24 Months) */
+input[type='range'].hearth-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type='range'].hearth-slider::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 999px;
+  background: #E7E5E4;
+}
+
+.dark input[type='range'].hearth-slider::-webkit-slider-runnable-track {
+  background: #38332E;
+}
+
+input[type='range'].hearth-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 22px;
+  width: 22px;
+  border-radius: 999px;
+  background: #C2410C;
+  border: 3px solid #FAF8F5;
+  box-shadow: 0 2px 8px rgba(194, 65, 12, 0.35);
+  margin-top: -7px;
+  transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+input[type='range'].hearth-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
