@@ -134,7 +134,7 @@ export const VendorPortalView: React.FC = () => {
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-pill bg-hearth-card border border-hearth-border text-[11px] font-mono text-hearth-terracotta font-semibold">
               <Building2 className="w-3.5 h-3.5" />
               <span>
-                Partner Vendor Workspace • {currentVendor.id} • Scoped Isolation (BR-012)
+                Partner Vendor Workspace • {currentVendor.id} • Partner-Scoped View
               </span>
             </div>
             <h1 className="font-serif text-2xl sm:text-3xl font-bold text-[#1C1917]">
@@ -149,32 +149,32 @@ export const VendorPortalView: React.FC = () => {
                 className="spring-btn px-4 py-2 rounded-pill bg-hearth-terracotta hover:bg-hearth-kiln text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm"
               >
                 <PackagePlus className="w-3.5 h-3.5" />
-                <span>Test Vendor Onboarding & Blacklist Match (FR-VEN-002)</span>
+                <span>New Partner Onboarding & Verification</span>
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Post-Termination Read-Only Restriction Banner (FR-VEN-011 to FR-VEN-015) */}
+      {/* Post-Termination Read-Only Restriction Banner */}
       {isReadOnlyTerminated && (
         <div className="p-5 rounded-3xl bg-[#FEE2E2] border-2 border-[#DC2626] text-[#991B1B] space-y-2 shadow-sm">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2 font-serif font-bold text-base">
               <AlertOctagon className="w-5 h-5" />
               <span>
-                FR-VEN-014 Post-Termination Read-Only Portal Mode Active
+                Post-Termination Read-Only Portal Mode Active
               </span>
             </div>
             <span className="px-3 py-1 rounded-pill bg-[#991B1B] text-white text-xs font-mono font-semibold">
-              Escrow Hold: ₹{currentVendor.settlementHoldAmount.toLocaleString('en-IN')} (FR-VEN-013)
+              Escrow Hold: ₹{currentVendor.settlementHoldAmount.toLocaleString('en-IN')}
             </span>
           </div>
           <p className="text-xs leading-relaxed">
-            Your Platform–Vendor Agreement has been terminated (FR-VEN-010). Public listings have been delisted or re-routed, and all catalogue/inventory editing permissions are revoked. You retain read-only visibility into active rental returns, inspection records, and your settlement hold ledger.
+            Your Platform–Vendor Agreement has been terminated. Public listings have been delisted or re-routed, and all catalogue/inventory editing permissions are revoked. You retain read-only visibility into active rental returns, inspection records, and your settlement hold ledger.
           </p>
           <div className="text-xs font-mono bg-white/70 px-3 py-1.5 rounded-xl border border-[#FECACA]">
-            Assigned Continuity Manager (FR-VEN-011): <strong>{currentVendor.continuityManager}</strong>
+            Assigned Continuity Manager: <strong>{currentVendor.continuityManager}</strong>
           </div>
         </div>
       )}
@@ -185,10 +185,10 @@ export const VendorPortalView: React.FC = () => {
           <Clock className="w-5 h-5 text-hearth-terracotta shrink-0 mt-0.5" />
           <div className="text-xs space-y-1">
             <div className="font-serif font-bold text-hearth-ink">
-              Indirect Vendor Inventory Control (FR-INV-010 / BR-030)
+              Staged Inventory Governance
             </div>
             <p className="text-hearth-umber leading-relaxed">
-              When you add, update, enable, or disable an inventory item below, the change is staged in <strong>Pending Admin Approval</strong> and never directly alters the live customer catalog until the Platform Manager approves or reassigns the vendor source (FR-INV-011).
+              When you add, update, enable, or disable an inventory item below, the change is staged in <strong>Pending Admin Approval</strong> and never directly alters the live customer catalog until the Platform Manager approves or reassigns the vendor source.
             </p>
           </div>
         </div>
@@ -197,7 +197,7 @@ export const VendorPortalView: React.FC = () => {
           <Lock className="w-5 h-5 text-hearth-sage shrink-0 mt-0.5" />
           <div className="text-xs space-y-1">
             <div className="font-serif font-bold text-hearth-ink">
-              Platform-Controlled Rental Pricing & Rate Cards (FR-PRC-001 / BR-027)
+              Platform-Controlled Rental Pricing & Rate Cards
             </div>
             <p className="text-hearth-umber leading-relaxed">
               Monthly rental rates, 4× security deposit multiples, ₹499 site visit fees, and per-meter AC installation rates are centrally governed by KaroRent and locked in the vendor portal.
@@ -206,7 +206,7 @@ export const VendorPortalView: React.FC = () => {
         </div>
       </div>
 
-      {/* Vendor Virtual Inventory & Staged Edit Cards (FR-INV-001 to 010) */}
+      {/* Vendor Virtual Inventory & Staged Edit Cards */}
       <div className="space-y-4">
         <h2 className="font-serif text-xl font-bold text-hearth-ink">
           Your Scoped Virtual Inventory & Staged Change Requests ({vendorInventory.length})
@@ -214,7 +214,7 @@ export const VendorPortalView: React.FC = () => {
 
         {vendorInventory.length === 0 ? (
           <div className="p-8 rounded-3xl bg-hearth-card border border-hearth-border text-center text-xs text-hearth-taupe">
-            No active inventory items assigned to {currentVendor.displayName}. (Items from terminated vendor VEN-203 were re-routed to VEN-201 under FR-INV-011).
+            No active inventory items assigned to {currentVendor.displayName}. (Items from terminated vendor VEN-203 were re-routed to VEN-201).
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -278,7 +278,7 @@ export const VendorPortalView: React.FC = () => {
                         </span>
                       </div>
                       <span className="text-[10px] font-mono text-hearth-taupe">
-                        Read-Only (BR-027)
+                        Read-Only (Platform Rate)
                       </span>
                     </div>
 
@@ -341,7 +341,7 @@ export const VendorPortalView: React.FC = () => {
                     )}
                   </div>
 
-                  {/* Staged Edit Trigger / Form (Disabled if Terminated Vendor per FR-VEN-014) */}
+                  {/* Staged Edit Trigger / Form */}
                   {!isReadOnlyTerminated && (
                     <div className="pt-3 border-t border-hearth-border">
                       {!isEditing ? (
@@ -355,7 +355,7 @@ export const VendorPortalView: React.FC = () => {
                             }}
                             className="spring-btn px-4 py-2 rounded-pill bg-hearth-terracotta hover:bg-hearth-kiln text-white text-xs font-semibold"
                           >
-                            Submit Staged Enable/Disable or Stock Update (FR-INV-010)
+                            Submit Staged Enable/Disable or Stock Update
                           </button>
                           <span className="text-[10px] font-mono text-hearth-taupe">
                             {inv.serializedAssets.length} Serialized Assets Tracked
@@ -364,7 +364,7 @@ export const VendorPortalView: React.FC = () => {
                       ) : (
                         <div className="p-4 rounded-2xl bg-hearth-oat border border-hearth-border space-y-3">
                           <div className="text-xs font-bold text-hearth-ink">
-                            Stage Inventory Change for Platform Manager Approval (BR-030)
+                            Stage Inventory Change for Platform Manager Approval
                           </div>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
@@ -402,7 +402,7 @@ export const VendorPortalView: React.FC = () => {
 
                           <div>
                             <label className="block text-[11px] font-semibold text-hearth-ink mb-1">
-                              Upload New Item Image URL (Optional — FR-INV-001)
+                              Upload New Item Image URL (Optional)
                             </label>
                             <input
                               type="text"
@@ -460,17 +460,17 @@ export const VendorPortalView: React.FC = () => {
         )}
       </div>
 
-      {/* New Vendor Onboarding & Blacklist Detection Modal (FR-VEN-001 / FR-VEN-002 / EX-031) */}
+      {/* New Vendor Onboarding & Blacklist Detection Modal */}
       {showOnboardingModal && (
         <div className="fixed inset-0 z-50 bg-[#1C1917]/55 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="w-full max-w-2xl rounded-3xl bg-hearth-parchment border border-hearth-border shadow-hearth-lg p-6 max-h-[90vh] overflow-y-auto space-y-4">
             <div className="flex items-center justify-between border-b border-hearth-border pb-3">
               <div>
                 <h3 className="font-serif text-xl font-bold text-hearth-ink">
-                  Vendor Onboarding & Blacklist Duplicate Detection (FR-VEN-001 / FR-VEN-002)
+                  Vendor Onboarding & Blacklist Duplicate Detection
                 </h3>
                 <p className="text-xs text-hearth-taupe">
-                  Evaluates GSTIN, PAN, Phone, Email, and Bank Payout Account against the Unified Vendor Blacklist (FR-BLK-002).
+                  Evaluates GSTIN, PAN, Phone, Email, and Bank Payout Account against the Unified Vendor Blacklist.
                 </p>
               </div>
               <button
@@ -478,7 +478,7 @@ export const VendorPortalView: React.FC = () => {
                 onClick={autofillBlacklistedVendorIdentifiers}
                 className="px-3 py-1.5 rounded-pill bg-[#FEE2E2] hover:bg-[#FECACA] text-[#991B1B] text-[11px] font-semibold shrink-0"
               >
-                Autofill Terminated Vendor Match (Test EX-031)
+                Autofill Terminated Vendor Match
               </button>
             </div>
 
@@ -602,7 +602,7 @@ export const VendorPortalView: React.FC = () => {
                   className="mt-0.5 rounded text-hearth-sage"
                 />
                 <span>
-                  <strong>Mandatory Operational Clause (FR-VEN-005 / BR-026):</strong> We agree that our pickup personnel will capture a verified timestamped photograph of every returned product at the customer's premises before pickup, and accept that undocumented warehouse damage cannot be charged to the customer.
+                  <strong>Mandatory Operational Clause:</strong> We agree that our pickup personnel will capture a verified timestamped photograph of every returned product at the customer's premises before pickup, and accept that undocumented warehouse damage cannot be charged to the customer.
                 </span>
               </label>
 

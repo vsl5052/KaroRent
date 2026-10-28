@@ -25,13 +25,13 @@ export const SettlementsFinanceView: React.FC = () => {
     <div className="space-y-7">
       <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-2">
         <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-pill bg-hearth-sageLight text-hearth-sage font-semibold">
-          Section 7.15 • FR-SET-001 to FR-SET-008 • FR-VEN-013
+          Partner Settlements & Escrow Governance
         </span>
         <h1 className="font-serif text-2xl font-bold text-hearth-ink">
           Platform Commission, Vendor Settlements & Termination Escrow Holds
         </h1>
         <p className="text-xs text-hearth-umber">
-          Vendor payable is calculated from reconciled customer rental collections less approved 12% platform commission (OBD-08). Enforces <strong>Segregation of Duties (FR-SET-008)</strong> where the preparer cannot be the sole approver, and automatically locks payouts for terminating vendors (FR-VEN-013).
+          Vendor payable is calculated from reconciled customer rental collections less approved 12% platform commission. Enforces <strong>Dual-Control Segregation of Duties</strong> where the preparer cannot be the sole approver, and automatically locks payouts for terminating vendors.
         </p>
       </div>
 
@@ -85,13 +85,13 @@ export const SettlementsFinanceView: React.FC = () => {
                     >
                       <ShieldCheck className="w-4 h-4" />
                       <span>
-                        Approve & Execute NEFT Payout (FR-SET-008 Segregation Verified)
+                        Approve & Execute NEFT Payout (Segregation Verified)
                       </span>
                     </button>
                   )}
               </div>
 
-              {/* Itemised Settlement Statement Breakdown (FR-SET-004) */}
+              {/* Itemised Settlement Statement Breakdown */}
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs">
                 <div className="p-3 rounded-2xl bg-hearth-oat border border-hearth-border">
                   <div className="text-[10px] text-hearth-taupe">
@@ -122,7 +122,7 @@ export const SettlementsFinanceView: React.FC = () => {
 
                 <div className="p-3 rounded-2xl bg-[#FEE2E2]/50 border border-[#FECACA]">
                   <div className="text-[10px] text-[#991B1B]">
-                    Termination Hold (FR-VEN-013)
+                    Termination Escrow Hold
                   </div>
                   <div className="font-ledger font-bold text-sm text-[#991B1B] mt-0.5">
                     -₹{st.terminationHoldbackAmount.toLocaleString('en-IN')}
@@ -141,7 +141,7 @@ export const SettlementsFinanceView: React.FC = () => {
 
               {st.payoutReference && (
                 <div className="text-[11px] font-mono text-hearth-sage">
-                  Reconciled Payout Reference (FR-SET-006): <strong>{st.payoutReference}</strong>
+                  Reconciled Payout Reference: <strong>{st.payoutReference}</strong>
                 </div>
               )}
             </div>

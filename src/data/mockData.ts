@@ -18,9 +18,6 @@ import {
   VirtualInventoryItem,
 } from '../types/srs';
 
-// ============================================================================
-// Role & Persona Switcher Profiles (Section 4 — Stakeholders & User Roles)
-// ============================================================================
 export const DEMO_PERSONAS: ActivePersona[] = [
   {
     id: 'persona-cus-ind',
@@ -46,10 +43,10 @@ export const DEMO_PERSONAS: ActivePersona[] = [
   },
   {
     id: 'persona-cus-blk',
-    name: 'Vikram Mehta (Blacklisted Client)',
+    name: 'Vikram Mehta (Flagged Account)',
     role: 'CUSTOMER_INDIVIDUAL',
-    roleBadge: 'Watchlisted / Blacklisted Client (FR-BLK-005)',
-    subtitle: 'Prior Default & Severe Damage Flag — Test Checkout Intercept',
+    roleBadge: 'Restricted / Watchlisted Account',
+    subtitle: 'Prior Default & Asset Damage Flag — Checkout Intercept Active',
     email: 'vikram.m88@mail.in',
     phone: '+91 99001 77889',
     customerId: 'CUS-1003',
@@ -59,7 +56,7 @@ export const DEMO_PERSONAS: ActivePersona[] = [
     id: 'persona-ven-active',
     name: 'CoolBreeze & Hearth Living Pvt Ltd',
     role: 'VENDOR_OWNER',
-    roleBadge: 'Approved Vendor Partner • Agreement Signed',
+    roleBadge: 'Approved Partner Vendor • Agreement Active',
     subtitle: 'Bengaluru East & Central Hub (VEN-201)',
     email: 'ops@coolbreezeliving.in',
     phone: '+91 80411 22334',
@@ -70,8 +67,8 @@ export const DEMO_PERSONAS: ActivePersona[] = [
     id: 'persona-ven-term',
     name: 'Apex Urban Rentals LLP (Terminating)',
     role: 'VENDOR_OWNER',
-    roleBadge: 'Post-Termination Read-Only Scope (FR-VEN-014)',
-    subtitle: 'Trading Cut Off • Continuity Manager Assigned',
+    roleBadge: 'Post-Termination Read-Only Access',
+    subtitle: 'New Orders Paused • Continuity Manager Assigned',
     email: 'admin@apexurban.in',
     phone: '+91 80999 00112',
     vendorId: 'VEN-203',
@@ -81,8 +78,8 @@ export const DEMO_PERSONAS: ActivePersona[] = [
     id: 'persona-field-tech',
     name: 'Rajan Kumar (Field Service & Pickup)',
     role: 'FIELD_PERSONNEL',
-    roleBadge: 'Delivery, AC Site-Visit & EXIF Pickup Tech',
-    subtitle: 'Job-Scoped Access Only • Zone: Bengaluru East',
+    roleBadge: 'Delivery, Home Measurement & Pickup Specialist',
+    subtitle: 'Assigned Jobs Only • Zone: Bengaluru East',
     email: 'rajan.field@karorent.in',
     phone: '+91 97400 55667',
     vendorId: 'VEN-201',
@@ -91,16 +88,13 @@ export const DEMO_PERSONAS: ActivePersona[] = [
     id: 'persona-super-admin',
     name: 'Siddharth Rao (Platform Manager)',
     role: 'PLATFORM_ADMIN',
-    roleBadge: 'Platform Super Admin & Mediator',
-    subtitle: 'Master Pricing, Staged Inventory, Deposit Vault & Blacklist Control',
+    roleBadge: 'Platform Administrator & Mediator',
+    subtitle: 'Master Pricing, Catalog Approvals, Deposit Vault & Trust Control',
     email: 'siddharth.rao@karorent.in',
     phone: '+91 98111 00999',
   },
 ];
 
-// ============================================================================
-// Customer Accounts (FR-CUS-001 to FR-CUS-007)
-// ============================================================================
 export const INITIAL_CUSTOMERS: CustomerAccount[] = [
   {
     id: 'CUS-1001',
@@ -146,7 +140,7 @@ export const INITIAL_CUSTOMERS: CustomerAccount[] = [
     companyName: 'Verma Studio Architecture Pvt Ltd',
     gstinOrTaxId: '29AABCV4421F1Z9',
     authorisedSignatoryName: 'Rohan Verma (Managing Director)',
-    authorisedSignatoryTitle: 'Authorised Corporate Signatory (FR-CUS-003)',
+    authorisedSignatoryTitle: 'Authorised Corporate Signatory',
     operationalRecipientName: 'Meera Nair (Facility Manager)',
     verifiedMobile: '+91 98801 44556',
     email: 'rohan@vermastudio.in',
@@ -179,7 +173,7 @@ export const INITIAL_CUSTOMERS: CustomerAccount[] = [
     paymentFingerprint: 'CARD-fingerprint-4921',
     status: 'Blacklisted / Watchlisted',
     blacklistReason:
-      'Enrolled under FR-BLK-004: Severe Payment Default (₹12,600 overdue > 45 days) and unauthorized asset tampering on prior rental BKG-2026-7104.',
+      'Severe Payment Default (₹12,600 overdue > 45 days) and unauthorized asset tampering on prior rental BKG-2026-7104.',
     createdAt: '2026-01-10',
     addresses: [
       {
@@ -198,9 +192,6 @@ export const INITIAL_CUSTOMERS: CustomerAccount[] = [
   },
 ];
 
-// ============================================================================
-// Vendors & Vendor Agreements (FR-VEN-001 to FR-VEN-015)
-// ============================================================================
 export const INITIAL_VENDORS: VendorRecord[] = [
   {
     id: 'VEN-201',
@@ -217,7 +208,7 @@ export const INITIAL_VENDORS: VendorRecord[] = [
     operatingHours: 'Mon–Sat • 09:00 AM – 07:30 PM IST',
     status: 'Approved',
     agreementState: 'Signed',
-    agreementVersion: 'PVA-v4.0-2026 (Includes Mandatory Doorstep Pickup Photo Clause)',
+    agreementVersion: 'Partner Vendor Master Agreement (2026 Edition)',
     agreementSignedAt: '2026-03-01 11:15 IST',
     agreementExpiryDate: '2027-03-01',
     mandatoryPickupPhotoClauseAccepted: true,
@@ -241,14 +232,14 @@ export const INITIAL_VENDORS: VendorRecord[] = [
     operatingHours: 'Mon–Sun • 09:30 AM – 08:00 PM IST',
     status: 'Approved',
     agreementState: 'Signed',
-    agreementVersion: 'PVA-v4.0-2026 (Includes Mandatory Doorstep Pickup Photo Clause)',
+    agreementVersion: 'Partner Vendor Master Agreement (2026 Edition)',
     agreementSignedAt: '2026-03-15 16:40 IST',
     agreementExpiryDate: '2027-03-15',
     mandatoryPickupPhotoClauseAccepted: true,
     settlementHoldAmount: 0,
     commissionRatePercent: 12,
     submittedAt: '2026-03-10',
-    decisionNotes: 'Approved backup source vendor for solid wood furniture and purifiers.',
+    decisionNotes: 'Approved partner vendor for solid wood furniture and purifiers.',
   },
   {
     id: 'VEN-203',
@@ -265,21 +256,21 @@ export const INITIAL_VENDORS: VendorRecord[] = [
     operatingHours: 'Suspended — Read Only',
     status: 'Terminating — Continuity Active',
     agreementState: 'Terminated',
-    agreementVersion: 'PVA-v3.2-2026',
+    agreementVersion: 'Partner Vendor Master Agreement (2025 Edition)',
     agreementExpiryDate: '2026-10-15',
     mandatoryPickupPhotoClauseAccepted: true,
-    continuityManager: 'CoolBreeze & Hearth Living (VEN-201) + Platform Ops Team',
-    settlementHoldAmount: 24500, // FR-VEN-013 Automated Financial Hold
+    continuityManager: 'CoolBreeze & Hearth Living (VEN-201) + Platform Operations Team',
+    settlementHoldAmount: 24500,
     commissionRatePercent: 15,
     submittedAt: '2026-01-05',
     decisionNotes:
-      'Terminated under FR-VEN-009/010 due to repeated SLA breaches and unverified pickup photos. Enrolled in Vendor Blacklist (FR-BLK-002). Payout held until active rentals complete.',
+      'Terminated due to repeated delivery delays and unverified pickup photos. Enrolled in Vendor Risk Registry. Payout held until active rentals complete.',
   },
   {
     id: 'VEN-204',
     legalBusinessName: 'PrimeMetro Appliances (Re-Application by Suresh M.)',
     displayName: 'PrimeMetro Appliances',
-    taxIdGstin: '27AAAAP0091E1Z5', // Matches blacklisted VEN-203!
+    taxIdGstin: '27AAAAP0091E1Z5',
     panNumber: 'AAAAP0091E',
     registeredPhone: '+91 80999 00112',
     email: 'suresh.new@primemetro.in',
@@ -290,14 +281,14 @@ export const INITIAL_VENDORS: VendorRecord[] = [
     operatingHours: 'Mon–Sat • 10:00 AM – 06:00 PM',
     status: 'Submitted',
     agreementState: 'Draft',
-    agreementVersion: 'PVA-v4.0-2026',
+    agreementVersion: 'Partner Vendor Master Agreement (2026 Edition)',
     agreementExpiryDate: '2027-10-28',
     mandatoryPickupPhotoClauseAccepted: true,
     blacklistMatchWarning: {
       matchedVendorId: 'VEN-203',
       matchedVendorName: 'Apex Urban Rentals LLP',
       matchedFields: ['GSTIN (27AAAAP0091E1Z5)', 'PAN (AAAAP0091E)', 'Bank Payout Account (AXIS •••• 4921)', 'Authorised Contact (Suresh Menon)'],
-      priorTerminationReason: 'Contract terminated on 2026-10-15 for chronic delivery SLA failure & falsified return condition claims (FR-BLK-002 / EX-031).',
+      priorTerminationReason: 'Contract terminated on 2026-10-15 for chronic delivery delays & unverified return condition claims.',
     },
     settlementHoldAmount: 0,
     commissionRatePercent: 12,
@@ -305,10 +296,6 @@ export const INITIAL_VENDORS: VendorRecord[] = [
   },
 ];
 
-// ============================================================================
-// Master Platform Products & Rate Cards (FR-CAT-001 to 005, FR-PRC-001, BR-027)
-// Matches Theme 3 "Terracotta Hearth" Mockup Cards & Pricing!
-// ============================================================================
 export const INITIAL_MASTER_PRODUCTS: PlatformMasterProduct[] = [
   {
     id: 'PRD-01',
@@ -321,9 +308,9 @@ export const INITIAL_MASTER_PRODUCTS: PlatformMasterProduct[] = [
     specifications: ['140cm × 70cm Solid Oak Top', 'Concealed Cable Tray', 'Sculpted Ash Chair Included', 'Zero-Tool 15-Min Setup'],
     lifestyleImage: 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=900&q=85',
     studioImage: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=900&q=85',
-    baseMonthlyRent: 1450, // Exact match to Theme 3 Screen A Card 1: ₹1,450 / month
+    baseMonthlyRent: 1450,
     tenureMultipliers: { 3: 1.0, 6: 0.95, 12: 0.88, 24: 0.8 },
-    depositMonthsMultiple: 4, // 4 × ₹1,450 = ₹5,800 Refundable Deposit!
+    depositMonthsMultiple: 4,
     standardDeliveryFee: 350,
     siteVisitFee: 0,
     installationRateCard: [],
@@ -333,17 +320,17 @@ export const INITIAL_MASTER_PRODUCTS: PlatformMasterProduct[] = [
     sku: 'KR-AC-INV-15T',
     title: '1.5 Ton 5-Star Dual Inverter Split Air Conditioner',
     category: 'Cooling & Air',
-    workflowType: 'SITE_VISIT_MULTI_STEP', // FR-CAT-003 Multi-Step Site Visit Required
+    workflowType: 'SITE_VISIT_MULTI_STEP',
     description:
       'Whisper-quiet architectural matte-white split AC with 100% copper condenser, PM 2.5 air filtration, and smart climate scheduling. Includes guided pre-installation home measurement visit.',
     specifications: ['1.5 Ton Cooling Capacity', '5-Star ISEER 5.2 Rating', '100% Pure Copper Condenser', 'Includes 3m Standard Copper Piping'],
     lifestyleImage: 'https://images.unsplash.com/photo-1615873968403-89e068629265?auto=format&fit=crop&w=900&q=85',
     studioImage: 'https://images.unsplash.com/photo-1585338107529-13afc5f02586?auto=format&fit=crop&w=900&q=85',
-    baseMonthlyRent: 2100, // Exact match to Theme 3 Screen A Card 2: ₹2,100 / month
+    baseMonthlyRent: 2100,
     tenureMultipliers: { 3: 1.0, 6: 0.94, 12: 0.86, 24: 0.78 },
-    depositMonthsMultiple: 4, // ₹8,400 Refundable Deposit (4 months)
+    depositMonthsMultiple: 4,
     standardDeliveryFee: 500,
-    siteVisitFee: 499, // FR-PRC-008 Paid Pre-Installation Site Visit Fee (₹499)
+    siteVisitFee: 499,
     installationRateCard: [
       { code: 'RC-PIPE-CU', label: 'Extra Insulated Copper Piping (Beyond 3m Free)', unit: 'meter', ratePerUnit: 850, includedFreeUnits: 3 },
       { code: 'RC-BRACKET', label: 'Heavy-Duty Powder-Coated Outdoor Unit Bracket', unit: 'set', ratePerUnit: 750, includedFreeUnits: 0 },
@@ -362,9 +349,9 @@ export const INITIAL_MASTER_PRODUCTS: PlatformMasterProduct[] = [
     specifications: ['215cm Width × 92cm Depth', 'Stain-Guard Belgian Linen', 'Solid Teak Base Frame', 'Removable Washable Covers'],
     lifestyleImage: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=900&q=85',
     studioImage: 'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=900&q=85',
-    baseMonthlyRent: 1850, // Exact match to Theme 3 Screen A Card 3: ₹1,850 / month
+    baseMonthlyRent: 1850,
     tenureMultipliers: { 3: 1.0, 6: 0.93, 12: 0.85, 24: 0.78 },
-    depositMonthsMultiple: 4, // ₹7,400 Refundable Deposit
+    depositMonthsMultiple: 4,
     standardDeliveryFee: 450,
     siteVisitFee: 0,
     installationRateCard: [],
@@ -382,7 +369,7 @@ export const INITIAL_MASTER_PRODUCTS: PlatformMasterProduct[] = [
     studioImage: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=900&q=85',
     baseMonthlyRent: 650,
     tenureMultipliers: { 3: 1.0, 6: 0.92, 12: 0.85, 24: 0.75 },
-    depositMonthsMultiple: 4, // ₹2,600 Refundable Deposit
+    depositMonthsMultiple: 4,
     standardDeliveryFee: 200,
     siteVisitFee: 0,
     installationRateCard: [
@@ -402,7 +389,7 @@ export const INITIAL_MASTER_PRODUCTS: PlatformMasterProduct[] = [
     studioImage: 'https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?auto=format&fit=crop&w=900&q=85',
     baseMonthlyRent: 1350,
     tenureMultipliers: { 3: 1.0, 6: 0.93, 12: 0.86, 24: 0.78 },
-    depositMonthsMultiple: 4, // ₹5,400 Refundable Deposit
+    depositMonthsMultiple: 4,
     standardDeliveryFee: 400,
     siteVisitFee: 0,
     installationRateCard: [],
@@ -420,7 +407,7 @@ export const INITIAL_MASTER_PRODUCTS: PlatformMasterProduct[] = [
     studioImage: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=900&q=85',
     baseMonthlyRent: 3200,
     tenureMultipliers: { 3: 1.0, 6: 0.92, 12: 0.84, 24: 0.76 },
-    depositMonthsMultiple: 4, // ₹12,800 Refundable Deposit
+    depositMonthsMultiple: 4,
     standardDeliveryFee: 500,
     siteVisitFee: 499,
     installationRateCard: [
@@ -430,9 +417,6 @@ export const INITIAL_MASTER_PRODUCTS: PlatformMasterProduct[] = [
   },
 ];
 
-// ============================================================================
-// Virtual Inventory & Staged Vendor Approval Requests (FR-INV-001 to FR-INV-011)
-// ============================================================================
 export const INITIAL_VIRTUAL_INVENTORY: VirtualInventoryItem[] = [
   {
     id: 'INV-501',
@@ -489,7 +473,6 @@ export const INITIAL_VIRTUAL_INVENTORY: VirtualInventoryItem[] = [
     maintenanceOrDamagedQuantity: 1,
     physicalCountVerified: 15,
     livePublicEnabled: true,
-    // Active Staged Disable Request from Vendor (FR-INV-010 / EX-033)!
     pendingStagedRequest: {
       id: 'STG-901',
       inventoryId: 'INV-502',
@@ -504,7 +487,7 @@ export const INITIAL_VIRTUAL_INVENTORY: VirtualInventoryItem[] = [
         'https://images.unsplash.com/photo-1615873968403-89e068629265?auto=format&fit=crop&w=900&q=85',
       ],
       vendorNotes:
-        'Requesting temporary disable or stock reduction to 10 units while our Domlur bay completes seasonal compressor servicing.',
+        'Requesting temporary pause or stock reduction to 10 units while our Domlur bay completes seasonal compressor servicing.',
       submittedAt: '2026-10-28 09:42 IST',
       status: 'Pending Admin Approval',
     },
@@ -646,7 +629,7 @@ export const INITIAL_VIRTUAL_INVENTORY: VirtualInventoryItem[] = [
     physicalCountVerified: 10,
     livePublicEnabled: true,
     lastSourceChangedAt: '2026-10-16 10:00 IST',
-    previousVendorSourceName: 'Apex Urban Rentals LLP (Terminated VEN-203)',
+    previousVendorSourceName: 'Apex Urban Rentals LLP (VEN-203)',
     itemImages: [
       'https://images.unsplash.com/photo-1593062096033-9a26b09da705?auto=format&fit=crop&w=900&q=85',
     ],
@@ -662,11 +645,7 @@ export const INITIAL_VIRTUAL_INVENTORY: VirtualInventoryItem[] = [
   },
 ];
 
-// ============================================================================
-// Bookings & Rental Orders (FR-BKG-001 to 009, WF-04, FR-RET-002/003)
-// ============================================================================
 export const INITIAL_BOOKINGS: BookingOrder[] = [
-  // 1. Multi-Step Split AC Booking — Matches Theme 3 Screen B Storyboard!
   {
     id: 'BKG-2026-8841',
     customerId: 'CUS-1001',
@@ -687,20 +666,20 @@ export const INITIAL_BOOKINGS: BookingOrder[] = [
     endDate: '2027-04-15',
     deliveryAddress: 'Flat 302, Terracotta Courtyards, 12th Main Road, Indiranagar, Bengaluru 560038',
     status: 'Active Rental',
-    monthlyRentRate: 1974, // 6-month plan rate
-    securityDepositAmount: 8400, // 4 months base deposit
+    monthlyRentRate: 1974,
+    securityDepositAmount: 8400,
     deliveryFee: 500,
     siteVisitFee: 499,
-    installationMaterialFee: 1175, // 0.5m extra copper pipe (₹425) + Outdoor Bracket (₹750)
+    installationMaterialFee: 1175,
     gstPercent: 18,
     siteVisit: {
       scheduledDate: '2026-10-13 11:00 IST',
       assignedTechnician: 'Rajan Kumar (Field Service)',
       status: 'Completed — Feasible',
-      measuredCopperPipeMeters: 3.5, // 3m free + 0.5m billable @ ₹850/m = ₹425
+      measuredCopperPipeMeters: 3.5,
       coreCuttingRequired: false,
-      outdoorBracketRequired: true, // ₹750
-      drainageExtensionMeters: 1.5, // within 2m free
+      outdoorBracketRequired: true,
+      drainageExtensionMeters: 1.5,
       sitePhotographs: [
         'https://images.unsplash.com/photo-1615873968403-89e068629265?auto=format&fit=crop&w=800&q=80',
       ],
@@ -715,7 +694,6 @@ export const INITIAL_BOOKINGS: BookingOrder[] = [
     deliveryEvidencePhoto: 'https://images.unsplash.com/photo-1615873968403-89e068629265?auto=format&fit=crop&w=800&q=80',
     createdAt: '2026-10-12',
   },
-  // 2. 1-Step Solid Oak Study Desk — Under 3-Way Return Inspection & Fair Deposit Settlement (Matches Theme 3 Screen B ₹5,800 Deposit!)
   {
     id: 'BKG-2026-8790',
     customerId: 'CUS-1001',
@@ -737,7 +715,7 @@ export const INITIAL_BOOKINGS: BookingOrder[] = [
     deliveryAddress: 'Flat 302, Terracotta Courtyards, 12th Main Road, Indiranagar, Bengaluru 560038',
     status: 'Picked Up — Under Inspection',
     monthlyRentRate: 1450,
-    securityDepositAmount: 5800, // Exact match to Theme 3 Screen B: ₹5,800 Original Deposit!
+    securityDepositAmount: 5800,
     deliveryFee: 350,
     siteVisitFee: 0,
     installationMaterialFee: 0,
@@ -752,7 +730,7 @@ export const INITIAL_BOOKINGS: BookingOrder[] = [
       preDispatchPhoto: 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=700&q=80',
       preDispatchNotes: 'Mint condition solid oak tabletop and ash chair dispatched in protective blankets.',
       customerPremisePickupPhoto: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=700&q=80',
-      pickupPhotoExifTimestamp: '2026-10-25 14:22:09 IST [EXIF Geo: 12.9784° N, 77.6408° E Verified]',
+      pickupPhotoExifTimestamp: '2026-10-25 14:22:09 IST [GPS: 12.9784° N, 77.6408° E Verified]',
       pickupPhotoGeoTag: 'Indiranagar 12th Main, Bengaluru',
       warehouseReturnPhoto: 'https://images.unsplash.com/photo-1540518614846-7ede433c4573?auto=format&fit=crop&w=700&q=80',
       warehouseInspectionFinding: 'Normal Wear',
@@ -765,7 +743,6 @@ export const INITIAL_BOOKINGS: BookingOrder[] = [
     },
     createdAt: '2026-04-18',
   },
-  // 3. Return Pickup Scheduled — Waiting for Mandatory Field EXIF Pickup Photo Gate (FR-RET-002 / BR-026 / EX-029)
   {
     id: 'BKG-2026-8812',
     customerId: 'CUS-1002',
@@ -801,7 +778,6 @@ export const INITIAL_BOOKINGS: BookingOrder[] = [
       pickupStatus: 'Scheduled',
       preDispatchPhoto: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=700&q=80',
       preDispatchNotes: 'Brand new Belgian linen upholstery, zero stains, 2 bouclé pillows included.',
-      // Intentionally missing customerPremisePickupPhoto so user can test the EXIF Pickup Photo Gate in Field Operations!
       proposedDeductionAmount: 0,
       approvedDeductionAmount: 0,
       transitDamageBlockedByBR026: false,
@@ -809,7 +785,6 @@ export const INITIAL_BOOKINGS: BookingOrder[] = [
     },
     createdAt: '2026-04-28',
   },
-  // 4. Multi-Step AC Booking Currently Scheduled for Site Visit (Ready for Field Tech to enter pipe metrics!)
   {
     id: 'BKG-2026-8905',
     customerId: 'CUS-1002',
@@ -829,11 +804,11 @@ export const INITIAL_BOOKINGS: BookingOrder[] = [
     endDate: '2027-11-02',
     deliveryAddress: 'Level 3, Sandstone Annexe, Kensington Road, Ulsoor, Bengaluru 560042',
     status: 'Site Visit Scheduled',
-    monthlyRentRate: 1806, // 12-month discounted platform rate
+    monthlyRentRate: 1806,
     securityDepositAmount: 8400,
     deliveryFee: 500,
     siteVisitFee: 499,
-    installationMaterialFee: 0, // Pending site visit measurement!
+    installationMaterialFee: 0,
     gstPercent: 18,
     siteVisit: {
       scheduledDate: '2026-10-28 17:30 IST',
@@ -844,13 +819,12 @@ export const INITIAL_BOOKINGS: BookingOrder[] = [
       outdoorBracketRequired: false,
       drainageExtensionMeters: 1.0,
       sitePhotographs: [],
-      technicianNotes: 'Awaiting technician site measurement input (FR-FUL-008).',
+      technicianNotes: 'Awaiting technician home measurement input.',
       calculatedMaterialCharges: 0,
     },
     agreementId: 'AGR-2026-8905',
     createdAt: '2026-10-28',
   },
-  // 5. Intercepted Blacklisted Client Booking Attempt (FR-BLK-005 / EX-032)
   {
     id: 'BKG-2026-8910',
     customerId: 'CUS-1003',
@@ -877,20 +851,17 @@ export const INITIAL_BOOKINGS: BookingOrder[] = [
     installationMaterialFee: 0,
     gstPercent: 18,
     blacklistFlagReason:
-      'Intercepted by FR-BKG-002 / FR-BLK-005: Customer matches active Customer Blacklist entry BLK-C-01 (₹12,600 unpaid rental/damage balance + unauthorized asset tampering on BKG-2026-7104). Stock allocation & vendor dispatch blocked.',
+      'Account matches an active Trust & Risk Registry alert (₹12,600 unpaid rental/damage balance + unauthorized asset tampering on prior order BKG-2026-7104). Stock allocation & vendor dispatch paused pending Administrator review.',
     agreementId: 'AGR-2026-8910',
     createdAt: '2026-10-28',
   },
 ];
 
-// ============================================================================
-// Platform–Customer Rental Agreements (FR-AGR-001 to FR-AGR-009)
-// ============================================================================
 export const INITIAL_AGREEMENTS: RentalAgreementRecord[] = [
   {
     id: 'AGR-2026-8841',
     bookingId: 'BKG-2026-8841',
-    templateVersion: 'KR-CUST-AGR-v4.0 (Tri-Partite Platform Contracting Standard)',
+    templateVersion: 'KaroRent Standard Residential Lease (2026 Edition)',
     status: 'Active',
     customerName: 'Ananya Sharma',
     vendorSnapshotName: 'CoolBreeze & Hearth Living Solutions Pvt Ltd (VEN-201)',
@@ -903,7 +874,7 @@ export const INITIAL_AGREEMENTS: RentalAgreementRecord[] = [
     lockedDepositAmount: 8400,
     lockedInstallationCharge: 1175,
     mandatoryPickupPhotoClause:
-      'Clause 9.4 (BR-026 Mandatory Doorstep Pickup Photo): Upon return pickup, the assigned vendor field representative MUST capture a timestamped photograph of the product at the Customer’s premises prior to removal. Any post-return warehouse damage not documented in the doorstep pickup photo is presumed to be vendor transit damage and cannot be deducted from the Customer’s Segregated Security Deposit.',
+      'Doorstep Handover Protection: Upon return pickup, the assigned field representative must capture a timestamped photograph of the product at the Customer’s premises prior to removal. Any post-return warehouse damage not documented in the doorstep pickup photo is presumed to be transit damage and cannot be deducted from the Customer’s Security Deposit.',
     signerIdentityMethod: 'Aadhaar OTP E-Sign',
     signatureHash: 'SHA256:9f84b2c1e7a04d33b812...e491 [Verified Aadhaar OTP • 2026-10-14 18:04:12 IST]',
     signedAt: '2026-10-14 18:04:12 IST',
@@ -912,7 +883,7 @@ export const INITIAL_AGREEMENTS: RentalAgreementRecord[] = [
         id: 'AMD-01',
         version: 'v1.1 — Post-Site Visit Rate Card Addendum',
         reason: 'Incorporated verified AC site visit measurement metrics (3.5m copper pipe + 1 outdoor bracket = ₹1,175).',
-        changedFieldsSummary: 'Installation & Material Charges updated from ₹0 (Estimate) to ₹1,175 (Platform Rate Card Locked).',
+        changedFieldsSummary: 'Installation & Material Charges updated from ₹0 (Estimate) to ₹1,175 (Standard Rate Card).',
         createdAt: '2026-10-13 14:10 IST',
         signedByCustomer: true,
         signedAt: '2026-10-14 18:04:12 IST',
@@ -922,7 +893,7 @@ export const INITIAL_AGREEMENTS: RentalAgreementRecord[] = [
   {
     id: 'AGR-2026-8790',
     bookingId: 'BKG-2026-8790',
-    templateVersion: 'KR-CUST-AGR-v4.0',
+    templateVersion: 'KaroRent Standard Residential Lease (2026 Edition)',
     status: 'Completed',
     customerName: 'Ananya Sharma',
     vendorSnapshotName: 'CoolBreeze & Hearth Living Solutions Pvt Ltd (VEN-201)',
@@ -935,7 +906,7 @@ export const INITIAL_AGREEMENTS: RentalAgreementRecord[] = [
     lockedDepositAmount: 5800,
     lockedInstallationCharge: 0,
     mandatoryPickupPhotoClause:
-      'Clause 9.4 (BR-026 Mandatory Doorstep Pickup Photo): Doorstep EXIF pickup photo mandatory before removal; protects customer against transit damage deductions.',
+      'Doorstep Handover Protection: Doorstep timestamped pickup photo is mandatory before removal and protects the customer against transit damage deductions.',
     signerIdentityMethod: 'Aadhaar OTP E-Sign',
     signatureHash: 'SHA256:3c71a9d8f0124b6e5501...a112 [Verified Aadhaar OTP • 2026-04-19 10:12:44 IST]',
     signedAt: '2026-04-19 10:12:44 IST',
@@ -944,10 +915,10 @@ export const INITIAL_AGREEMENTS: RentalAgreementRecord[] = [
   {
     id: 'AGR-2026-8812',
     bookingId: 'BKG-2026-8812',
-    templateVersion: 'KR-CORP-AGR-v4.0 (B2B Signatory Edition)',
+    templateVersion: 'KaroRent Commercial Corporate Lease (2026 Edition)',
     status: 'Active',
     customerName: 'Verma Studio Architecture Pvt Ltd',
-    authorisedSignatory: 'Rohan Verma (Managing Director — FR-CUS-003)',
+    authorisedSignatory: 'Rohan Verma (Managing Director)',
     vendorSnapshotName: 'Oak & Loom Artisan Furniture Craft LLP (VEN-202)',
     productTitle: 'Alabaster Bouclé & Oatmeal Linen 3-Seater Sofa',
     allocatedSerialNumber: 'SN-SOFA-2026-044',
@@ -958,7 +929,7 @@ export const INITIAL_AGREEMENTS: RentalAgreementRecord[] = [
     lockedDepositAmount: 7400,
     lockedInstallationCharge: 0,
     mandatoryPickupPhotoClause:
-      'Clause 9.4 (BR-026 Mandatory Doorstep Pickup Photo): Doorstep EXIF pickup photo mandatory before removal; protects corporate lessee against transit damage claims.',
+      'Doorstep Handover Protection: Doorstep timestamped pickup photo is mandatory before removal and protects the corporate lessee against transit damage claims.',
     signerIdentityMethod: 'Corporate DSC / Signatory OTP',
     signatureHash: 'SHA256:7d22e8a4b901c43f1180...c904 [Corporate Signatory Verified • 2026-04-29 15:30:00 IST]',
     signedAt: '2026-04-29 15:30:00 IST',
@@ -967,7 +938,7 @@ export const INITIAL_AGREEMENTS: RentalAgreementRecord[] = [
   {
     id: 'AGR-2026-8905',
     bookingId: 'BKG-2026-8905',
-    templateVersion: 'KR-CORP-AGR-v4.0 (B2B Signatory Edition)',
+    templateVersion: 'KaroRent Commercial Corporate Lease (2026 Edition)',
     status: 'Awaiting Signature',
     customerName: 'Verma Studio Architecture Pvt Ltd',
     authorisedSignatory: 'Rohan Verma (Managing Director)',
@@ -980,17 +951,12 @@ export const INITIAL_AGREEMENTS: RentalAgreementRecord[] = [
     lockedDepositAmount: 8400,
     lockedInstallationCharge: 0,
     mandatoryPickupPhotoClause:
-      'Clause 9.4 (BR-026 Mandatory Doorstep Pickup Photo): Doorstep EXIF pickup photo mandatory before removal; protects customer against transit damage deductions.',
+      'Doorstep Handover Protection: Doorstep timestamped pickup photo is mandatory before removal and protects the customer against transit damage deductions.',
     amendments: [],
   },
 ];
 
-// ============================================================================
-// 5-Invoice Financial Split Documents (FR-PAY-011, FR-PAY-004, BR-010, BR-011)
-// Demonstrates all 5 segregated document types linked to parent bookings!
-// ============================================================================
 export const INITIAL_INVOICES: FinancialInvoiceDocument[] = [
-  // Booking BKG-2026-8841 (Split AC) — Shows 5 distinct charge documents!
   {
     id: 'INV-SV-8841-01',
     bookingId: 'BKG-2026-8841',
@@ -998,7 +964,7 @@ export const INITIAL_INVOICES: FinancialInvoiceDocument[] = [
     customerName: 'Ananya Sharma',
     vendorId: 'VEN-201',
     chargeType: 'SITE_VISIT_INVOICE',
-    title: '1. Pre-Installation AC Site Feasibility Visit Invoice (FR-PRC-008)',
+    title: '1. Pre-Installation AC Home Measurement Visit Invoice',
     baseAmount: 423,
     taxAmount: 76,
     totalPayable: 499,
@@ -1030,7 +996,7 @@ export const INITIAL_INVOICES: FinancialInvoiceDocument[] = [
     customerName: 'Ananya Sharma',
     vendorId: 'VEN-201',
     chargeType: 'PERIODIC_RENTAL_INVOICE',
-    title: '3. Periodic Monthly Rental Charge Invoice — Cycle 1 of 6 (FR-PAY-004)',
+    title: '3. Periodic Monthly Rental Charge Invoice — Cycle 1 of 6',
     cycleNumber: 1,
     baseAmount: 1974,
     taxAmount: 355,
@@ -1049,14 +1015,13 @@ export const INITIAL_INVOICES: FinancialInvoiceDocument[] = [
     chargeType: 'SECURITY_DEPOSIT_COLLECTION_NOTE',
     title: '4. Refundable Security Deposit Collection Note [4× Base Rent • Tax-Exempt Vault]',
     baseAmount: 8400,
-    taxAmount: 0, // BR-011: Deposit is not rental revenue!
+    taxAmount: 0,
     totalPayable: 8400,
     paymentState: 'Successful',
     providerReference: 'RZP_VAULT_DEP8841',
     dueDate: '2026-10-14',
     paidAt: '2026-10-14 18:08 IST',
   },
-  // Booking BKG-2026-8790 (Study Desk)
   {
     id: 'INV-DP-8790-01',
     bookingId: 'BKG-2026-8790',
@@ -1090,27 +1055,23 @@ export const INITIAL_INVOICES: FinancialInvoiceDocument[] = [
     dueDate: '2026-09-20',
     paidAt: '2026-09-19 11:02 IST',
   },
-  // 5th Charge Type Example: Post-Return / Ancillary Adjustment Invoice (FR-PAY-011)
   {
     id: 'INV-ADJ-7104-05',
     bookingId: 'BKG-2026-7104',
     customerId: 'CUS-1003',
-    customerName: 'Vikram Mehta (Blacklisted Default)',
+    customerName: 'Vikram Mehta (Defaulted Account)',
     vendorId: 'VEN-201',
     chargeType: 'POST_RETURN_ADJUSTMENT_INVOICE',
-    title: '5. Post-Return Unrecovered Damage & Overdue Late-Fee Adjustment Invoice (FR-PAY-009)',
+    title: '5. Post-Return Unrecovered Damage & Overdue Late-Fee Adjustment Invoice',
     baseAmount: 10678,
     taxAmount: 1922,
     totalPayable: 12600,
     paymentState: 'Failed',
     dueDate: '2026-09-01',
-    correctionReason: 'Excess damage & 38-day overdue penalty beyond collected security deposit; triggered Customer Blacklist FR-BLK-004.',
+    correctionReason: 'Excess damage & 38-day overdue penalty beyond collected security deposit; account placed on Risk Watchlist.',
   },
 ];
 
-// ============================================================================
-// Segregated Security Deposit Ledgers (FR-DEP-001 to FR-DEP-006)
-// ============================================================================
 export const INITIAL_DEPOSIT_LEDGERS: SegregatedDepositLedger[] = [
   {
     id: 'DEP-LED-8790',
@@ -1128,7 +1089,7 @@ export const INITIAL_DEPOSIT_LEDGERS: SegregatedDepositLedger[] = [
     netRefundableAmount: 5800,
     refundedAmount: 0,
     refundStatus: 'Scheduled (14-Day Window)',
-    settlementDueDate: '2026-11-08 (14 Days Post-Inspection per FR-DEP-006)',
+    settlementDueDate: '2026-11-08 (14 Days Post-Inspection)',
   },
   {
     id: 'DEP-LED-8841',
@@ -1166,9 +1127,6 @@ export const INITIAL_DEPOSIT_LEDGERS: SegregatedDepositLedger[] = [
   },
 ];
 
-// ============================================================================
-// Damage, Loss & Dispute Cases (FR-DSP-001 to FR-DSP-007)
-// ============================================================================
 export const INITIAL_DISPUTE_CASES: DisputeCaseRecord[] = [
   {
     id: 'DSP-2026-409',
@@ -1182,17 +1140,17 @@ export const INITIAL_DISPUTE_CASES: DisputeCaseRecord[] = [
     status: 'Decided',
     allegationSummary:
       'Warehouse intake staff noted a 4cm scuff on the lower rear leg of the oak desk and initially proposed a ₹1,200 polishing deduction.',
-    policyClauseCited: 'BR-026 / FR-RET-003 (Three-Way Evidence & Doorstep Pickup Photo Presumption)',
+    policyClauseCited: 'Three-Way Evidence & Doorstep Pickup Photo Protection',
     proposedChargeAmount: 1200,
     finalApprovedAmount: 0,
     preDispatchPhoto: 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=700&q=80',
     pickupHandoverPhoto: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=700&q=80',
     warehouseReturnPhoto: 'https://images.unsplash.com/photo-1540518614846-7ede433c4573?auto=format&fit=crop&w=700&q=80',
     customerResponseText:
-      'The verified EXIF doorstep pickup photo taken by Rajan Kumar at 14:22 IST clearly shows all 4 legs unblemished at handover. The scuff occurred in the delivery van.',
+      'The verified doorstep pickup photo taken by Rajan Kumar at 14:22 IST clearly shows all 4 legs unblemished at handover. The scuff occurred in the delivery van.',
     vendorRecommendation: 'Waive customer charge; log under logistics transit care.',
     platformMediatorDecision:
-      'Deduction of ₹1,200 DISALLOWED under BR-026. Doorstep pickup photo verified zero damage at customer premises; full ₹5,800 deposit approved for refund.',
+      'Deduction of ₹1,200 disallowed. Doorstep pickup photo verified zero damage at customer premises; full ₹5,800 deposit approved for refund.',
     severeViolationBlacklistTriggered: false,
     dueDate: '2026-10-29',
     createdAt: '2026-10-25',
@@ -1209,22 +1167,19 @@ export const INITIAL_DISPUTE_CASES: DisputeCaseRecord[] = [
     status: 'Under Platform Review',
     allegationSummary:
       'Customer defaulted on 3 periodic billing cycles and attempted unauthorized dismantling of the outdoor copper condenser unit, causing severe compressor damage documented in the doorstep pickup photo.',
-    policyClauseCited: 'FR-DSP-005 / FR-BLK-004 (Severe Asset Damage & Non-Payment Default)',
+    policyClauseCited: 'Severe Asset Damage & Non-Payment Default Policy',
     proposedChargeAmount: 18500,
     preDispatchPhoto: 'https://images.unsplash.com/photo-1615873968403-89e068629265?auto=format&fit=crop&w=700&q=80',
     pickupHandoverPhoto: 'https://images.unsplash.com/photo-1585338107529-13afc5f02586?auto=format&fit=crop&w=700&q=80',
     warehouseReturnPhoto: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=700&q=80',
     customerResponseText: 'No response submitted within the 7-day dispute window.',
-    vendorRecommendation: 'Forfeit ₹8,400 deposit, issue ₹12,600 Post-Return Adjustment Invoice, and enroll client in Customer Blacklist.',
+    vendorRecommendation: 'Forfeit ₹8,400 deposit, issue ₹12,600 Post-Return Adjustment Invoice, and enroll client in Customer Risk Registry.',
     severeViolationBlacklistTriggered: true,
     dueDate: '2026-10-30',
     createdAt: '2026-09-15',
   },
 ];
 
-// ============================================================================
-// Maintenance, Repairs & Asset Replacement Tickets (FR-SRV-001 to 006)
-// ============================================================================
 export const INITIAL_SERVICE_TICKETS: ServiceMaintenanceTicket[] = [
   {
     id: 'SRV-2026-301',
@@ -1244,9 +1199,6 @@ export const INITIAL_SERVICE_TICKETS: ServiceMaintenanceTicket[] = [
   },
 ];
 
-// ============================================================================
-// Customer Support & Complaint Tickets (FR-SUP-001 to FR-SUP-005)
-// ============================================================================
 export const INITIAL_SUPPORT_TICKETS: SupportComplaintTicket[] = [
   {
     id: 'SUP-2026-701',
@@ -1268,18 +1220,15 @@ export const INITIAL_SUPPORT_TICKETS: SupportComplaintTicket[] = [
       {
         author: 'Platform Concierge',
         role: 'Platform Support',
-        message: 'Confirmed! Under FR-DEP-006, your ₹7,400 deposit is held in KaroRent’s segregated vault and auto-releases within 14 days of three-way inspection closure.',
+        message: 'Confirmed! Your ₹7,400 deposit is held in KaroRent’s segregated vault and auto-releases within 14 days of three-way inspection closure.',
         timestamp: '2026-10-27 16:42 IST',
       },
     ],
-    internalAdminNotes: 'INTERNAL NOTE (Hidden from Customer/Vendor per FR-SUP-002): Verified corporate GSTIN 29AABCV4421F1Z9 matches B2B ledger.',
+    internalAdminNotes: 'INTERNAL ADMIN NOTE: Verified corporate GSTIN 29AABCV4421F1Z9 matches corporate billing ledger.',
     slaDeadline: '2026-10-29 18:00 IST',
   },
 ];
 
-// ============================================================================
-// Vendor Commission & Settlement Statements (FR-SET-001 to FR-SET-008)
-// ============================================================================
 export const INITIAL_SETTLEMENTS: VendorSettlementStatement[] = [
   {
     id: 'SET-2026-10-A',
@@ -1311,7 +1260,7 @@ export const INITIAL_SETTLEMENTS: VendorSettlementStatement[] = [
     netVendorPayable: 36960,
     status: 'Paid',
     preparedByActor: 'Meghna Iyer (Platform Finance Analyst)',
-    approvedByActor: 'Siddharth Rao (Platform Super Admin)',
+    approvedByActor: 'Siddharth Rao (Platform Administrator)',
     payoutReference: 'NEFT_UTR_HDFC26102599812',
     createdAt: '2026-10-25 14:00 IST',
   },
@@ -1319,23 +1268,20 @@ export const INITIAL_SETTLEMENTS: VendorSettlementStatement[] = [
     id: 'SET-2026-10-HOLD',
     vendorId: 'VEN-203',
     vendorName: 'Apex Urban Rentals LLP (Terminating Vendor)',
-    periodLabel: 'October 2026 — Termination Escrow Hold (FR-VEN-013)',
+    periodLabel: 'October 2026 — Termination Escrow Hold',
     grossEligibleCollections: 28824,
     platformCommissionPercent: 15,
     platformCommissionFee: 4324,
     refundsAndChargebacks: 0,
     damageRecoveryCredit: 0,
-    terminationHoldbackAmount: 24500, // Full net amount held until active rentals complete!
+    terminationHoldbackAmount: 24500,
     netVendorPayable: 0,
     status: 'On Hold — Vendor Termination',
-    preparedByActor: 'System Automated Hold (FR-VEN-013)',
+    preparedByActor: 'Automated Escrow Hold',
     createdAt: '2026-10-15 17:30 IST',
   },
 ];
 
-// ============================================================================
-// Unified Blacklist Registry (FR-BLK-001 to FR-BLK-008)
-// ============================================================================
 export const INITIAL_BLACKLIST: BlacklistEntry[] = [
   {
     id: 'BLK-V-01',
@@ -1353,12 +1299,12 @@ export const INITIAL_BLACKLIST: BlacklistEntry[] = [
       addressSnippet: 'Bommanahalli Industrial Layout, Bengaluru',
     },
     evidenceSummary:
-      'Auto-enrolled on vendor contract termination (FR-VEN-015 / FR-BLK-002). Flagged 1 re-application attempt under alias "PrimeMetro Appliances" (VEN-204) matching GSTIN, PAN, and Bank Payout Account.',
+      'Auto-enrolled upon vendor contract termination. Flagged 1 re-application attempt under alias "PrimeMetro Appliances" (VEN-204) matching GSTIN, PAN, and Bank Payout Account.',
     outstandingDuesAmount: 24500,
     blockedAttemptsCount: 1,
     status: 'Active Blacklist',
     effectiveTimestamp: '2026-10-15 17:30 IST',
-    enrolledByActor: 'System Automatic Enrollment (FR-BLK-002)',
+    enrolledByActor: 'System Automatic Enrollment',
   },
   {
     id: 'BLK-C-01',
@@ -1375,26 +1321,23 @@ export const INITIAL_BLACKLIST: BlacklistEntry[] = [
       addressSnippet: 'No. 412, 27th Main, Sector 2, HSR Layout, Bengaluru 560102',
     },
     evidenceSummary:
-      'Enrolled under FR-BLK-004: ₹12,600 unpaid Post-Return Adjustment Invoice > 45 days in default + confirmed compressor tampering on Split AC rental BKG-2026-7104.',
+      '₹12,600 unpaid Post-Return Adjustment Invoice > 45 days in default + confirmed compressor tampering on Split AC rental BKG-2026-7104.',
     evidencePhotoUrl: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=700&q=80',
     outstandingDuesAmount: 12600,
     blockedAttemptsCount: 2,
     status: 'Active Blacklist',
     effectiveTimestamp: '2026-10-05 12:00 IST',
-    enrolledByActor: 'Siddharth Rao (Platform Super Admin)',
+    enrolledByActor: 'Siddharth Rao (Platform Administrator)',
   },
 ];
 
-// ============================================================================
-// Notifications (FR-NTF-001 to FR-NTF-006)
-// ============================================================================
 export const INITIAL_NOTIFICATIONS: PlatformNotification[] = [
   {
     id: 'NTF-01',
-    eventCode: 'FR-INV-010 / EX-033',
-    title: 'Staged Vendor Disable Request Pending Approval',
+    eventCode: 'Catalog Approval',
+    title: 'Staged Vendor Pause Request Pending Review',
     message:
-      'CoolBreeze & Hearth Living requested to disable "1.5 Ton Split AC" (INV-502). Live platform status remains ENABLED until you Approve, Reject, or Reassign Vendor Source.',
+      'CoolBreeze & Hearth Living requested to pause "1.5 Ton Split AC" (INV-502). Live platform status remains ENABLED until you Approve, Reject, or Reassign Vendor Source.',
     recipientRole: 'PLATFORM_ADMIN',
     category: 'Inventory Approval',
     priority: 'high',
@@ -1404,10 +1347,10 @@ export const INITIAL_NOTIFICATIONS: PlatformNotification[] = [
   },
   {
     id: 'NTF-02',
-    eventCode: 'FR-BLK-003 / EX-031',
-    title: 'Blacklist Match Alert — Terminated Vendor Re-Application',
+    eventCode: 'Risk Alert',
+    title: 'Terminated Vendor Re-Application Flagged',
     message:
-      'Applicant "PrimeMetro Appliances" (VEN-204) matched 4 blacklisted identifiers (GSTIN, PAN, Bank Account, Contact) of terminated vendor Apex Urban Rentals LLP.',
+      'Applicant "PrimeMetro Appliances" (VEN-204) matched 4 identifiers (GSTIN, PAN, Bank Account, Contact) of terminated vendor Apex Urban Rentals LLP.',
     recipientRole: 'PLATFORM_ADMIN',
     category: 'Blacklist Alert',
     priority: 'critical',
@@ -1417,10 +1360,10 @@ export const INITIAL_NOTIFICATIONS: PlatformNotification[] = [
   },
   {
     id: 'NTF-03',
-    eventCode: 'FR-BLK-005 / EX-032',
-    title: 'Blacklisted Client Booking Intercepted (BKG-2026-8910)',
+    eventCode: 'Checkout Hold',
+    title: 'Watchlisted Client Booking Intercepted (BKG-2026-8910)',
     message:
-      'Vikram Mehta (CUS-1003) attempted to book Creator Studio 5K Bundle. Booking held in Flagged — Blacklist Review due to ₹12,600 prior unpaid balance.',
+      'Vikram Mehta (CUS-1003) attempted to book Creator Studio 5K Bundle. Booking held in Risk Review due to ₹12,600 prior unpaid balance.',
     recipientRole: 'PLATFORM_ADMIN',
     category: 'Blacklist Alert',
     priority: 'critical',
@@ -1430,7 +1373,7 @@ export const INITIAL_NOTIFICATIONS: PlatformNotification[] = [
   },
   {
     id: 'NTF-04',
-    eventCode: 'FR-RET-005 / FR-DEP-006',
+    eventCode: 'Deposit Vault',
     title: 'Full ₹5,800 Deposit Refund Approved (Zero Deduction)',
     message:
       'Three-way photo comparison for your Nordic Solid Oak Study Desk (BKG-2026-8790) verified zero customer damage. Full ₹5,800 refund scheduled.',
@@ -1444,8 +1387,8 @@ export const INITIAL_NOTIFICATIONS: PlatformNotification[] = [
   },
   {
     id: 'NTF-05',
-    eventCode: 'FR-RET-002 / BR-026',
-    title: 'Mandatory Doorstep EXIF Pickup Photo Required',
+    eventCode: 'Field Pickup',
+    title: 'Doorstep Timestamped Pickup Photo Required',
     message:
       'Pickup job for BKG-2026-8812 (Oatmeal Linen 3-Seater Sofa) requires a verified customer-premise timestamped photo before transitioning to Picked Up.',
     recipientRole: 'FIELD_PERSONNEL',
@@ -1458,17 +1401,14 @@ export const INITIAL_NOTIFICATIONS: PlatformNotification[] = [
   },
 ];
 
-// ============================================================================
-// Immutable Audit Log (FR-ADM-004)
-// ============================================================================
 export const INITIAL_AUDIT_LOGS: AuditLogEntry[] = [
   {
     id: 'AUD-2026-9904',
     timestamp: '2026-10-28 09:42:11 IST',
     actorName: 'Arjun Shetty',
     actorRole: 'Vendor Owner (VEN-201)',
-    moduleCode: 'FR-INV-010 / BR-030',
-    actionSummary: 'Submitted staged inventory disable request for INV-502 (Split AC)',
+    moduleCode: 'Inventory Staging',
+    actionSummary: 'Submitted staged inventory pause request for INV-502 (Split AC)',
     affectedRecordId: 'INV-502 / STG-901',
     priorValue: 'Live Status: Enabled (Stock: 15)',
     newValue: 'Staged: Pending Admin Approval (Live Status Unchanged: Enabled)',
@@ -1478,20 +1418,20 @@ export const INITIAL_AUDIT_LOGS: AuditLogEntry[] = [
     id: 'AUD-2026-9903',
     timestamp: '2026-10-26 11:30:05 IST',
     actorName: 'Siddharth Rao',
-    actorRole: 'Platform Super Admin',
-    moduleCode: 'FR-DSP-004 / BR-026',
+    actorRole: 'Platform Administrator',
+    moduleCode: 'Dispute Resolution',
     actionSummary: 'Disallowed ₹1,200 warehouse scuff claim; approved full ₹5,800 deposit refund',
     affectedRecordId: 'DSP-2026-409 / DEP-LED-8790',
     priorValue: 'Proposed Deduction: ₹1,200',
     newValue: 'Approved Deduction: ₹0 (Full ₹5,800 Refund)',
-    mandatoryReason: 'Verified EXIF doorstep pickup photo at 14:22 IST showed zero scuff at customer handover (BR-026).',
+    mandatoryReason: 'Verified doorstep pickup photo at 14:22 IST showed zero scuff at customer handover.',
   },
   {
     id: 'AUD-2026-9902',
     timestamp: '2026-10-16 10:00:00 IST',
     actorName: 'Siddharth Rao',
-    actorRole: 'Platform Super Admin',
-    moduleCode: 'FR-INV-011 / BR-031',
+    actorRole: 'Platform Administrator',
+    moduleCode: 'Source Routing',
     actionSummary: 'Reassigned inventory source for Creator Studio 5K Bundle (INV-506)',
     affectedRecordId: 'INV-506',
     priorValue: 'Source Vendor: Apex Urban Rentals LLP (VEN-203)',
@@ -1502,23 +1442,20 @@ export const INITIAL_AUDIT_LOGS: AuditLogEntry[] = [
     id: 'AUD-2026-9901',
     timestamp: '2026-10-15 17:30:00 IST',
     actorName: 'System / Siddharth Rao',
-    actorRole: 'Platform Super Admin',
-    moduleCode: 'FR-VEN-015 / FR-BLK-002',
-    actionSummary: 'Initiated vendor termination, placed ₹24,500 settlement hold & enrolled in Vendor Blacklist',
+    actorRole: 'Platform Administrator',
+    moduleCode: 'Vendor Governance',
+    actionSummary: 'Initiated vendor termination, placed ₹24,500 settlement hold & enrolled in Risk Registry',
     affectedRecordId: 'VEN-203 / BLK-V-01',
     priorValue: 'Vendor Status: Approved',
-    newValue: 'Status: Terminating — Continuity Active • Blacklist: Active',
-    mandatoryReason: 'Chronic delivery SLA failure and unverified pickup condition claims.',
+    newValue: 'Status: Terminating — Continuity Active • Risk Registry: Active',
+    mandatoryReason: 'Chronic delivery delays and unverified pickup condition claims.',
   },
 ];
 
-// ============================================================================
-// Section 18 — Open Business Decisions (OBD-01 to OBD-25) Governance Matrix
-// ============================================================================
 export const INITIAL_OBD_DECISIONS: OpenBusinessDecisionItem[] = [
   {
-    id: 'OBD-01',
-    title: 'Booking Confirmation & Inventory Hold Trigger',
+    id: 'POL-01',
+    title: 'Booking Confirmation & Inventory Hold Window',
     priority: 'Critical',
     selectedOption: '15-Minute Temporary Hold at Checkout Start; Hard Commit on Agreement + Payment',
     options: [
@@ -1526,30 +1463,30 @@ export const INITIAL_OBD_DECISIONS: OpenBusinessDecisionItem[] = [
       'Hold Only After Vendor Confirmation',
       'Hold Only After Electronic Signature Completion',
     ],
-    ownerRole: 'Product Owner & Operations Lead',
+    ownerRole: 'Product & Operations Lead',
     effectiveDate: '2026-10-01',
     status: 'Approved Policy Active',
   },
   {
-    id: 'OBD-03',
-    title: 'Platform Authority Over Vendor Financial & Inspection Decisions',
+    id: 'POL-02',
+    title: 'Platform Authority Over Deposit & Inspection Decisions',
     priority: 'Critical',
     selectedOption: 'Platform Mediator Approves All Deposit Deductions & Financial Adjustments',
     options: [
       'Platform Mediator Approves All Deposit Deductions & Financial Adjustments',
       'Vendor Decision Final Unless Disputed Within 7 Days',
     ],
-    ownerRole: 'Platform Super Admin & Legal',
+    ownerRole: 'Platform Operations & Legal',
     effectiveDate: '2026-10-01',
     status: 'Approved Policy Active',
   },
   {
-    id: 'OBD-06',
-    title: 'Post-Return Damage Assessment & Doorstep Photo Standard',
+    id: 'POL-03',
+    title: 'Post-Return Inspection & Doorstep Photo Standard',
     priority: 'High',
-    selectedOption: '48-Hour Post-Pickup Inspection Window + Mandatory EXIF Doorstep Pickup Photo (BR-026)',
+    selectedOption: '48-Hour Post-Pickup Inspection Window + Mandatory Doorstep Pickup Photo',
     options: [
-      '48-Hour Post-Pickup Inspection Window + Mandatory EXIF Doorstep Pickup Photo (BR-026)',
+      '48-Hour Post-Pickup Inspection Window + Mandatory Doorstep Pickup Photo',
       '72-Hour Warehouse Inspection Window with Customer Video Sign-Off',
     ],
     ownerRole: 'Operations & Risk Lead',
@@ -1557,7 +1494,7 @@ export const INITIAL_OBD_DECISIONS: OpenBusinessDecisionItem[] = [
     status: 'Approved Policy Active',
   },
   {
-    id: 'OBD-08',
+    id: 'POL-04',
     title: 'Platform Commission Base & Settlement Schedule',
     priority: 'Critical',
     selectedOption: '12% Platform Fee on Net Base Rent (Excludes Refundable Deposit & Taxes) • Bi-Weekly Payout',
@@ -1565,33 +1502,33 @@ export const INITIAL_OBD_DECISIONS: OpenBusinessDecisionItem[] = [
       '12% Platform Fee on Net Base Rent (Excludes Refundable Deposit & Taxes) • Bi-Weekly Payout',
       '15% Flat Commission Across Rent + Installation • Monthly Payout',
     ],
-    ownerRole: 'Chief Financial Officer',
+    ownerRole: 'Finance Controller',
     effectiveDate: '2026-10-01',
     status: 'Approved Policy Active',
   },
   {
-    id: 'OBD-21',
+    id: 'POL-05',
     title: 'Rental Lifecycle Activation Trigger',
     priority: 'Critical',
-    selectedOption: 'Customer Delivery & Installation Acknowledgement Timestamp (FR-FUL-007)',
+    selectedOption: 'Customer Delivery & Installation Acknowledgement Timestamp',
     options: [
-      'Customer Delivery & Installation Acknowledgement Timestamp (FR-FUL-007)',
+      'Customer Delivery & Installation Acknowledgement Timestamp',
       'Vendor Warehouse Dispatch Timestamp',
     ],
-    ownerRole: 'Product Owner',
+    ownerRole: 'Operations Lead',
     effectiveDate: '2026-10-01',
     status: 'Approved Policy Active',
   },
   {
-    id: 'OBD-25',
-    title: 'Client Blacklist Thresholds & New Booking Intercept Behavior',
+    id: 'POL-06',
+    title: 'Client Risk Registry Thresholds & Checkout Protection',
     priority: 'High',
-    selectedOption: 'Auto-Blacklist on Invoice >30 Days Default or Severe Damage; Hold New Bookings in Flagged — Blacklist Review',
+    selectedOption: 'Auto-Flag on Invoice >30 Days Default or Severe Damage; Hold New Bookings for Admin Review',
     options: [
-      'Auto-Blacklist on Invoice >30 Days Default or Severe Damage; Hold New Bookings in Flagged — Blacklist Review',
+      'Auto-Flag on Invoice >30 Days Default or Severe Damage; Hold New Bookings for Admin Review',
       'Hard-Block Checkout Immediately Without Admin Review Queue',
     ],
-    ownerRole: 'Platform Risk & Super Admin',
+    ownerRole: 'Trust & Safety Lead',
     effectiveDate: '2026-10-28',
     status: 'Approved Policy Active',
   },

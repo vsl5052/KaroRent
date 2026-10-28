@@ -74,9 +74,6 @@ export const TopEditorialHeader: React.FC = () => {
             <span className="font-serif text-2xl font-bold tracking-tight text-hearth-ink">
               KaroRent
             </span>
-            <span className="hidden sm:inline-block ml-2 text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-pill bg-hearth-oat text-hearth-taupe border border-hearth-border">
-              SRS v4.0
-            </span>
           </div>
         </button>
 
@@ -94,7 +91,7 @@ export const TopEditorialHeader: React.FC = () => {
           {showLocationMenu && (
             <div className="absolute left-0 mt-2 w-72 rounded-2xl bg-hearth-card border border-hearth-border shadow-hearth-lg p-2 z-50">
               <div className="px-3 py-1.5 text-[11px] font-mono uppercase text-hearth-taupe">
-                Select Service Zone (FR-INV-003)
+                Select Service Zone
               </div>
               {LOCATIONS.map((loc) => (
                 <button
@@ -178,7 +175,7 @@ export const TopEditorialHeader: React.FC = () => {
           </button>
         </nav>
 
-        {/* Role & Persona Switcher (Section 4 — Multi-Role Testing) */}
+        {/* Role & Persona Switcher */}
         <div className="relative">
           <button
             onClick={() => setShowPersonaMenu(!showPersonaMenu)}
@@ -189,7 +186,7 @@ export const TopEditorialHeader: React.FC = () => {
                 ? 'bg-hearth-sage text-white border-hearth-sage shadow-sm'
                 : 'bg-hearth-oat text-hearth-ink border-hearth-border hover:border-hearth-terracotta'
             }`}
-            title="Switch Active SRS Stakeholder Role"
+            title="Switch Active Account Role"
           >
             {activePersona.isBlacklisted || activePersona.isTerminatedVendor ? (
               <ShieldAlert className="w-3.5 h-3.5 shrink-0" />
@@ -215,10 +212,10 @@ export const TopEditorialHeader: React.FC = () => {
                 <div>
                   <div className="text-xs font-serif font-semibold text-hearth-ink flex items-center gap-1.5">
                     <Users className="w-3.5 h-3.5 text-hearth-terracotta" />
-                    SRS v4.0 Stakeholder Role Switcher
+                    Account & Role Switcher
                   </div>
                   <p className="text-[10px] text-hearth-taupe">
-                    Test role-scoped isolation (BR-012 / BR-013) & blacklist workflows
+                    Switch between customer, partner vendor, field technician, and admin views
                   </p>
                 </div>
               </div>
@@ -265,12 +262,12 @@ export const TopEditorialHeader: React.FC = () => {
           )}
         </div>
 
-        {/* Notifications Drawer Trigger (FR-NTF-001) */}
+        {/* Notifications Drawer Trigger */}
         <div className="relative">
           <button
             onClick={() => setShowNotifDrawer(!showNotifDrawer)}
             className="relative p-2 rounded-pill bg-hearth-oat hover:bg-hearth-apricot border border-hearth-border text-hearth-ink transition-colors"
-            title="Role-Scoped Notifications (FR-NTF-001)"
+            title="Account Notifications"
           >
             <Bell className="w-4 h-4" />
             {unreadCount > 0 && (
@@ -285,7 +282,7 @@ export const TopEditorialHeader: React.FC = () => {
               <div className="flex items-center justify-between pb-2.5 border-b border-hearth-border">
                 <div>
                   <h4 className="font-serif text-sm font-semibold text-hearth-ink">
-                    Event Notifications (FR-NTF-001)
+                    Activity & Event Notifications
                   </h4>
                   <p className="text-[10px] text-hearth-taupe">
                     Scoped for: {activePersona.name}
@@ -340,14 +337,14 @@ export const TopEditorialHeader: React.FC = () => {
           {darkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4" />}
         </button>
 
-        {/* Reset Demo Data Button */}
+        {/* Reset Data Button */}
         <button
           onClick={resetDemoState}
           className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-pill bg-hearth-oat hover:bg-hearth-apricot border border-hearth-border text-[11px] font-medium text-hearth-taupe hover:text-hearth-ink transition-colors"
-          title="Reset all local mock data to initial SRS v4.0 state"
+          title="Reset platform data to default state"
         >
           <RotateCcw className="w-3.5 h-3.5" />
-          <span className="hidden lg:inline">Reset Demo</span>
+          <span className="hidden lg:inline">Reset Data</span>
         </button>
       </div>
     </header>

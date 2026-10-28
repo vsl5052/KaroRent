@@ -78,17 +78,15 @@ export const FieldServiceView: React.FC = () => {
     addToast({
       title: 'Live Doorstep Photo & EXIF Captured',
       description: `Verified timestamp ${ts} at customer premises. Picked Up transition gate is now unlocked!`,
-      ruleCode: 'FR-RET-002',
       variant: 'success',
     });
   };
 
   const handleAttemptBlockedPickup = () => {
     addToast({
-      title: 'Status Transition Blocked (EX-029 / BR-026)',
+      title: 'Status Transition Blocked',
       description:
         'Cannot transition return to Picked Up without uploading a live timestamped photograph at the customer’s premises!',
-      ruleCode: 'EX-029',
       variant: 'error',
     });
   };
@@ -105,25 +103,25 @@ export const FieldServiceView: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-[#FAF8F5] via-[#FAF8F5]/95 to-transparent flex items-center p-6 sm:p-8">
           <div className="max-w-xl space-y-2">
             <span className="px-3 py-1 rounded-pill bg-hearth-card border border-hearth-border text-[10px] font-mono uppercase text-hearth-terracotta font-semibold">
-              Job-Scoped Field Technician View (Section 4)
+              Job-Scoped Field Technician View
             </span>
             <h1 className="font-serif text-2xl sm:text-3xl font-bold text-[#1C1917]">
               Home Site Visits, Deliveries & Doorstep EXIF Pickup Gate
             </h1>
             <p className="text-xs text-[#44403C]">
-              Enforces <strong>FR-FUL-008</strong> (AC Pre-Installation Metric Capture) and <strong>BR-026 / EX-029</strong> (Mandatory Customer-Premise Timestamped Pickup Photo before marking any return as Picked Up).
+              Manages on-site AC pre-installation measurements and enforces our mandatory customer-premise timestamped pickup photo before marking any return as Picked Up.
             </p>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-7 items-start">
-        {/* MODULE A: Mandatory Customer-Premise EXIF Pickup Photo Gate (FR-RET-002 / BR-026 / EX-029) */}
+        {/* MODULE A: Mandatory Customer-Premise EXIF Pickup Photo Gate */}
         <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-5">
           <div className="flex items-center justify-between border-b border-hearth-border pb-3">
             <div>
               <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-pill bg-[#FEE2E2] text-[#991B1B] font-semibold">
-                Mandatory Contractual Gate • FR-RET-002 / BR-026 / EX-029
+                Mandatory Doorstep Verification Gate
               </span>
               <h2 className="font-serif text-xl font-bold text-hearth-ink mt-1">
                 Return Pickup Handover & EXIF Timestamp Gate
@@ -165,7 +163,7 @@ export const FieldServiceView: React.FC = () => {
               <div className="font-bold text-xs flex items-center gap-2">
                 <Lock className="w-4 h-4 shrink-0" />
                 <span>
-                  GATE LOCKED (BR-026 / EX-029): Mandatory Customer-Premise Pickup Photo Required!
+                  GATE LOCKED: Mandatory Customer-Premise Pickup Photo Required!
                 </span>
               </div>
               <p className="text-[11px] leading-relaxed">
@@ -187,7 +185,7 @@ export const FieldServiceView: React.FC = () => {
                   className="w-20 h-20 rounded-xl object-cover border border-[#166534]"
                 />
                 <div className="text-[11px] font-mono space-y-0.5">
-                  <div>Format: JPEG [Validated per FR-DSP-002]</div>
+                  <div>Format: JPEG [Validated]</div>
                   <div>EXIF Timestamp: {capturedExifTimestamp}</div>
                   <div>Geo-Coordinates: {capturedGeoTag}</div>
                 </div>
@@ -216,7 +214,7 @@ export const FieldServiceView: React.FC = () => {
               >
                 <Lock className="w-4 h-4" />
                 <span>
-                  2. Mark Return as Picked Up [LOCKED — Click to Test EX-029 Blocker]
+                  2. Mark Return as Picked Up [LOCKED — Photo Required]
                 </span>
               </button>
             ) : (
@@ -235,19 +233,19 @@ export const FieldServiceView: React.FC = () => {
               >
                 <CheckCircle2 className="w-4 h-4" />
                 <span>
-                  2. Complete Handover & Transition to Picked Up — Under Inspection (FR-RET-002)
+                  2. Complete Handover & Transition to Picked Up — Under Inspection
                 </span>
               </button>
             )}
           </div>
         </div>
 
-        {/* MODULE B: Pre-Installation AC Site Feasibility & Metric Capture (FR-FUL-008 / FR-PRC-008 / EX-030) */}
+        {/* MODULE B: Pre-Installation AC Site Feasibility & Metric Capture */}
         <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-5">
           <div className="flex items-center justify-between border-b border-hearth-border pb-3">
             <div>
               <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-pill bg-hearth-apricot text-hearth-terracotta font-semibold">
-                Multi-Step Appliance Flow • FR-FUL-008 / FR-PRC-008 / EX-030
+                Multi-Step Appliance Flow • On-Site Metrics
               </span>
               <h2 className="font-serif text-xl font-bold text-hearth-ink mt-1">
                 Pre-Installation Site Feasibility & Metric Capture
@@ -275,7 +273,7 @@ export const FieldServiceView: React.FC = () => {
             </select>
           </div>
 
-          {/* Feasibility Toggle (Feasible vs. Not Feasible EX-030) */}
+          {/* Feasibility Toggle */}
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
@@ -299,14 +297,14 @@ export const FieldServiceView: React.FC = () => {
               }`}
             >
               <AlertOctagon className="w-4 h-4" />
-              <span>Site Not Feasible (EX-030)</span>
+              <span>Site Not Feasible</span>
             </button>
           </div>
 
           {!isFeasible ? (
             <div className="p-4 rounded-2xl bg-[#FEE2E2]/60 border border-[#FECACA] space-y-3 text-xs">
               <div className="font-bold text-[#991B1B]">
-                EX-030 Unfeasible Site Cancellation Rule:
+                Unfeasible Site Cancellation Policy:
               </div>
               <p className="text-hearth-umber">
                 Marking the site Not Feasible will automatically cancel the booking without charging rental or security deposit, and release the virtual inventory hold.
@@ -400,7 +398,7 @@ export const FieldServiceView: React.FC = () => {
               <div className="p-3.5 rounded-2xl bg-hearth-apricot border border-hearth-terracotta/30 flex items-center justify-between">
                 <div>
                   <div className="font-semibold text-hearth-ink">
-                    Platform Rate-Card Material Total (FR-PRC-004):
+                    Platform Rate-Card Material Total:
                   </div>
                   <div className="text-[10px] text-hearth-taupe">
                     Vendor inputs physical metrics only; system calculates price from locked Rate Card.
@@ -434,18 +432,18 @@ export const FieldServiceView: React.FC = () => {
           >
             {isFeasible
               ? `Submit Site Metrics & Dispatch ₹${previewMaterialTotal.toLocaleString('en-IN')} Final Quote to Customer`
-              : 'Record Site Unfeasible & Release Booking Hold (EX-030)'}
+              : 'Record Site Unfeasible & Release Booking Hold'}
           </button>
         </div>
       </div>
 
-      {/* MODULE C: Confirmed Bookings Ready for Dispatch & Delivery Activation (FR-FUL-002 to 007) */}
+      {/* MODULE C: Confirmed Bookings Ready for Dispatch & Delivery Activation */}
       {dispatchBookings.length > 0 && (
         <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-4">
           <h3 className="font-serif text-lg font-bold text-hearth-ink flex items-center gap-2">
             <Truck className="w-5 h-5 text-hearth-sage" />
             <span>
-              Confirmed Orders Ready for Dispatch & Delivery Activation (FR-FUL-002 / FR-FUL-007)
+              Confirmed Orders Ready for Dispatch & Delivery Activation
             </span>
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

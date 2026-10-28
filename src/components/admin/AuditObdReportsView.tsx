@@ -35,7 +35,7 @@ export const AuditObdReportsView: React.FC = () => {
     );
   });
 
-  // Role-Scoped CSV Report Export (FR-RPT-001 / FR-RPT-002)
+  // Role-Scoped CSV Report Export
   const handleExportScopedReport = (reportType: string) => {
     const isVendor = activePersona.role === 'VENDOR_OWNER';
     const scopedBookings = isVendor
@@ -45,7 +45,7 @@ export const AuditObdReportsView: React.FC = () => {
     const csvRows = [
       ['Report Type', reportType],
       ['Exported By', `${activePersona.name} (${activePersona.roleBadge})`],
-      ['Data Scoping Rule', isVendor ? 'Vendor-Isolated Scope (BR-012 / FR-RPT-002)' : 'Global Platform Scope'],
+      ['Data Scoping Rule', isVendor ? 'Partner-Isolated Scope' : 'Global Platform Scope'],
       [],
       ['Booking ID', 'Customer', 'Product', 'Vendor Source', 'Status', 'Monthly Rent (INR)', '4x Vault Deposit (INR)'],
       ...scopedBookings.map((b) => [
@@ -70,27 +70,26 @@ export const AuditObdReportsView: React.FC = () => {
     URL.revokeObjectURL(url);
 
     addToast({
-      title: `Exported ${reportType} Report (FR-RPT-001)`,
-      description: `Role-scoped CSV generated respecting BR-012 / FR-RPT-002 privacy boundaries.`,
-      ruleCode: 'FR-RPT-002',
+      title: `Exported ${reportType} Report`,
+      description: `Role-scoped CSV generated respecting partner privacy boundaries.`,
       variant: 'success',
     });
   };
 
   return (
     <div className="space-y-8">
-      {/* Top Exportable Reconciliation & Role-Scoped Reports Strip (Section 13 / FR-RPT-001..004) */}
+      {/* Top Exportable Reconciliation & Role-Scoped Reports Strip */}
       <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-pill bg-hearth-sageLight text-hearth-sage font-semibold">
-              Section 13 & 18 • FR-RPT-001..004 • FR-ADM-004..006
+              Platform Compliance • Governance Policies • Audit Trail
             </span>
             <h1 className="font-serif text-2xl font-bold text-hearth-ink mt-1">
-              Role-Scoped Reconciliation Exports, Open Business Decisions & Audit Trail
+              Role-Scoped Reconciliation Exports, Platform Policies & Audit Trail
             </h1>
             <p className="text-xs text-hearth-umber">
-              Export role-scoped CSV manifests (FR-RPT-002), configure versioned Open Business Decisions (OBD-01 to OBD-25), and inspect the immutable actor/timestamp audit trail.
+              Export role-scoped CSV manifests, configure versioned operational policies, and inspect the immutable actor/timestamp audit trail.
             </p>
           </div>
 
@@ -113,15 +112,15 @@ export const AuditObdReportsView: React.FC = () => {
         </div>
       </div>
 
-      {/* Section 18: Open Business Decisions (OBD-01 to OBD-25) Policy Configurator */}
+      {/* Operational Governance Policy Configurator */}
       <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="font-serif text-lg font-bold text-hearth-ink">
-              Section 18 — Open Business Decisions (OBD) Versioned Policy Matrix (FR-ADM-006)
+              Platform Governance & Operational Policy Matrix
             </h2>
             <p className="text-xs text-hearth-taupe">
-              Changes to policy have effective dates and never retroactively rewrite historical accepted agreements or invoices (BR-020).
+              Changes to policy have effective dates and never retroactively rewrite historical accepted agreements or invoices.
             </p>
           </div>
         </div>
@@ -163,23 +162,23 @@ export const AuditObdReportsView: React.FC = () => {
         </div>
       </div>
 
-      {/* Immutable Audit Trail Table (FR-ADM-004) */}
+      {/* Immutable Audit Trail Table */}
       <div className="rounded-3xl bg-hearth-card border border-hearth-border shadow-hearth overflow-hidden">
         <div className="px-6 py-4 bg-hearth-oat border-b border-hearth-border flex flex-wrap items-center justify-between gap-3">
           <div>
             <h3 className="font-serif font-bold text-base text-hearth-ink flex items-center gap-2">
               <History className="w-4 h-4 text-hearth-terracotta" />
-              <span>Immutable System Audit Trail (FR-ADM-004)</span>
+              <span>Immutable System Audit Trail</span>
             </h3>
             <p className="text-[11px] text-hearth-taupe">
-              Records actor, timestamp, module code, affected record, prior/new state, and mandatory reason for every critical action.
+              Records actor, timestamp, module category, affected record, prior/new state, and mandatory reason for every critical action.
             </p>
           </div>
           <input
             type="text"
             value={auditSearch}
             onChange={(e) => setAuditSearch(e.target.value)}
-            placeholder="Filter audit trail by FR/BR code, actor, or record..."
+            placeholder="Filter audit trail by module, actor, or record..."
             className="px-3.5 py-1.5 rounded-pill bg-hearth-card border border-hearth-border text-xs w-72"
           />
         </div>
@@ -190,7 +189,7 @@ export const AuditObdReportsView: React.FC = () => {
               <tr className="border-b border-hearth-border bg-hearth-oat/50 text-[10px] font-mono uppercase text-hearth-taupe">
                 <th className="py-3 px-4">Timestamp (IST)</th>
                 <th className="py-3 px-4">Actor & Role</th>
-                <th className="py-3 px-4">SRS Rule Code</th>
+                <th className="py-3 px-4">Module</th>
                 <th className="py-3 px-4">Action & Affected Record</th>
                 <th className="py-3 px-4">Prior → New State</th>
                 <th className="py-3 px-4">Mandatory Reason</th>

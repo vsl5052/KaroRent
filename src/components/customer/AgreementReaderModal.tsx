@@ -28,7 +28,7 @@ export const AgreementReaderModal: React.FC<{ inlineMode?: boolean }> = ({
   );
   const [otpInput, setOtpInput] = useState('482910');
   const [authorityDeclaration, setAuthorityDeclaration] = useState(
-    'Authorised Corporate Signatory / Verified Lessee (FR-CUS-003)'
+    'Authorised Corporate Signatory / Verified Lessee'
   );
   const [consentChecked, setConsentChecked] = useState(true);
 
@@ -54,7 +54,7 @@ export const AgreementReaderModal: React.FC<{ inlineMode?: boolean }> = ({
   const handleDownloadCertificate = () => {
     const content = [
       `====================================================================`,
-      `KARORENT PLATFORM–CUSTOMER RENTAL AGREEMENT CERTIFICATE (FR-AGR-008)`,
+      `KARORENT PLATFORM–CUSTOMER RENTAL AGREEMENT CERTIFICATE`,
       `====================================================================`,
       `Agreement ID     : ${agreement.id}`,
       `Parent Booking   : ${agreement.bookingId}`,
@@ -62,11 +62,11 @@ export const AgreementReaderModal: React.FC<{ inlineMode?: boolean }> = ({
       `Status           : ${agreement.status}`,
       `Customer / Lessee: ${agreement.customerName}`,
       `Signatory Role   : ${agreement.authorisedSignatory || 'Verified Individual Customer'}`,
-      `Vendor Snapshot  : ${agreement.vendorSnapshotName} (BR-006)`,
+      `Vendor Snapshot  : ${agreement.vendorSnapshotName}`,
       `Product & Serial : ${agreement.productTitle} (${agreement.allocatedSerialNumber || 'Allocated at Dispatch'})`,
       `Rental Tenure    : ${agreement.tenureMonths} Months (${agreement.startDate} to ${agreement.endDate})`,
       `Locked Base Rent : INR ${agreement.lockedMonthlyRent} / month`,
-      `Segregated Vault : INR ${agreement.lockedDepositAmount} (4x Refundable Deposit — BR-011)`,
+      `Segregated Vault : INR ${agreement.lockedDepositAmount} (4x Refundable Deposit)`,
       `Mandatory Clause : ${agreement.mandatoryPickupPhotoClause}`,
       `Signature Proof  : ${agreement.signatureHash || 'Pending Signature'}`,
       `====================================================================`,
@@ -81,9 +81,8 @@ export const AgreementReaderModal: React.FC<{ inlineMode?: boolean }> = ({
     URL.revokeObjectURL(url);
 
     addToast({
-      title: `Downloaded ${agreement.id} (FR-AGR-008)`,
+      title: `Downloaded ${agreement.id}`,
       description: 'Immutable signed contract certificate saved with cryptographic OTP evidence.',
-      ruleCode: 'FR-AGR-008',
       variant: 'success',
     });
   };
@@ -95,7 +94,7 @@ export const AgreementReaderModal: React.FC<{ inlineMode?: boolean }> = ({
         <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-hearth-border">
           <div>
             <h2 className="font-serif text-xl font-bold text-hearth-ink">
-              Rental Agreement & E-Signature Reader (FR-AGR-001 to 009)
+              Rental Agreement & E-Signature Reader
             </h2>
             <p className="text-xs text-hearth-taupe">
               Stationery-grade contract viewer with immutable version history and Sage-Green Aadhaar/Corporate OTP verification seal.
@@ -118,13 +117,13 @@ export const AgreementReaderModal: React.FC<{ inlineMode?: boolean }> = ({
         </div>
       )}
 
-      {/* Stationery Contract Card (Exact Match to Theme 3 Screen B Left Panel!) */}
+      {/* Stationery Contract Card */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left 5 Columns: Sticky Key Terms Summary Box */}
         <div className="lg:col-span-5 rounded-2xl bg-[#EFECE4] dark:bg-hearth-oat border border-hearth-border p-5 space-y-3.5">
           <div className="flex items-center justify-between">
             <span className="font-serif font-bold text-sm text-hearth-ink">
-              Key Terms Summary (BR-006 Snapshot)
+              Key Terms Summary (Locked Snapshot)
             </span>
             <span className="text-[10px] font-mono px-2 py-0.5 rounded-pill bg-hearth-card border border-hearth-border text-hearth-terracotta">
               {agreement.id}
@@ -133,29 +132,29 @@ export const AgreementReaderModal: React.FC<{ inlineMode?: boolean }> = ({
 
           <ul className="space-y-2 text-xs text-hearth-umber list-disc pl-4 leading-relaxed">
             <li>
-              <strong>Contracting Party (Section 1):</strong> KaroRent Marketplace Platform contracts directly with <strong>{agreement.customerName}</strong>.
+              <strong>Contracting Party:</strong> KaroRent Marketplace Platform contracts directly with <strong>{agreement.customerName}</strong>.
             </li>
             <li>
               <strong>Fulfilling Partner Snapshot:</strong> {agreement.vendorSnapshotName}.
             </li>
             <li>
-              <strong>Locked Financial Terms (FR-PRC-005):</strong> Monthly Rent of{' '}
+              <strong>Locked Financial Terms:</strong> Monthly Rent of{' '}
               <strong className="font-ledger">₹{agreement.lockedMonthlyRent.toLocaleString('en-IN')}/mo</strong> + Segregated 4-Month Security Deposit of{' '}
               <strong className="font-ledger">₹{agreement.lockedDepositAmount.toLocaleString('en-IN')}</strong>.
             </li>
             <li>
-              <strong>Mandatory Doorstep Pickup Photo (Clause 9.4 / BR-026):</strong> Field pickup personnel MUST capture a verified EXIF timestamped photo at your premises. Undocumented warehouse scuffs cannot be deducted from your deposit.
+              <strong>Mandatory Doorstep Pickup Photo:</strong> Field pickup personnel MUST capture a verified EXIF timestamped photo at your premises. Undocumented warehouse scuffs cannot be deducted from your deposit.
             </li>
             <li>
-              <strong>14-Day Vault Settlement (FR-DEP-006):</strong> Deposit refunds within 14 days of rental closure.
+              <strong>14-Day Vault Settlement:</strong> Deposit refunds within 14 days of rental closure.
             </li>
           </ul>
 
-          {/* Amendment Trail (FR-AGR-006) */}
+          {/* Amendment Trail */}
           {agreement.amendments.length > 0 && (
             <div className="pt-3 border-t border-hearth-border space-y-2">
               <div className="text-[11px] font-mono uppercase text-hearth-terracotta font-semibold">
-                Traceable Amendments (FR-AGR-006)
+                Traceable Amendments
               </div>
               {agreement.amendments.map((am) => (
                 <div
@@ -195,33 +194,33 @@ export const AgreementReaderModal: React.FC<{ inlineMode?: boolean }> = ({
 
           <div className="space-y-3 text-xs text-hearth-umber leading-relaxed max-h-64 overflow-y-auto pr-2">
             <p>
-              <strong>1. Parties & Scope (FR-AGR-002):</strong> This Rental Agreement is executed between <strong>KaroRent Platform Operator</strong> ("Contracting Party & Invoice Issuer") and <strong>{agreement.customerName}</strong> ("Customer"). Physical custody and doorstep fulfilment are performed by approved partner <strong>{agreement.vendorSnapshotName}</strong> under a separate Platform–Vendor Agreement.
+              <strong>1. Parties & Scope:</strong> This Rental Agreement is executed between <strong>KaroRent Platform Operator</strong> ("Contracting Party & Invoice Issuer") and <strong>{agreement.customerName}</strong> ("Customer"). Physical custody and doorstep fulfilment are performed by approved partner <strong>{agreement.vendorSnapshotName}</strong> under a separate Platform–Vendor Agreement.
             </p>
             <p>
               <strong>2. Leased Asset & Tenure:</strong> Product: <strong>{agreement.productTitle}</strong> (Serial: <span className="font-mono">{agreement.allocatedSerialNumber || 'Assigned at Dispatch'}</span>) for a minimum tenure of <strong>{agreement.tenureMonths} Months</strong> ({agreement.startDate} through {agreement.endDate}).
             </p>
             <p>
-              <strong>3. Segregated Security Deposit Vault (FR-DEP-002 / BR-011):</strong> The Customer’s refundable deposit of <strong>₹{agreement.lockedDepositAmount.toLocaleString('en-IN')}</strong> is held in a segregated ledger distinct from rental revenue and shall be refunded within 14 days following return inspection settlement.
+              <strong>3. Segregated Security Deposit Vault:</strong> The Customer’s refundable deposit of <strong>₹{agreement.lockedDepositAmount.toLocaleString('en-IN')}</strong> is held in a segregated ledger distinct from rental revenue and shall be refunded within 14 days following return inspection settlement.
             </p>
             <p className="p-3 rounded-xl bg-hearth-sageLight border border-hearth-sage/25 text-hearth-ink">
-              <strong>4. Mandatory Customer-Premise Pickup Photo Protection (FR-VEN-005 / BR-026):</strong> {agreement.mandatoryPickupPhotoClause}
+              <strong>4. Mandatory Customer-Premise Pickup Photo Protection:</strong> {agreement.mandatoryPickupPhotoClause}
             </p>
           </div>
 
-          {/* Signed State vs. Interactive E-Signature Pad (FR-AGR-004 / FR-AGR-005) */}
+          {/* Signed State vs. Interactive E-Signature Pad */}
           {isSigned ? (
             <div className="pt-4 border-t border-hearth-border flex flex-wrap items-center justify-between gap-4">
               <div className="space-y-1 text-xs">
                 <div className="font-semibold text-hearth-sage flex items-center gap-1.5">
                   <ShieldCheck className="w-4 h-4" />
-                  <span>Cryptographic Electronic Signature Verified (FR-AGR-004)</span>
+                  <span>Cryptographic Electronic Signature Verified</span>
                 </div>
                 <div className="font-mono text-[11px] text-hearth-taupe break-all">
                   {agreement.signatureHash}
                 </div>
               </div>
 
-              {/* Exact Circular Sage-Green Stamp from Theme 3 Screen B Mockup! */}
+              {/* Circular Sage-Green Stamp */}
               <div className="animate-stamp w-28 h-28 rounded-full border-2 border-dashed border-[#2F5233] bg-[#EFF6F0]/90 flex flex-col items-center justify-center text-center p-2 shadow-sm select-none">
                 <span className="text-[9px] font-mono uppercase tracking-wider text-[#2F5233] font-bold">
                   Sage-Green
@@ -238,12 +237,12 @@ export const AgreementReaderModal: React.FC<{ inlineMode?: boolean }> = ({
             <div className="pt-4 border-t border-hearth-border space-y-3 bg-hearth-apricot/70 p-4 rounded-2xl border border-hearth-terracotta/30">
               <div className="text-xs font-bold text-hearth-terracotta flex items-center gap-1.5">
                 <FileSignature className="w-4 h-4" />
-                <span>Activation Gate (FR-AGR-005): Complete E-Signature to Unlock Rental</span>
+                <span>Activation Gate: Complete E-Signature to Unlock Rental</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[11px] font-semibold text-hearth-ink mb-1">
-                    Signer Authority / Designation (FR-CUS-003)
+                    Signer Authority / Designation
                   </label>
                   <input
                     type="text"
@@ -272,7 +271,7 @@ export const AgreementReaderModal: React.FC<{ inlineMode?: boolean }> = ({
                   className="rounded text-hearth-terracotta"
                 />
                 <span>
-                  I have reviewed the complete agreement, price snapshot, and Clause 9.4 (BR-026) and consent to sign electronically.
+                  I have reviewed the complete agreement, price snapshot, and doorstep pickup protection policy and consent to sign electronically.
                 </span>
               </label>
               <button

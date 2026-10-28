@@ -79,7 +79,7 @@ export const FiveInvoiceLedgerView: React.FC = () => {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <span className="text-[10px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded-pill bg-hearth-sageLight text-hearth-sage font-semibold">
-              FR-PAY-011 • FR-DEP-002 • BR-011 Financial Segregation
+              Multi-Document Financial Segregation
             </span>
             <h1 className="font-serif text-2xl font-bold text-hearth-ink mt-1">
               5-Document Financial Split & Segregated Security Deposit Vault
@@ -90,7 +90,7 @@ export const FiveInvoiceLedgerView: React.FC = () => {
           </div>
         </div>
 
-        {/* 5-Charge-Type Filter Pills (FR-PAY-011) */}
+        {/* 5-Charge-Type Filter Pills */}
         <div className="flex flex-wrap items-center gap-2 pt-2">
           <button
             onClick={() => setSelectedChargeFilter('ALL')}
@@ -118,11 +118,11 @@ export const FiveInvoiceLedgerView: React.FC = () => {
         </div>
       </div>
 
-      {/* Segregated Security Deposit Vault Ledgers (FR-DEP-001 to 006) */}
+      {/* Segregated Security Deposit Vault Ledgers */}
       <div className="space-y-3">
         <h2 className="font-serif text-lg font-bold text-hearth-ink flex items-center gap-2">
           <ShieldCheck className="w-5 h-5 text-hearth-sage" />
-          <span>Segregated Security Deposit Vault Ledgers (FR-DEP-002 • 4× Monthly Rent • 14-Day Refund Rule)</span>
+          <span>Segregated Security Deposit Vault Ledgers (4× Monthly Rent • 14-Day Refund Guarantee)</span>
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -183,15 +183,15 @@ export const FiveInvoiceLedgerView: React.FC = () => {
         </div>
       </div>
 
-      {/* 5-Invoice Financial Split Table (FR-PAY-011) */}
+      {/* 5-Invoice Financial Split Table */}
       <div className="rounded-3xl bg-hearth-card border border-hearth-border shadow-hearth overflow-hidden">
         <div className="px-6 py-4 bg-hearth-oat border-b border-hearth-border flex items-center justify-between">
           <div>
             <h3 className="font-serif font-bold text-base text-hearth-ink">
-              Itemised Invoices, Deposit Notes & Adjustments (FR-PAY-011)
+              Itemised Invoices, Deposit Notes & Adjustments
             </h3>
             <p className="text-[11px] text-hearth-taupe">
-              Idempotent payment reconciliation (FR-PAY-003) prevents duplicate charges on retry.
+              Idempotent payment reconciliation prevents duplicate charges on retry.
             </p>
           </div>
         </div>
@@ -201,7 +201,7 @@ export const FiveInvoiceLedgerView: React.FC = () => {
             <thead>
               <tr className="border-b border-hearth-border bg-hearth-oat/50 text-[11px] font-mono uppercase text-hearth-taupe">
                 <th className="py-3 px-4">Doc ID & Booking</th>
-                <th className="py-3 px-4">FR-PAY-011 Charge Type</th>
+                <th className="py-3 px-4">Document Charge Type</th>
                 <th className="py-3 px-4">Description & Customer</th>
                 <th className="py-3 px-4 text-right">Base</th>
                 <th className="py-3 px-4 text-right">GST</th>
@@ -282,8 +282,7 @@ export const FiveInvoiceLedgerView: React.FC = () => {
                           onClick={() =>
                             addToast({
                               title: `Receipt ${inv.id} Downloaded`,
-                              description: `Provider Ref ${inv.providerReference} verified (FR-PAY-005).`,
-                              ruleCode: 'FR-PAY-005',
+                              description: `Provider Ref ${inv.providerReference} verified.`,
                               variant: 'info',
                             })
                           }

@@ -26,10 +26,10 @@ export const BlacklistRegistryView: React.FC = () => {
   >('ALL');
   const [overrideTargetId, setOverrideTargetId] = useState<string | null>(null);
   const [overrideReason, setOverrideReason] = useState(
-    'Verified full settlement of ₹12,600 past-due damage invoice via NEFT UTR #994120; approved Super Admin exception override under FR-BLK-008.'
+    'Verified full settlement of ₹12,600 past-due damage invoice via NEFT UTR #994120; approved Super Admin exception override.'
   );
   const [bookingOverrideReason, setBookingOverrideReason] = useState(
-    'Customer cleared prior default balance and deposited additional security buffer; approved one-time booking release (FR-BLK-008).'
+    'Customer cleared prior default balance and deposited additional security buffer; approved one-time booking release.'
   );
 
   const filteredBlacklist =
@@ -48,13 +48,13 @@ export const BlacklistRegistryView: React.FC = () => {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-pill bg-[#FEE2E2] text-[#991B1B] font-semibold">
-              Section 7.20 • FR-BLK-001 to FR-BLK-008 • WF-16
+              Trust & Safety Watchlist • Fraud & Evasion Interception
             </span>
             <h1 className="font-serif text-2xl font-bold text-hearth-ink mt-1">
               Unified Vendor & Client Blacklist Registry & Evasion Radar
             </h1>
             <p className="text-xs text-hearth-umber">
-              Maintains two segregated, auditable risk ledgers: (1) <strong>Vendor Blacklist</strong> (auto-enrolled on contract termination per FR-BLK-002) and (2) <strong>Customer Blacklist</strong> (severe payment default, heavy asset damage, or extreme policy breach per FR-BLK-004).
+              Maintains two segregated, auditable risk ledgers: (1) <strong>Vendor Blacklist</strong> (auto-enrolled on contract termination) and (2) <strong>Customer Blacklist</strong> (severe payment default, heavy asset damage, or extreme policy breach).
             </p>
           </div>
 
@@ -82,14 +82,14 @@ export const BlacklistRegistryView: React.FC = () => {
         </div>
       </div>
 
-      {/* Intercepted Client Bookings Queue (FR-BLK-005 / EX-032) */}
+      {/* Intercepted Client Bookings Queue */}
       {flaggedBookings.length > 0 && (
         <div className="rounded-3xl bg-[#FEE2E2]/35 border-2 border-[#DC2626] p-6 space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2 text-[#991B1B]">
               <ShieldAlert className="w-5 h-5" />
               <h2 className="font-serif text-lg font-bold">
-                Intercepted Client Bookings Held in “Flagged — Blacklist Review” (FR-BLK-005 / EX-032)
+                Intercepted Client Bookings Held in “Flagged — Blacklist Review”
               </h2>
             </div>
             <span className="text-xs font-mono text-[#991B1B] font-semibold">
@@ -138,7 +138,7 @@ export const BlacklistRegistryView: React.FC = () => {
                     }
                     className="spring-btn px-4 py-2 rounded-pill bg-hearth-sage text-white text-xs font-semibold shrink-0"
                   >
-                    Approve One-Time Override (FR-BLK-008)
+                    Approve One-Time Override
                   </button>
                 </div>
               </div>
@@ -147,7 +147,7 @@ export const BlacklistRegistryView: React.FC = () => {
         </div>
       )}
 
-      {/* Unified Blacklist Cards with Identifier Fingerprints (FR-BLK-001, FR-BLK-006) */}
+      {/* Unified Blacklist Cards with Identifier Fingerprints */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {filteredBlacklist.map((entry) => (
           <div
@@ -202,12 +202,12 @@ export const BlacklistRegistryView: React.FC = () => {
                 {entry.evidenceSummary}
               </p>
 
-              {/* Evasion & Duplicate Account Identifier Matrix (FR-BLK-002 / FR-BLK-006) */}
+              {/* Evasion & Duplicate Account Identifier Matrix */}
               <div className="p-3.5 rounded-2xl bg-hearth-parchment border border-hearth-border space-y-1.5 text-[11px] font-mono">
                 <div className="text-hearth-ink font-sans font-bold text-xs flex items-center gap-1.5">
                   <Fingerprint className="w-4 h-4 text-hearth-terracotta" />
                   <span>
-                    Cross-Checked Evasion Identifiers (FR-BLK-002 / FR-BLK-006)
+                    Cross-Checked Evasion Identifiers
                   </span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-hearth-umber">
@@ -234,7 +234,7 @@ export const BlacklistRegistryView: React.FC = () => {
               )}
             </div>
 
-            {/* Super Admin Exception Override Controls (FR-BLK-008) */}
+            {/* Super Admin Exception Override Controls */}
             {entry.status === 'Active Blacklist' && (
               <div className="pt-3 border-t border-hearth-border">
                 {overrideTargetId !== entry.id ? (
@@ -243,12 +243,12 @@ export const BlacklistRegistryView: React.FC = () => {
                     className="px-4 py-2 rounded-pill bg-hearth-oat hover:bg-hearth-apricot border border-hearth-border text-xs font-semibold text-hearth-ink flex items-center gap-1.5"
                   >
                     <KeyRound className="w-3.5 h-3.5 text-hearth-terracotta" />
-                    <span>Super Admin Exception Override / Whitelist (FR-BLK-008)</span>
+                    <span>Super Admin Exception Override / Whitelist</span>
                   </button>
                 ) : (
                   <div className="space-y-2">
                     <label className="block text-[11px] font-semibold text-hearth-ink">
-                      Mandatory Super Admin Justification & Debt Clearance Proof (FR-BLK-008) *
+                      Mandatory Super Admin Justification & Debt Clearance Proof *
                     </label>
                     <input
                       type="text"

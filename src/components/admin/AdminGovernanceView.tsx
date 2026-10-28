@@ -34,7 +34,7 @@ export const AdminGovernanceView: React.FC = () => {
   // Staged Inventory Decision State
   const [adminReasonByInv, setAdminReasonByInv] = useState<Record<string, string>>({
     'INV-502':
-      'Reassigning inventory source to Oak & Loom Studio (VEN-202) under FR-INV-011 so Split AC remains enabled on the live marketplace without interruption.',
+      'Reassigning inventory source to Oak & Loom Studio (VEN-202) so Split AC remains enabled on the live marketplace without interruption.',
     'INV-503':
       'Verified daylight studio photography and physical stock audit; approved for public display.',
   });
@@ -43,14 +43,14 @@ export const AdminGovernanceView: React.FC = () => {
     'INV-503': 'VEN-201',
   });
 
-  // Direct Source Switcher State (FR-INV-011)
+  // Direct Source Switcher State
   const [directSwitchInvId, setDirectSwitchInvId] = useState<string>('INV-501');
   const [directSwitchNewVendorId, setDirectSwitchNewVendorId] = useState<string>('VEN-202');
   const [directSwitchReason, setDirectSwitchReason] = useState<string>(
-    'Rebalancing Indiranagar zone fulfilment load under BR-031; historical rentals preserve prior vendor snapshot.'
+    'Rebalancing Indiranagar zone fulfilment load; historical rentals preserve prior vendor snapshot.'
   );
 
-  // Master Platform Pricing Editor State (FR-PRC-001 / BR-027)
+  // Master Platform Pricing Editor State
   const [selectedPricingProductId, setSelectedPricingProductId] =
     useState<string>('PRD-02');
   const selectedProd =
@@ -65,10 +65,10 @@ export const AdminGovernanceView: React.FC = () => {
   );
   const [editPipeRate, setEditPipeRate] = useState<number>(850);
   const [pricingReason, setPricingReason] = useState<string>(
-    'Q4 2026 Platform Rate-Card standardization approved by Product Owner (BR-027).'
+    'Q4 2026 Platform Rate-Card standardization approved by Product Owner.'
   );
 
-  // Vendor Termination & Continuity Modal State (FR-VEN-009 to 015)
+  // Vendor Termination & Continuity Modal State
   const [terminatingVendorId, setTerminatingVendorId] = useState<string | null>(
     null
   );
@@ -76,7 +76,7 @@ export const AdminGovernanceView: React.FC = () => {
     'Oak & Loom Studio (VEN-202) + Platform Operations Continuity Desk'
   );
   const [terminationReason, setTerminationReason] = useState<string>(
-    'Initiating termination under FR-VEN-009/010 due to repeated SLA breaches; placing automated payout hold (FR-VEN-013) and enrolling in Vendor Blacklist (FR-BLK-002).'
+    'Initiating partner contract termination due to repeated SLA breaches; placing automated payout hold and enrolling in Vendor Blacklist.'
   );
 
   const stagedItems = virtualInventory.filter((i) => i.pendingStagedRequest);
@@ -108,19 +108,19 @@ export const AdminGovernanceView: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <div className="rounded-3xl bg-hearth-card border border-hearth-border p-5 shadow-hearth">
           <div className="text-[11px] font-mono uppercase text-hearth-taupe">
-            Staged Vendor Edits (FR-INV-010)
+            Staged Vendor Edits
           </div>
           <div className="font-serif text-3xl font-bold text-hearth-terracotta mt-1 font-ledger">
             {stagedItems.length} Pending
           </div>
           <div className="text-[11px] text-hearth-umber mt-1">
-            Live catalog protected by BR-030 approval gate
+            Live catalog protected by admin approval gate
           </div>
         </div>
 
         <div className="rounded-3xl bg-hearth-card border border-hearth-border p-5 shadow-hearth">
           <div className="text-[11px] font-mono uppercase text-hearth-taupe">
-            Blacklist & Fraud Intercepts (FR-BLK)
+            Blacklist & Fraud Intercepts
           </div>
           <div className="font-serif text-3xl font-bold text-[#991B1B] mt-1 font-ledger">
             {blacklist.filter((b) => b.status === 'Active Blacklist').length} Active
@@ -133,7 +133,7 @@ export const AdminGovernanceView: React.FC = () => {
 
         <div className="rounded-3xl bg-hearth-card border border-hearth-border p-5 shadow-hearth">
           <div className="text-[11px] font-mono uppercase text-hearth-taupe">
-            Returns Under 3-Way Care (FR-RET-003)
+            Returns Under 3-Way Care
           </div>
           <div className="font-serif text-3xl font-bold text-hearth-ink mt-1 font-ledger">
             {bookings.filter((b) => b.returnRecord).length} Cases
@@ -145,7 +145,7 @@ export const AdminGovernanceView: React.FC = () => {
 
         <div className="rounded-3xl bg-hearth-card border border-hearth-border p-5 shadow-hearth">
           <div className="text-[11px] font-mono uppercase text-hearth-taupe">
-            Segregated Deposit Vault (FR-DEP-002)
+            Segregated Deposit Vault
           </div>
           <div className="font-serif text-3xl font-bold text-hearth-sage mt-1 font-ledger">
             ₹{totalVaultBalance.toLocaleString('en-IN')}
@@ -156,18 +156,18 @@ export const AdminGovernanceView: React.FC = () => {
         </div>
       </div>
 
-      {/* SECTION 1: Staged Vendor Inventory Approval & Source Reassignment Queue (FR-INV-009 / 010 / 011 / EX-033) */}
+      {/* SECTION 1: Staged Vendor Inventory Approval & Source Reassignment Queue */}
       <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-hearth-border pb-4">
           <div>
             <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-pill bg-hearth-apricot text-hearth-terracotta font-semibold">
-              WF-02 • FR-INV-009 / FR-INV-010 / FR-INV-011 / BR-030 / EX-033
+              Catalog Governance & Source Continuity
             </span>
             <h2 className="font-serif text-xl font-bold text-hearth-ink mt-1">
               Staged Vendor Inventory Approval & Source Reassignment Queue
             </h2>
             <p className="text-xs text-hearth-umber">
-              Vendor actions to enable, disable, or update stock are held here in staging. If a vendor requests to disable a popular item, you can seamlessly reassign its Source Vendor (FR-INV-011) so the item remains enabled on the live marketplace!
+              Vendor actions to enable, disable, or update stock are held here in staging. If a vendor requests to disable a popular item, you can seamlessly reassign its Source Vendor so the item remains enabled on the live marketplace!
             </p>
           </div>
         </div>
@@ -182,7 +182,7 @@ export const AdminGovernanceView: React.FC = () => {
               const req = inv.pendingStagedRequest!;
               const reasonVal =
                 adminReasonByInv[inv.id] ||
-                'Reviewed staged vendor inventory change under FR-INV-010.';
+                'Reviewed staged vendor inventory change.';
               const targetVenId =
                 targetVendorByInv[inv.id] ||
                 eligibleVendors.find((v) => v.id !== inv.owningVendorId)?.id ||
@@ -256,7 +256,7 @@ export const AdminGovernanceView: React.FC = () => {
                   <div className="space-y-3 pt-2 border-t border-hearth-border text-xs">
                     <div>
                       <label className="block font-semibold text-hearth-ink mb-1">
-                        Option B — Reassign Inventory Source to Alternate Eligible Vendor (FR-INV-011 / EX-033):
+                        Option B — Reassign Inventory Source to Alternate Eligible Vendor:
                       </label>
                       <select
                         value={targetVenId}
@@ -278,7 +278,7 @@ export const AdminGovernanceView: React.FC = () => {
 
                     <div>
                       <label className="block font-semibold text-hearth-ink mb-1">
-                        Mandatory Governance Reason (Logged in Audit Trail FR-ADM-004) *
+                        Mandatory Governance Reason (Logged in Audit Trail) *
                       </label>
                       <input
                         type="text"
@@ -347,12 +347,12 @@ export const AdminGovernanceView: React.FC = () => {
           </div>
         )}
 
-        {/* Anytime Platform Manager Inventory Source Switcher (FR-INV-011 / BR-031 / EX-034) */}
+        {/* Anytime Platform Manager Inventory Source Switcher */}
         <div className="p-4 rounded-2xl bg-hearth-oat border border-hearth-border space-y-3">
           <div className="text-xs font-bold text-hearth-ink flex items-center gap-2">
             <ArrowRightLeft className="w-4 h-4 text-hearth-terracotta" />
             <span>
-              Direct Inventory Source Reassignment Tool (FR-INV-011 / BR-031 / EX-034)
+              Direct Inventory Source Reassignment Tool
             </span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs items-end">
@@ -416,13 +416,13 @@ export const AdminGovernanceView: React.FC = () => {
         </div>
       </div>
 
-      {/* SECTION 2: Master Platform Pricing & Installation Rate-Card Authority (FR-PRC-001 / BR-027) */}
+      {/* SECTION 2: Master Platform Pricing & Installation Rate-Card Authority */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-7">
         <div className="xl:col-span-5 rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-pill bg-hearth-sageLight text-hearth-sage font-semibold">
-                FR-PRC-001 • BR-027
+                Central Rate Authority
               </span>
               <h3 className="font-serif text-lg font-bold text-hearth-ink mt-1">
                 Master Platform Pricing & Rate Cards
@@ -485,7 +485,7 @@ export const AdminGovernanceView: React.FC = () => {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block font-semibold text-hearth-ink mb-1">
-                    Site Visit Fee (₹ — FR-PRC-008)
+                    Site Visit Fee (₹)
                   </label>
                   <input
                     type="number"
@@ -512,7 +512,7 @@ export const AdminGovernanceView: React.FC = () => {
 
             <div>
               <label className="block font-semibold text-hearth-ink mb-1">
-                Policy Change Rationale (FR-ADM-006) *
+                Policy Change Rationale *
               </label>
               <input
                 type="text"
@@ -540,12 +540,12 @@ export const AdminGovernanceView: React.FC = () => {
           </div>
         </div>
 
-        {/* SECTION 3: Vendor Onboarding, Blacklist Match Detection & Termination Continuity (FR-VEN-001 to 015) */}
+        {/* SECTION 3: Vendor Onboarding, Blacklist Match Detection & Termination Continuity */}
         <div className="xl:col-span-7 rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-pill bg-[#FEE2E2] text-[#991B1B] font-semibold">
-                FR-VEN-002 • FR-VEN-009..015 • FR-BLK-002
+                Partner Onboarding & Continuity Governance
               </span>
               <h3 className="font-serif text-lg font-bold text-hearth-ink mt-1">
                 Vendor Governance, Blacklist Match Review & Termination Continuity
@@ -609,7 +609,7 @@ export const AdminGovernanceView: React.FC = () => {
                             reviewVendorApplication(
                               v.id,
                               'Rejected',
-                              'Rejected due to Blacklist Match with terminated vendor VEN-203 (FR-BLK-003).'
+                              'Rejected due to Blacklist Match with terminated vendor VEN-203.'
                             )
                           }
                           className="px-3 py-1.5 rounded-pill bg-[#991B1B] text-white text-[11px] font-semibold"
@@ -624,19 +624,19 @@ export const AdminGovernanceView: React.FC = () => {
                         onClick={() => setTerminatingVendorId(v.id)}
                         className="px-3 py-1.5 rounded-pill bg-[#FEE2E2] hover:bg-[#FECACA] text-[#991B1B] border border-[#FECACA] text-[11px] font-semibold"
                       >
-                        Initiate Termination (FR-VEN-010)
+                        Initiate Termination
                       </button>
                     )}
                   </div>
                 </div>
 
-                {/* High-Priority Blacklist Match Warning (FR-VEN-002 / FR-BLK-003 / EX-031) */}
+                {/* High-Priority Blacklist Match Warning */}
                 {v.blacklistMatchWarning && (
                   <div className="p-3 rounded-xl bg-[#FEE2E2] border border-[#FECACA] text-[#991B1B] text-xs space-y-1">
                     <div className="font-bold flex items-center gap-1.5">
                       <ShieldAlert className="w-4 h-4 shrink-0" />
                       <span>
-                        HIGH-PRIORITY ALERT (FR-VEN-002 / EX-031): Blacklist Match — Terminated Vendor ({v.blacklistMatchWarning.matchedVendorId})
+                        HIGH-PRIORITY ALERT: Blacklist Match — Terminated Vendor ({v.blacklistMatchWarning.matchedVendorId})
                       </span>
                     </div>
                     <div className="text-[11px]">
@@ -652,7 +652,7 @@ export const AdminGovernanceView: React.FC = () => {
 
                 {v.continuityManager && (
                   <div className="text-[11px] font-mono text-[#9A3412] bg-[#FFEDD5] px-3 py-1.5 rounded-xl">
-                    FR-VEN-011 Continuity Manager: {v.continuityManager} | FR-VEN-013 Settlement Hold: ₹{v.settlementHoldAmount.toLocaleString('en-IN')}
+                    Continuity Manager: {v.continuityManager} | Settlement Escrow Hold: ₹{v.settlementHoldAmount.toLocaleString('en-IN')}
                   </div>
                 )}
               </div>
@@ -661,23 +661,23 @@ export const AdminGovernanceView: React.FC = () => {
         </div>
       </div>
 
-      {/* Vendor Termination & Continuity Manager Modal (FR-VEN-009 to 015) */}
+      {/* Vendor Termination & Continuity Manager Modal */}
       {terminatingVendorId && (
         <div className="fixed inset-0 z-50 bg-[#1C1917]/55 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="w-full max-w-lg rounded-3xl bg-hearth-parchment border border-hearth-border p-6 shadow-hearth-lg space-y-4">
             <div className="flex items-center gap-2 text-[#991B1B]">
               <AlertOctagon className="w-5 h-5" />
               <h3 className="font-serif text-lg font-bold">
-                Initiate Vendor Termination & Continuity Assignment (FR-VEN-009..015)
+                Initiate Vendor Termination & Continuity Assignment
               </h3>
             </div>
             <p className="text-xs text-hearth-umber leading-relaxed">
-              Terminating vendor <strong>{terminatingVendorId}</strong> will immediately delist public listings (FR-VEN-010), place an automated escrow hold on pending payouts (FR-VEN-013), restrict the vendor to read-only access (FR-VEN-014), and automatically enroll all vendor identifiers into the Unified Vendor Blacklist (FR-BLK-002).
+              Terminating vendor <strong>{terminatingVendorId}</strong> will immediately delist public listings, place an automated escrow hold on pending payouts, restrict the vendor to read-only access, and automatically enroll all vendor identifiers into the Unified Vendor Blacklist.
             </p>
             <div className="space-y-3 text-xs">
               <div>
                 <label className="block font-semibold text-hearth-ink mb-1">
-                  Assign Continuity Manager for Active Rentals (FR-VEN-011) *
+                  Assign Continuity Manager for Active Rentals *
                 </label>
                 <input
                   type="text"

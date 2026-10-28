@@ -6,51 +6,51 @@ import { NavigationTab } from '../../types/srs';
 const TAB_TITLES: Record<NavigationTab, { title: string; srsRef: string }> = {
   MARKETPLACE: {
     title: 'Warm Lifestyle Marketplace & Interior Catalog',
-    srsRef: 'FR-CAT-001..007 • FR-PRC-001 (Platform Pricing)',
+    srsRef: 'Platform-Guaranteed Pricing & Curated Living',
   },
   MY_RENTALS: {
     title: 'Customer Rental Lifecycle & Guided AC Site-Visit Storyboard',
-    srsRef: 'WF-04 • FR-BKG-004 • FR-LIF-001..008',
+    srsRef: 'Multi-Step Home Visits & Active Leases',
   },
   AGREEMENTS_ESIGN: {
     title: 'Stationery Rental Agreement & E-Signature Reader',
-    srsRef: 'FR-AGR-001..009 • BR-002 • Clause 9.4 (BR-026)',
+    srsRef: 'Digital Lease Execution & Doorstep Care Terms',
   },
   INVOICES_DEPOSITS: {
     title: '5-Invoice Financial Split & Segregated Deposit Vault',
-    srsRef: 'FR-PAY-011 • FR-DEP-001..006 • BR-011',
+    srsRef: 'Separated Billing & Protected Deposit Escrow',
   },
   THREE_WAY_INSPECTION: {
     title: 'Condition Comparison Storyboard & Fair Deposit Settlement',
-    srsRef: 'FR-RET-002..008 • BR-026 (Doorstep EXIF Photo Gate)',
+    srsRef: 'Doorstep EXIF Photo Verification & Fair Refunds',
   },
   VENDOR_PORTAL: {
     title: 'Partner Vendor Portal — Catalogue & Staged Inventory Governance',
-    srsRef: 'FR-INV-010 • BR-030 (Pending Admin Approval Gate)',
+    srsRef: 'Partner Asset Tracking & Staged Updates',
   },
   FIELD_OPERATIONS: {
     title: 'Field Service Console — AC Site Visits, Deliveries & EXIF Pickup Gate',
-    srsRef: 'FR-FUL-008 • FR-RET-002 • EX-029',
+    srsRef: 'On-Site Measurements, Delivery OTP & Pickup Care',
   },
   ADMIN_GOVERNANCE: {
     title: 'Super Admin Governance — Staged Approvals, Source Routing & Rate Cards',
-    srsRef: 'FR-INV-009..011 • BR-031 • FR-PRC-001',
+    srsRef: 'Central Rate Cards & Partner Fulfilment Routing',
   },
   BLACKLIST_REGISTRY: {
     title: 'Unified Vendor & Client Blacklist Registry & Evasion Radar',
-    srsRef: 'FR-BLK-001..008 • WF-16 • EX-031 / EX-032',
+    srsRef: 'Trust & Safety Watchlist & Risk Interception',
   },
   SETTLEMENTS_FINANCE: {
     title: 'Platform Commission, Vendor Settlements & Termination Holds',
-    srsRef: 'FR-SET-001..008 • FR-VEN-013 (Escrow Hold)',
+    srsRef: 'Automated Partner Payouts & Escrow Management',
   },
   SUPPORT_DISPUTES: {
     title: 'Customer Support Concierge, SLA Escalations & Asset Replacements',
-    srsRef: 'FR-SRV-001..006 • FR-SUP-001..005 • FR-DSP',
+    srsRef: '24/7 Maintenance Concierge & Dispute Resolution',
   },
   AUDIT_OBD_REPORTS: {
-    title: 'Immutable Audit Trail, Open Business Decisions (OBD) & Role Exports',
-    srsRef: 'FR-ADM-004 • Section 18 OBD-01..25 • FR-RPT-001',
+    title: 'Immutable Audit Trail, Governance Policies & Role Exports',
+    srsRef: 'Platform Governance, Compliance Logs & CSV Reports',
   },
 };
 

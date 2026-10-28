@@ -28,18 +28,18 @@ export const SupportDisputesView: React.FC = () => {
       {/* Header */}
       <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-2">
         <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-pill bg-hearth-apricot text-hearth-terracotta font-semibold">
-          FR-SRV-001..006 • FR-SUP-001..005 • FR-DSP-001..007
+          Service Concierge • Asset Swaps • SLA Escalations
         </span>
         <h1 className="font-serif text-2xl font-bold text-hearth-ink">
           Maintenance, Asset Replacement Swaps & Support SLA Concierge
         </h1>
         <p className="text-xs text-hearth-umber">
-          Tracks serialized asset replacements with automatic contract addendum generation (FR-SRV-004) and enforces support privacy rules where internal platform notes remain hidden from customers and vendors (FR-SUP-002).
+          Tracks serialized asset replacements with automatic contract addendum generation and enforces support privacy rules where internal platform notes remain hidden from customers and vendors.
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Maintenance & Asset Replacement Tickets (FR-SRV-001 to 006) */}
+        {/* Maintenance & Asset Replacement Tickets */}
         <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-4">
           <h2 className="font-serif text-lg font-bold text-hearth-ink flex items-center gap-2">
             <Wrench className="w-5 h-5 text-hearth-terracotta" />
@@ -69,7 +69,7 @@ export const SupportDisputesView: React.FC = () => {
 
                 {t.replacementAssetSerial && (
                   <div className="p-2.5 rounded-xl bg-[#DCFCE7] text-[#166534] font-mono text-[11px]">
-                    ✓ Swapped to Serial {t.replacementAssetSerial} • Downtime Credit: ₹{t.downtimeCreditAmount} (FR-SRV-005)
+                    ✓ Swapped to Serial {t.replacementAssetSerial} • Downtime Credit: ₹{t.downtimeCreditAmount}
                   </div>
                 )}
 
@@ -91,7 +91,7 @@ export const SupportDisputesView: React.FC = () => {
                         className="spring-btn px-3.5 py-1.5 rounded-pill bg-hearth-terracotta text-white text-xs font-semibold flex items-center gap-1"
                       >
                         <ArrowRightLeft className="w-3.5 h-3.5" />
-                        <span>Execute Asset Swap & Amend Contract (FR-SRV-004)</span>
+                        <span>Execute Asset Swap & Amend Contract</span>
                       </button>
                     </div>
                   )}
@@ -100,7 +100,7 @@ export const SupportDisputesView: React.FC = () => {
           </div>
         </div>
 
-        {/* Customer Support & SLA Escalation Tickets (FR-SUP-001 to 005) */}
+        {/* Customer Support & SLA Escalation Tickets */}
         <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-4">
           <h2 className="font-serif text-lg font-bold text-hearth-ink flex items-center gap-2">
             <MessageSquareWarning className="w-5 h-5 text-hearth-sage" />
@@ -113,7 +113,7 @@ export const SupportDisputesView: React.FC = () => {
             {supportTickets.map((st) => {
               const replyVal =
                 replyTextByTicket[st.id] ||
-                'Escalated/resolved under FR-SUP-004 with verified ledger confirmation.';
+                'Escalated/resolved with verified ledger confirmation.';
 
               return (
                 <div

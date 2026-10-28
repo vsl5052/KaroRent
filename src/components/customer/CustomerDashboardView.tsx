@@ -66,7 +66,7 @@ export const CustomerDashboardView: React.FC = () => {
 
   return (
     <div className="space-y-7">
-      {/* Top Header & Guided AC Site-Visit Storyboard (Exact Match to Theme 3 Screen B Mockup!) */}
+      {/* Top Header & Guided AC Site-Visit Storyboard */}
       <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
@@ -74,7 +74,7 @@ export const CustomerDashboardView: React.FC = () => {
               KaroRent Customer & Support Mediator Lifecycle Console
             </h1>
             <p className="text-xs text-hearth-umber mt-0.5">
-              Theme 3: ‘Terracotta Hearth’, Warm Editorial Lifestyle, Human-Centric Hospitality • Consolidated Multi-Vendor View (FR-CUS-004)
+              Warm Editorial Lifestyle & Human-Centric Hospitality • Consolidated Multi-Vendor View
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -82,12 +82,12 @@ export const CustomerDashboardView: React.FC = () => {
               onClick={() => setShowClosureCheckModal(true)}
               className="px-3.5 py-1.5 rounded-pill bg-hearth-oat hover:bg-hearth-apricot border border-hearth-border text-xs font-medium text-hearth-umber"
             >
-              Test Account Closure Gate (FR-CUS-006 / EX-024)
+              Check Account Closure Eligibility
             </button>
           </div>
         </div>
 
-        {/* 4-Stage Horizontal AC Site-Visit Milestone Stepper (WF-04 / FR-FUL-008 / FR-PRC-008) */}
+        {/* 4-Stage Horizontal AC Site-Visit Milestone Stepper */}
         <div className="rounded-2xl bg-hearth-parchment border border-hearth-border p-5 shadow-sm">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-semibold text-hearth-ink flex items-center gap-1.5">
@@ -97,7 +97,7 @@ export const CustomerDashboardView: React.FC = () => {
               </span>
             </span>
             <span className="text-[11px] font-mono text-hearth-terracotta font-semibold">
-              WF-04 Path B • Status: {featuredMultiStepBooking.status}
+              Multi-Step Installation • Status: {featuredMultiStepBooking.status}
             </span>
           </div>
 
@@ -177,13 +177,13 @@ export const CustomerDashboardView: React.FC = () => {
         </div>
       </div>
 
-      {/* Customer Account & Corporate Signatory Metadata Strip (FR-CUS-002 / FR-CUS-003) */}
+      {/* Customer Account & Corporate Signatory Metadata Strip */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="rounded-2xl bg-hearth-card border border-hearth-border p-4 flex items-start gap-3">
           <UserCheck className="w-5 h-5 text-hearth-terracotta shrink-0 mt-0.5" />
           <div className="text-xs space-y-1">
             <div className="font-serif font-bold text-hearth-ink">
-              Account Authority & KYC (FR-CUS-001 / 003)
+              Account Authority & KYC
             </div>
             <div className="text-hearth-umber">
               <strong>{currentCustomer.fullName}</strong> ({currentCustomer.accountType})
@@ -205,7 +205,7 @@ export const CustomerDashboardView: React.FC = () => {
           <MapPin className="w-5 h-5 text-hearth-sage shrink-0 mt-0.5" />
           <div className="text-xs space-y-1">
             <div className="font-serif font-bold text-hearth-ink">
-              Verified Delivery Addresses (FR-CUS-002)
+              Verified Delivery Addresses
             </div>
             {currentCustomer.addresses.map((addr) => (
               <div key={addr.id} className="text-[11px] text-hearth-umber">
@@ -221,7 +221,7 @@ export const CustomerDashboardView: React.FC = () => {
               Stationery Agreements & 5-Invoice Vault
             </div>
             <p className="text-[11px] text-hearth-umber">
-              Download immutable e-signed contracts (FR-AGR-008) or review segregated deposit balances.
+              Download immutable e-signed contracts or review segregated deposit balances.
             </p>
           </div>
           <button
@@ -233,14 +233,14 @@ export const CustomerDashboardView: React.FC = () => {
         </div>
       </div>
 
-      {/* Consolidated Multi-Vendor Rental & Booking Cards (FR-CUS-004) */}
+      {/* Consolidated Multi-Vendor Rental & Booking Cards */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="font-serif text-xl font-bold text-hearth-ink">
             Consolidated Bookings & Active Rentals Across All Partner Vendors ({scopedBookings.length})
           </h2>
           <span className="text-xs font-mono text-hearth-taupe">
-            Scoped per BR-013
+            Account-Scoped View
           </span>
         </div>
 
@@ -293,7 +293,7 @@ export const CustomerDashboardView: React.FC = () => {
                       </span>
                     </p>
                     <p className="text-[11px] text-hearth-taupe">
-                      Snapshot Address (BR-006): {booking.deliveryAddress}
+                      Snapshot Address: {booking.deliveryAddress}
                     </p>
                   </div>
 
@@ -319,26 +319,26 @@ export const CustomerDashboardView: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Blacklist Interception Alert Banner (FR-BLK-005 / EX-032) */}
+                {/* Blacklist Interception Alert Banner */}
                 {isFlaggedBlacklist && (
                   <div className="p-4 rounded-2xl bg-[#FEE2E2] border border-[#FECACA] text-[#991B1B] text-xs flex items-start gap-3">
                     <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
                     <div className="space-y-1">
                       <div className="font-bold">
-                        Booking Intercepted by Pre-Confirmation Risk Gate (FR-BKG-002 / FR-BLK-005)
+                        Booking Intercepted by Pre-Confirmation Risk Gate
                       </div>
                       <p>{booking.blacklistFlagReason}</p>
                     </div>
                   </div>
                 )}
 
-                {/* Post-Site Visit Final Quote Acceptance Banner (FR-PRC-008 / EX-030) */}
+                {/* Post-Site Visit Final Quote Acceptance Banner */}
                 {isFinalBillSent && booking.siteVisit && (
                   <div className="p-4 rounded-2xl bg-hearth-apricot border-2 border-hearth-terracotta/50 space-y-3">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div>
                         <div className="text-xs font-bold text-hearth-terracotta uppercase font-mono">
-                          Action Required — Accept or Reject Post-Site Visit Final Charges (FR-PRC-008)
+                          Action Required — Accept or Reject Post-Site Visit Final Charges
                         </div>
                         <p className="text-xs text-hearth-ink mt-0.5">
                           Field technician measured <strong>{booking.siteVisit.measuredCopperPipeMeters}m copper pipe</strong> • Calculated Installation Material Charge:{' '}
@@ -363,7 +363,7 @@ export const CustomerDashboardView: React.FC = () => {
                           }
                           className="px-4 py-2 rounded-pill bg-[#FEE2E2] text-[#991B1B] border border-[#FECACA] text-xs font-semibold"
                         >
-                          Reject & Cancel (EX-030)
+                          Reject & Cancel
                         </button>
                       </div>
                     </div>
@@ -406,7 +406,7 @@ export const CustomerDashboardView: React.FC = () => {
                     )}
                   </div>
 
-                  {/* Lifecycle Actions for Active Rentals (FR-LIF-003, FR-RET-001, FR-SRV-001) */}
+                  {/* Lifecycle Actions for Active Rentals */}
                   {booking.status === 'Active Rental' && (
                     <div className="flex flex-wrap items-center gap-2">
                       <button
@@ -414,7 +414,7 @@ export const CustomerDashboardView: React.FC = () => {
                         className="px-3 py-1.5 rounded-pill bg-hearth-apricot hover:bg-hearth-terracotta hover:text-white border border-hearth-terracotta/30 text-hearth-terracotta text-xs font-semibold flex items-center gap-1 transition-colors"
                       >
                         <CalendarPlus className="w-3.5 h-3.5" />
-                        <span>Extend +3 Mo (FR-LIF-003)</span>
+                        <span>Extend +3 Mo</span>
                       </button>
 
                       <button
@@ -422,7 +422,7 @@ export const CustomerDashboardView: React.FC = () => {
                         className="px-3 py-1.5 rounded-pill bg-hearth-oat hover:bg-hearth-apricot border border-hearth-border text-xs font-medium text-hearth-umber flex items-center gap-1"
                       >
                         <Wrench className="w-3.5 h-3.5 text-hearth-terracotta" />
-                        <span>Maintenance / Swap (FR-SRV)</span>
+                        <span>Maintenance / Swap</span>
                       </button>
 
                       <button
@@ -430,7 +430,7 @@ export const CustomerDashboardView: React.FC = () => {
                         className="px-3.5 py-1.5 rounded-pill bg-hearth-terracotta hover:bg-hearth-kiln text-white text-xs font-semibold flex items-center gap-1"
                       >
                         <Truck className="w-3.5 h-3.5" />
-                        <span>Request Return Pickup (FR-RET-001)</span>
+                        <span>Request Return Pickup</span>
                       </button>
                     </div>
                   )}
@@ -441,15 +441,15 @@ export const CustomerDashboardView: React.FC = () => {
         </div>
       </div>
 
-      {/* Return Pickup Request Modal (FR-RET-001) */}
+      {/* Return Pickup Request Modal */}
       {returnModalBookingId && (
         <div className="fixed inset-0 z-50 bg-[#1C1917]/50 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="w-full max-w-md rounded-3xl bg-hearth-parchment border border-hearth-border p-6 shadow-hearth-lg space-y-4">
             <h3 className="font-serif text-lg font-bold text-hearth-ink">
-              Schedule Return Pickup (FR-RET-001)
+              Schedule Return Pickup
             </h3>
             <p className="text-xs text-hearth-umber">
-              Under <strong>Clause 9.4 (BR-026)</strong>, our field staff will capture a mandatory timestamped photograph of your item at your doorstep before pickup to guarantee fair deposit settlement.
+              Under our <strong>Doorstep Handover Protection Policy</strong>, our field staff will capture a mandatory timestamped photograph of your item at your doorstep before pickup to guarantee fair deposit settlement.
             </p>
             <div>
               <label className="block text-xs font-semibold text-hearth-ink mb-1">
@@ -486,12 +486,12 @@ export const CustomerDashboardView: React.FC = () => {
         </div>
       )}
 
-      {/* Service / Asset Replacement Request Modal (FR-SRV-001 / FR-SRV-004) */}
+      {/* Service / Asset Replacement Request Modal */}
       {serviceModalBookingId && (
         <div className="fixed inset-0 z-50 bg-[#1C1917]/50 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="w-full max-w-md rounded-3xl bg-hearth-parchment border border-hearth-border p-6 shadow-hearth-lg space-y-4">
             <h3 className="font-serif text-lg font-bold text-hearth-ink">
-              Raise Maintenance or Asset Swap Ticket (FR-SRV-001)
+              Raise Maintenance or Asset Swap Ticket
             </h3>
             <div>
               <label className="block text-xs font-semibold text-hearth-ink mb-1">
@@ -513,7 +513,7 @@ export const CustomerDashboardView: React.FC = () => {
                 className="rounded border-hearth-border text-hearth-terracotta"
               />
               <span>
-                Request Replacement Asset Swap & Consent to Serial Addendum (FR-SRV-004 / BR-018)
+                Request Replacement Asset Swap & Consent to Serial Addendum
               </span>
             </label>
             <div className="flex justify-end gap-2 pt-2">
@@ -528,7 +528,7 @@ export const CustomerDashboardView: React.FC = () => {
                   if (serviceIssueText.trim().length < 5) {
                     addToast({
                       title: 'Issue Description Required',
-                      description: 'Please enter at least 5 characters (SRS 9.1).',
+                      description: 'Please enter at least 5 characters.',
                       variant: 'error',
                     });
                     return;
@@ -550,18 +550,18 @@ export const CustomerDashboardView: React.FC = () => {
         </div>
       )}
 
-      {/* Account Closure Blocker Validation Modal (FR-CUS-006 / EX-024 / BR-019) */}
+      {/* Account Closure Blocker Validation Modal */}
       {showClosureCheckModal && (
         <div className="fixed inset-0 z-50 bg-[#1C1917]/50 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="w-full max-w-lg rounded-3xl bg-hearth-parchment border border-hearth-border p-6 shadow-hearth-lg space-y-4">
             <div className="flex items-center gap-2.5 text-[#991B1B]">
               <AlertOctagon className="w-5 h-5" />
               <h3 className="font-serif text-lg font-bold">
-                Account Closure Pre-Flight Check (FR-CUS-006 / EX-024)
+                Account Closure Pre-Flight Check
               </h3>
             </div>
             <p className="text-xs text-hearth-umber leading-relaxed">
-              Per <strong>BR-019 & EX-024</strong>, an account with active rentals, open return inspections, or unresolved deposit settlements cannot undergo immediate destructive closure, and signed contracts/invoices must be retained for statutory audit.
+              Under our <strong>Account Retention & Deposit Protection Policy</strong>, an account with active rentals, open return inspections, or unresolved deposit settlements cannot undergo immediate destructive closure, and signed contracts/invoices must be retained for statutory audit.
             </p>
             <div className="p-3.5 rounded-2xl bg-[#FEE2E2]/60 border border-[#FECACA] space-y-1.5 text-xs text-[#991B1B]">
               <div className="font-bold">

@@ -50,7 +50,6 @@ export interface ToastMessage {
 }
 
 interface KaroRentState {
-  // UI & Navigation State
   darkMode: boolean;
   activeTab: NavigationTab;
   activePersona: ActivePersona;
@@ -59,7 +58,6 @@ interface KaroRentState {
   latencyActionLabel: string | null;
   toasts: ToastMessage[];
 
-  // Marketplace Filters
   selectedLocation: string;
   searchQuery: string;
   selectedCategory: ProductCategory | 'All';
@@ -69,7 +67,6 @@ interface KaroRentState {
   activeAgreementModalBookingId: string | null;
   activeCheckoutProductId: string | null;
 
-  // Core SRS v4.0 Domain Entities
   customers: CustomerAccount[];
   vendors: VendorRecord[];
   masterProducts: PlatformMasterProduct[];
@@ -87,7 +84,6 @@ interface KaroRentState {
   auditLogs: AuditLogEntry[];
   obdDecisions: OpenBusinessDecisionItem[];
 
-  // UI Actions
   toggleDarkMode: () => void;
   setActiveTab: (tab: NavigationTab) => void;
   switchPersona: (personaId: string) => void;
@@ -104,8 +100,6 @@ interface KaroRentState {
   markAllNotificationsRead: () => void;
   resetDemoState: () => void;
 
-  // Async Business Workflow Mutations (Simulated 250–450ms Latency)
-  // 1. Booking & Dual-Path Checkout (WF-04, FR-BKG-001 to 009, FR-BLK-005)
   createBookingOrder: (payload: {
     productId: string;
     quantity: number;
@@ -114,7 +108,6 @@ interface KaroRentState {
     deliveryAddress: string;
   }) => Promise<{ bookingId: string; interceptedByBlacklist: boolean }>;
 
-  // 2. Field Technician AC Pre-Installation Site Visit Metrics (FR-FUL-008, FR-PRC-008, EX-030)
   submitSiteVisitMetrics: (payload: {
     bookingId: string;
     feasible: boolean;
@@ -127,23 +120,13 @@ interface KaroRentState {
     sitePhotoUrl: string;
   }) => Promise<void>;
 
-  // 3. Customer Accepts or Rejects Post-Visit Final Quote (FR-PRC-008, EX-030)
   respondToPostVisitQuote: (bookingId: string, decision: 'Accepted' | 'Rejected') => Promise<void>;
-
-  // 4. Customer Signs Electronic Rental Agreement (FR-AGR-001 to 009)
   signRentalAgreement: (bookingId: string, otpCode: string, signerAuthorityNote?: string) => Promise<void>;
-
-  // 5. Customer Pays Invoice (Idempotent Reconciliation FR-PAY-001 to 011)
   payInvoiceDocument: (invoiceId: string) => Promise<void>;
-
-  // 6. Field Dispatch & Delivery Activation (FR-FUL-002 to 007)
   completeDeliveryAndActivate: (bookingId: string, serialNumber: string, photoUrl: string) => Promise<void>;
-
-  // 7. Customer Requests Renewal / Extension or Return Pickup (FR-LIF-003, FR-RET-001)
   requestRentalRenewal: (bookingId: string, additionalMonths: 3 | 6) => Promise<void>;
   initiateReturnPickupRequest: (bookingId: string, preferredSlot: string) => Promise<void>;
 
-  // 8. Field Staff Mandatory EXIF Pickup Photo Gate (FR-RET-002, BR-026, EX-029)
   completeCustomerPremisePickupWithPhoto: (payload: {
     bookingId: string;
     photoUrl: string;
@@ -151,7 +134,6 @@ interface KaroRentState {
     geoTag: string;
   }) => Promise<void>;
 
-  // 9. Three-Way Warehouse Return Inspection & Deposit Deduction / Dispute (FR-RET-003 to 008, BR-026)
   submitWarehouseInspection: (payload: {
     bookingId: string;
     warehousePhotoUrl: string;
@@ -163,7 +145,6 @@ interface KaroRentState {
 
   customerDisputeInspectionFinding: (bookingId: string, disputeReason: string) => Promise<void>;
 
-  // 10. Platform Mediator Resolves Dispute & Optional Direct Customer Blacklisting (FR-DSP-004, FR-DSP-005, FR-BLK-004)
   resolveDisputeAndSettleDeposit: (payload: {
     bookingId: string;
     finalApprovedDeduction: number;
@@ -171,7 +152,6 @@ interface KaroRentState {
     enrollCustomerInBlacklist: boolean;
   }) => Promise<void>;
 
-  // 11. Vendor Submits Staged Inventory Enable/Disable/Stock Edit (FR-INV-010, BR-030)
   submitVendorStagedInventoryChange: (payload: {
     inventoryId: string;
     requestedPublicEnabled: boolean;
@@ -180,7 +160,6 @@ interface KaroRentState {
     vendorNotes: string;
   }) => Promise<void>;
 
-  // 12. Platform Manager Approves/Rejects Staged Inventory OR Reassigns Vendor Source (FR-INV-009, FR-INV-010, FR-INV-011, BR-031)
   resolveStagedInventoryRequest: (payload: {
     inventoryId: string;
     decision: 'APPROVE' | 'REJECT' | 'REASSIGN_SOURCE';
@@ -188,7 +167,6 @@ interface KaroRentState {
     adminReason: string;
   }) => Promise<void>;
 
-  // 13. Platform Super Admin Updates Master Product Pricing & Rate Card (FR-PRC-001, BR-027)
   updateMasterProductPricing: (payload: {
     productId: string;
     baseMonthlyRent: number;
@@ -198,7 +176,6 @@ interface KaroRentState {
     reason: string;
   }) => Promise<void>;
 
-  // 14. Vendor Onboarding, Termination & Continuity Manager Assignment (FR-VEN-001 to 015, FR-BLK-002)
   submitNewVendorApplication: (payload: {
     legalBusinessName: string;
     displayName: string;
@@ -212,17 +189,10 @@ interface KaroRentState {
   }) => Promise<void>;
 
   reviewVendorApplication: (vendorId: string, decision: 'Approved' | 'Rejected' | 'Clarification Required', reason: string) => Promise<void>;
-
   terminateVendorAndAssignContinuity: (vendorId: string, continuityManager: string, reason: string) => Promise<void>;
-
-  // 15. Blacklist Exception Override by Super Admin (FR-BLK-008)
   overrideBlacklistEntry: (blacklistId: string, overrideReason: string) => Promise<void>;
   overrideFlaggedBooking: (bookingId: string, overrideReason: string) => Promise<void>;
-
-  // 16. Finance Vendor Settlement Approval (Segregation of Duties FR-SET-008)
   approveAndReleaseVendorSettlement: (settlementId: string) => Promise<void>;
-
-  // 17. Service & Maintenance / Asset Swap (FR-SRV-001 to 006) & Support Escalation (FR-SUP-001 to 005)
   createServiceTicket: (bookingId: string, issueDescription: string, requestAssetSwap: boolean) => Promise<void>;
   executeVendorAssetReplacement: (ticketId: string, replacementSerial: string) => Promise<void>;
   escalateSupportTicket: (ticketId: string, resolutionOrEscalationNote: string) => Promise<void>;
@@ -293,9 +263,8 @@ export const useKaroRentStore = create<KaroRentState>()(
 
         set({ activePersona: found, activeTab: defaultTab });
         get().addToast({
-          title: `Switched Role: ${found.name}`,
-          description: `${found.roleBadge} — Strict data scoping enforced (BR-012 / BR-013).`,
-          ruleCode: 'FR-ADM-002',
+          title: `Switched Profile: ${found.name}`,
+          description: `${found.roleBadge} — Account permissions and data isolation updated.`,
           variant: found.isBlacklisted || found.isTerminatedVendor ? 'warning' : 'info',
         });
       },
@@ -314,8 +283,7 @@ export const useKaroRentStore = create<KaroRentState>()(
           if (current.length >= 3) {
             get().addToast({
               title: 'Comparison Tray Full',
-              description: 'Compare up to 3 products side by side (FR-CAT-005).',
-              ruleCode: 'FR-CAT-005',
+              description: 'You can compare up to 3 products side by side.',
               variant: 'warning',
             });
             return;
@@ -365,22 +333,18 @@ export const useKaroRentStore = create<KaroRentState>()(
           activeTab: 'MARKETPLACE',
         });
         get().addToast({
-          title: 'Demo Fixtures Reset',
-          description: 'All SRS v4.0 ledgers, staged requests, and bookings restored to initial state.',
-          ruleCode: 'SRS-v4.0',
+          title: 'Demo Data Reset',
+          description: 'All catalogs, bookings, invoices, and ledgers have been restored to their initial state.',
           variant: 'info',
         });
       },
 
-      // ========================================================================
-      // 1. Create Booking Order (WF-04, FR-BKG-001..009, FR-BLK-005, FR-PAY-011)
-      // ========================================================================
       createBookingOrder: async ({ productId, quantity, tenureMonths, startDate, deliveryAddress }) => {
         const state = get();
         if (state.isSimulatingLatency) {
-          throw new Error('Duplicate submission blocked (FR-BKG-009).');
+          throw new Error('Duplicate submission prevented.');
         }
-        set({ isSimulatingLatency: true, latencyActionLabel: 'Validating Blacklist, Virtual Stock & Generating Invoices...' });
+        set({ isSimulatingLatency: true, latencyActionLabel: 'Checking Account Eligibility, Stock & Generating Invoices...' });
         await simulateLatency(420);
 
         const product = state.masterProducts.find((p) => p.id === productId)!;
@@ -398,7 +362,6 @@ export const useKaroRentStore = create<KaroRentState>()(
         startObj.setMonth(startObj.getMonth() + tenureMonths);
         const endDate = startObj.toISOString().split('T')[0];
 
-        // Pre-confirmation Blacklist Check (FR-BKG-002 / FR-BLK-005 / EX-032)
         const matchingBlacklist = state.blacklist.find(
           (b) =>
             b.ledgerType === 'CUSTOMER_BLACKLIST' &&
@@ -434,7 +397,7 @@ export const useKaroRentStore = create<KaroRentState>()(
             siteVisitFee: product.siteVisitFee,
             installationMaterialFee: 0,
             gstPercent: 18,
-            blacklistFlagReason: `Intercepted by FR-BLK-005 / EX-032: Customer matches active Blacklist (${matchingBlacklist?.id || 'Watchlist'}) for ${matchingBlacklist?.categoryReason || 'Prior Default'}. Inventory allocation & vendor dispatch blocked pending Super Admin review.`,
+            blacklistFlagReason: `Account matches an active Trust & Safety Registry record (${matchingBlacklist?.id || 'Watchlist'}) for ${matchingBlacklist?.categoryReason || 'Prior Default'}. Stock allocation and partner dispatch are paused pending Administrator review.`,
             agreementId,
             createdAt: '2026-10-28',
           };
@@ -444,12 +407,12 @@ export const useKaroRentStore = create<KaroRentState>()(
             timestamp: nowIST(),
             actorName: customer.fullName,
             actorRole: persona.roleBadge,
-            moduleCode: 'FR-BLK-005 / EX-032',
-            actionSummary: `Intercepted booking attempt ${bookingId} by blacklisted client`,
+            moduleCode: 'Risk Protection',
+            actionSummary: `Intercepted booking attempt ${bookingId} by watchlisted client`,
             affectedRecordId: bookingId,
             priorValue: 'Pre-Confirmation Check',
             newValue: 'Status: Flagged — Blacklist Review (Stock Not Allocated)',
-            mandatoryReason: 'Automatic Customer Blacklist cross-booking protection.',
+            mandatoryReason: 'Automatic cross-booking risk protection.',
           };
 
           set((s) => ({
@@ -463,9 +426,9 @@ export const useKaroRentStore = create<KaroRentState>()(
             notifications: [
               {
                 id: `NTF-${Date.now()}`,
-                eventCode: 'FR-BLK-005 / EX-032',
-                title: `Blacklist Intercept: Booking ${bookingId} Blocked`,
-                message: `${customer.fullName} attempted to book ${product.title}. Held in Flagged — Blacklist Review.`,
+                eventCode: 'Risk Alert',
+                title: `Booking ${bookingId} Held for Risk Review`,
+                message: `${customer.fullName} attempted to book ${product.title}. Held for Administrator review.`,
                 recipientRole: 'PLATFORM_ADMIN',
                 category: 'Blacklist Alert',
                 priority: 'critical',
@@ -478,16 +441,14 @@ export const useKaroRentStore = create<KaroRentState>()(
           }));
 
           get().addToast({
-            title: 'Booking Intercepted — Blacklist Review (FR-BLK-005)',
-            description: `${bookingId} placed in Flagged — Blacklist Review. Stock was NOT allocated and Platform Admin has been alerted.`,
-            ruleCode: 'EX-032',
+            title: 'Booking Held for Trust & Safety Review',
+            description: `${bookingId} requires Administrator clearance due to prior account flags. Stock was not allocated.`,
             variant: 'error',
           });
 
           return { bookingId, interceptedByBlacklist: true };
         }
 
-        // Standard Validated Booking Flow (Path A: 1-Step Direct vs Path B: Multi-Step Site Visit)
         const isMultiStep = product.workflowType === 'SITE_VISIT_MULTI_STEP';
         const initialStatus = isMultiStep ? 'Awaiting Site Visit Payment' : 'Awaiting Customer Agreement';
 
@@ -516,7 +477,7 @@ export const useKaroRentStore = create<KaroRentState>()(
           siteVisitFee: product.siteVisitFee,
           installationMaterialFee: 0,
           gstPercent: 18,
-          reservationHoldExpiresAt: '15:00 mins (OBD-01 Hold Active)',
+          reservationHoldExpiresAt: '15:00 mins (Reservation Hold Active)',
           siteVisit: isMultiStep
             ? {
                 scheduledDate: 'Pending ₹499 Site Visit Payment',
@@ -540,8 +501,8 @@ export const useKaroRentStore = create<KaroRentState>()(
           bookingId,
           templateVersion:
             customer.accountType === 'Business'
-              ? 'KR-CORP-AGR-v4.0 (B2B Signatory Edition)'
-              : 'KR-CUST-AGR-v4.0 (Tri-Partite Platform Contracting Standard)',
+              ? 'KaroRent Commercial Corporate Lease (2026 Edition)'
+              : 'KaroRent Standard Residential Lease (2026 Edition)',
           status: 'Awaiting Signature',
           customerName: newBooking.customerName,
           authorisedSignatory: customer.authorisedSignatoryName,
@@ -554,11 +515,10 @@ export const useKaroRentStore = create<KaroRentState>()(
           lockedDepositAmount: securityDepositAmount,
           lockedInstallationCharge: product.standardDeliveryFee,
           mandatoryPickupPhotoClause:
-            'Clause 9.4 (BR-026 Mandatory Doorstep Pickup Photo): Vendor pickup staff must capture a verified timestamped photo at customer premises before return removal.',
+            'Doorstep Handover Protection: Pickup staff must capture a verified timestamped photo at customer premises before return removal.',
           amendments: [],
         };
 
-        // Generate Separate Invoices by Charge Type (FR-PAY-011)
         const newInvoices: FinancialInvoiceDocument[] = [];
         if (isMultiStep) {
           newInvoices.push({
@@ -568,7 +528,7 @@ export const useKaroRentStore = create<KaroRentState>()(
             customerName: newBooking.customerName,
             vendorId: inventory.owningVendorId,
             chargeType: 'SITE_VISIT_INVOICE',
-            title: `1. Pre-Installation Site Feasibility Visit Invoice — ${product.title}`,
+            title: `1. Pre-Installation Home Measurement Visit Invoice — ${product.title}`,
             baseAmount: 423,
             taxAmount: 76,
             totalPayable: product.siteVisitFee,
@@ -668,8 +628,8 @@ export const useKaroRentStore = create<KaroRentState>()(
               timestamp: nowIST(),
               actorName: newBooking.customerName,
               actorRole: persona.roleBadge,
-              moduleCode: isMultiStep ? 'WF-04 Path B / FR-PRC-008' : 'WF-04 Path A / FR-BKG-001',
-              actionSummary: `Created booking ${bookingId} (${isMultiStep ? 'Multi-Step Site Visit' : '1-Step Direct'}) with reservation hold`,
+              moduleCode: 'Booking Created',
+              actionSummary: `Created booking ${bookingId} with temporary stock reservation`,
               affectedRecordId: bookingId,
               priorValue: `Available Stock: ${inventory.availableQuantity}`,
               newValue: `Reserved: ${quantity} unit(s) • Status: ${initialStatus}`,
@@ -680,31 +640,24 @@ export const useKaroRentStore = create<KaroRentState>()(
         }));
 
         get().addToast({
-          title: isMultiStep
-            ? `Multi-Step Booking ${bookingId} Created`
-            : `1-Step Booking ${bookingId} Created`,
+          title: `Booking ${bookingId} Reserved`,
           description: isMultiStep
-            ? `Pay ₹${product.siteVisitFee} Site Visit Invoice to schedule your home measurement visit (FR-PRC-008).`
-            : `Sign your e-agreement and complete invoice payment to trigger dispatch (WF-04).`,
-          ruleCode: 'WF-04',
+            ? `Pay the ₹${product.siteVisitFee} Home Measurement Visit Invoice to schedule your technician visit.`
+            : `Please review and sign your digital rental agreement to proceed.`,
           variant: 'success',
         });
 
         return { bookingId, interceptedByBlacklist: false };
       },
 
-      // ========================================================================
-      // 2. Field Technician Submits Site Visit Metrics (FR-FUL-008, FR-PRC-008, EX-030)
-      // ========================================================================
       submitSiteVisitMetrics: async (payload) => {
-        set({ isSimulatingLatency: true, latencyActionLabel: 'Calculating Platform Rate-Card Final Quote...' });
+        set({ isSimulatingLatency: true, latencyActionLabel: 'Calculating Rate-Card Final Quote...' });
         await simulateLatency(380);
 
         const state = get();
         const booking = state.bookings.find((b) => b.id === payload.bookingId);
         if (!booking) return;
 
-        // Calculate strictly from Platform Rate Card (FR-PRC-004 / BR-027)
         const extraPipeMeters = Math.max(0, payload.measuredCopperPipeMeters - 3);
         const pipeCharge = Math.round(extraPipeMeters * 850);
         const bracketCharge = payload.outdoorBracketRequired ? 750 : 0;
@@ -714,7 +667,6 @@ export const useKaroRentStore = create<KaroRentState>()(
         const totalMaterialCharges = pipeCharge + bracketCharge + coreCutCharge + drainCharge;
 
         if (!payload.feasible) {
-          // EX-030: Site Unfeasible -> Cancel without charging rent/deposit; release inventory hold!
           set((s) => ({
             isSimulatingLatency: false,
             latencyActionLabel: null,
@@ -754,8 +706,8 @@ export const useKaroRentStore = create<KaroRentState>()(
                 id: `AUD-${Date.now()}`,
                 timestamp: nowIST(),
                 actorName: 'Rajan Kumar (Field Service)',
-                actorRole: 'Field Personnel',
-                moduleCode: 'EX-030 / FR-FUL-008',
+                actorRole: 'Field Specialist',
+                moduleCode: 'Site Assessment',
                 actionSummary: `Site visit marked Not Feasible for ${booking.id}; released inventory hold`,
                 affectedRecordId: booking.id,
                 priorValue: 'Status: Site Visit Scheduled',
@@ -767,15 +719,13 @@ export const useKaroRentStore = create<KaroRentState>()(
           }));
 
           get().addToast({
-            title: 'Site Unfeasible — Booking Cancelled (EX-030)',
-            description: 'Inventory hold released. Customer is not charged rent or security deposit.',
-            ruleCode: 'EX-030',
+            title: 'Site Unfeasible — Booking Cancelled',
+            description: 'Inventory hold released. Customer is not charged rental or security deposit.',
             variant: 'warning',
           });
           return;
         }
 
-        // Feasible -> Generate Final Charges & Separate Invoices (FR-PRC-008, FR-PAY-011)
         const suffix = booking.id.slice(9);
         const installBase = booking.deliveryFee + totalMaterialCharges;
         const installTax = Math.round(installBase * 0.18);
@@ -864,7 +814,7 @@ export const useKaroRentStore = create<KaroRentState>()(
                     {
                       id: `AMD-${Date.now()}`,
                       version: 'v1.1 — Post-Site Visit Rate Card Addendum',
-                      reason: `Measured ${payload.measuredCopperPipeMeters}m copper pipe + installation accessories via Platform Rate Card.`,
+                      reason: `Measured ${payload.measuredCopperPipeMeters}m copper pipe + installation accessories via Standard Rate Card.`,
                       changedFieldsSummary: `Measured Material Fee locked at ₹${totalMaterialCharges.toLocaleString('en-IN')}`,
                       createdAt: nowIST(),
                       signedByCustomer: false,
@@ -884,9 +834,9 @@ export const useKaroRentStore = create<KaroRentState>()(
               id: `AUD-${Date.now()}`,
               timestamp: nowIST(),
               actorName: 'Rajan Kumar (Field Service)',
-              actorRole: 'Field Personnel',
-              moduleCode: 'FR-FUL-008 / FR-PRC-008',
-              actionSummary: `Recorded site visit metrics for ${booking.id}; auto-calculated ₹${totalMaterialCharges} material charges`,
+              actorRole: 'Field Specialist',
+              moduleCode: 'Site Assessment',
+              actionSummary: `Recorded site visit metrics for ${booking.id}; calculated ₹${totalMaterialCharges} material charges`,
               affectedRecordId: booking.id,
               priorValue: 'Status: Site Visit Scheduled',
               newValue: `Status: Final Bill Sent (Material Fee: ₹${totalMaterialCharges})`,
@@ -897,16 +847,12 @@ export const useKaroRentStore = create<KaroRentState>()(
         }));
 
         get().addToast({
-          title: 'Site Metrics Logged & Final Bill Sent (FR-PRC-008)',
-          description: `Calculated ₹${totalMaterialCharges.toLocaleString('en-IN')} from Platform Rate Card and generated segregated invoices.`,
-          ruleCode: 'FR-FUL-008',
+          title: 'Home Measurement Logged & Final Quote Sent',
+          description: `Calculated ₹${totalMaterialCharges.toLocaleString('en-IN')} from the Platform Rate Card and generated itemised invoices.`,
           variant: 'success',
         });
       },
 
-      // ========================================================================
-      // 3. Customer Accepts or Rejects Post-Visit Final Quote (FR-PRC-008, EX-030)
-      // ========================================================================
       respondToPostVisitQuote: async (bookingId, decision) => {
         set({ isSimulatingLatency: true, latencyActionLabel: 'Recording Quote Decision...' });
         await simulateLatency(300);
@@ -944,9 +890,8 @@ export const useKaroRentStore = create<KaroRentState>()(
           }));
 
           get().addToast({
-            title: 'Post-Visit Quote Rejected (EX-030)',
+            title: 'Post-Visit Quote Declined',
             description: 'Booking cancelled without charging rental or security deposit. Inventory hold released.',
-            ruleCode: 'EX-030',
             variant: 'warning',
           });
           return;
@@ -967,18 +912,14 @@ export const useKaroRentStore = create<KaroRentState>()(
         }));
 
         get().addToast({
-          title: 'Final Transparent Quote Accepted!',
-          description: 'Please e-sign the updated Platform–Customer Rental Agreement to proceed.',
-          ruleCode: 'FR-PRC-008',
+          title: 'Final Transparent Quote Accepted',
+          description: 'Please e-sign the updated Rental Agreement to proceed.',
           variant: 'success',
         });
       },
 
-      // ========================================================================
-      // 4. Sign Rental Agreement (FR-AGR-001 to 009, BR-002)
-      // ========================================================================
       signRentalAgreement: async (bookingId, otpCode, signerAuthorityNote) => {
-        set({ isSimulatingLatency: true, latencyActionLabel: 'Cryptographically Sealing E-Signature & Consent...' });
+        set({ isSimulatingLatency: true, latencyActionLabel: 'Sealing Digital E-Signature & Consent...' });
         await simulateLatency(400);
 
         const hash = `SHA256:${Math.random().toString(16).slice(2, 10)}e91b...${otpCode} [Verified OTP • ${nowIST()}]`;
@@ -992,7 +933,7 @@ export const useKaroRentStore = create<KaroRentState>()(
                   ...a,
                   status: 'Signed',
                   signerIdentityMethod: a.authorisedSignatory ? 'Corporate DSC / Signatory OTP' : 'Aadhaar OTP E-Sign',
-                   authorisedSignatory: signerAuthorityNote || a.authorisedSignatory,
+                  authorisedSignatory: signerAuthorityNote || a.authorisedSignatory,
                   signatureHash: hash,
                   signedAt: nowIST(),
                   amendments: a.amendments.map((am) => ({ ...am, signedByCustomer: true, signedAt: nowIST() })),
@@ -1013,7 +954,7 @@ export const useKaroRentStore = create<KaroRentState>()(
               timestamp: nowIST(),
               actorName: s.activePersona.name,
               actorRole: s.activePersona.roleBadge,
-              moduleCode: 'FR-AGR-004 / BR-002',
+              moduleCode: 'Digital E-Sign',
               actionSummary: `Electronically signed rental agreement for ${bookingId}`,
               affectedRecordId: bookingId,
               priorValue: 'Agreement: Awaiting Signature',
@@ -1025,30 +966,25 @@ export const useKaroRentStore = create<KaroRentState>()(
         }));
 
         get().addToast({
-          title: 'Agreement E-Signed & Sealed (FR-AGR-004)',
-          description: 'Immutable copy generated with Sage-Green OTP verification stamp.',
-          ruleCode: 'BR-002',
+          title: 'Rental Agreement E-Signed & Sealed',
+          description: 'Verified copy generated with OTP verification stamp.',
           variant: 'success',
         });
       },
 
-      // ========================================================================
-      // 5. Pay Invoice Document (FR-PAY-001 to 011, BR-008)
-      // ========================================================================
       payInvoiceDocument: async (invoiceId) => {
         const state = get();
         const inv = state.invoices.find((i) => i.id === invoiceId);
         if (!inv || inv.paymentState === 'Successful') {
           get().addToast({
-            title: 'Idempotency Guard (FR-PAY-003)',
+            title: 'Already Paid',
             description: 'This invoice is already reconciled as Paid. Duplicate charge prevented.',
-            ruleCode: 'FR-PAY-003',
             variant: 'info',
           });
           return;
         }
 
-        set({ isSimulatingLatency: true, latencyActionLabel: `Reconciling Payment for ${inv.id} with Provider...` });
+        set({ isSimulatingLatency: true, latencyActionLabel: `Reconciling Payment for ${inv.id}...` });
         await simulateLatency(380);
 
         const providerRef = `RZP_${inv.chargeType.slice(0, 4)}_${Math.floor(100000 + Math.random() * 899999)}`;
@@ -1109,12 +1045,12 @@ export const useKaroRentStore = create<KaroRentState>()(
                 timestamp: nowIST(),
                 actorName: s.activePersona.name,
                 actorRole: s.activePersona.roleBadge,
-                moduleCode: 'FR-PAY-001 / BR-008',
+                moduleCode: 'Billing & Vault',
                 actionSummary: `Reconciled payment of ₹${inv.totalPayable.toLocaleString('en-IN')} for ${inv.id}`,
                 affectedRecordId: inv.id,
                 priorValue: 'Payment: Pending',
                 newValue: `Payment: Successful (Ref: ${providerRef})`,
-                mandatoryReason: 'Verified payment gateway webhook reconciliation.',
+                mandatoryReason: 'Verified payment gateway confirmation.',
               },
               ...s.auditLogs,
             ],
@@ -1122,16 +1058,12 @@ export const useKaroRentStore = create<KaroRentState>()(
         });
 
         get().addToast({
-          title: `Payment Reconciled: ₹${inv.totalPayable.toLocaleString('en-IN')}`,
-          description: `Provider Ref ${providerRef} linked to ${inv.bookingId}.`,
-          ruleCode: 'FR-PAY-001',
+          title: `Payment Confirmed: ₹${inv.totalPayable.toLocaleString('en-IN')}`,
+          description: `Transaction Reference ${providerRef} linked to ${inv.bookingId}.`,
           variant: 'success',
         });
       },
 
-      // ========================================================================
-      // 6. Field Dispatch & Delivery Activation (FR-FUL-002 to 007)
-      // ========================================================================
       completeDeliveryAndActivate: async (bookingId, serialNumber, photoUrl) => {
         set({ isSimulatingLatency: true, latencyActionLabel: 'Recording Proof-of-Delivery & Activating Rental...' });
         await simulateLatency(350);
@@ -1172,8 +1104,8 @@ export const useKaroRentStore = create<KaroRentState>()(
               id: `AUD-${Date.now()}`,
               timestamp: nowIST(),
               actorName: 'Rajan Kumar (Field Service)',
-              actorRole: 'Field Personnel',
-              moduleCode: 'FR-FUL-007 / OBD-21',
+              actorRole: 'Field Specialist',
+              moduleCode: 'Delivery & Setup',
               actionSummary: `Delivered asset ${serialNumber} and activated rental ${bookingId}`,
               affectedRecordId: bookingId,
               priorValue: 'Status: Confirmed',
@@ -1185,18 +1117,14 @@ export const useKaroRentStore = create<KaroRentState>()(
         }));
 
         get().addToast({
-          title: `Rental ${bookingId} Activated (FR-FUL-007)`,
+          title: `Rental ${bookingId} Activated`,
           description: `Asset ${serialNumber} delivered and acknowledged at customer premises.`,
-          ruleCode: 'FR-FUL-007',
           variant: 'success',
         });
       },
 
-      // ========================================================================
-      // 7. Renewal Request & Return Pickup Request (FR-LIF-003, FR-RET-001)
-      // ========================================================================
       requestRentalRenewal: async (bookingId, additionalMonths) => {
-        set({ isSimulatingLatency: true, latencyActionLabel: 'Checking Virtual Stock & Extending Rental Tenure...' });
+        set({ isSimulatingLatency: true, latencyActionLabel: 'Checking Availability & Extending Tenure...' });
         await simulateLatency(320);
 
         set((s) => ({
@@ -1221,8 +1149,8 @@ export const useKaroRentStore = create<KaroRentState>()(
                     {
                       id: `AMD-${Date.now()}`,
                       version: `v1.${a.amendments.length + 1} — Tenure Extension Addendum`,
-                      reason: `Customer requested ${additionalMonths}-month renewal extension (FR-LIF-003).`,
-                      changedFieldsSummary: `Extended rental tenure by +${additionalMonths} months at Platform Rate.`,
+                      reason: `Customer requested ${additionalMonths}-month renewal extension.`,
+                      changedFieldsSummary: `Extended rental tenure by +${additionalMonths} months at locked Platform Rate.`,
                       createdAt: nowIST(),
                       signedByCustomer: true,
                       signedAt: nowIST(),
@@ -1234,15 +1162,14 @@ export const useKaroRentStore = create<KaroRentState>()(
         }));
 
         get().addToast({
-          title: `Rental Extended by +${additionalMonths} Months (FR-LIF-005)`,
+          title: `Rental Extended by +${additionalMonths} Months`,
           description: 'Agreement addendum generated and return due date updated.',
-          ruleCode: 'FR-LIF-003',
           variant: 'success',
         });
       },
 
       initiateReturnPickupRequest: async (bookingId, preferredSlot) => {
-        set({ isSimulatingLatency: true, latencyActionLabel: 'Scheduling Return Pickup & Preparing EXIF Gate...' });
+        set({ isSimulatingLatency: true, latencyActionLabel: 'Scheduling Return Pickup...' });
         await simulateLatency(320);
 
         set((s) => ({
@@ -1273,28 +1200,23 @@ export const useKaroRentStore = create<KaroRentState>()(
         }));
 
         get().addToast({
-          title: 'Return Pickup Scheduled (FR-RET-001)',
-          description: `Field staff assigned for ${preferredSlot}. Mandatory doorstep EXIF photo gate armed (BR-026).`,
-          ruleCode: 'FR-RET-001',
+          title: 'Return Pickup Scheduled',
+          description: `Field specialist assigned for ${preferredSlot}. Doorstep photo verification gate is active.`,
           variant: 'info',
         });
       },
 
-      // ========================================================================
-      // 8. Mandatory Customer-Premise EXIF Pickup Photo Gate (FR-RET-002, BR-026, EX-029)
-      // ========================================================================
       completeCustomerPremisePickupWithPhoto: async ({ bookingId, photoUrl, exifTimestamp, geoTag }) => {
         if (!photoUrl || !exifTimestamp) {
           get().addToast({
-            title: 'Transition Blocked by BR-026 / EX-029',
+            title: 'Pickup Status Locked',
             description: 'Cannot mark return as Picked Up without a verified timestamped photo at the customer premises.',
-            ruleCode: 'BR-026',
             variant: 'error',
           });
           return;
         }
 
-        set({ isSimulatingLatency: true, latencyActionLabel: 'Verifying EXIF Timestamp & Unlocking Picked Up Status...' });
+        set({ isSimulatingLatency: true, latencyActionLabel: 'Verifying Doorstep Timestamp & Unlocking Picked Up Status...' });
         await simulateLatency(380);
 
         set((s) => ({
@@ -1309,7 +1231,7 @@ export const useKaroRentStore = create<KaroRentState>()(
                     ...b.returnRecord,
                     pickupStatus: 'Picked Up',
                     customerPremisePickupPhoto: photoUrl,
-                    pickupPhotoExifTimestamp: `${exifTimestamp} [EXIF Geo: ${geoTag} Verified]`,
+                    pickupPhotoExifTimestamp: `${exifTimestamp} [GPS: ${geoTag} Verified]`,
                     pickupPhotoGeoTag: geoTag,
                   },
                 }
@@ -1320,29 +1242,25 @@ export const useKaroRentStore = create<KaroRentState>()(
               id: `AUD-${Date.now()}`,
               timestamp: nowIST(),
               actorName: 'Rajan Kumar (Field Service)',
-              actorRole: 'Field Personnel',
-              moduleCode: 'FR-RET-002 / BR-026',
-              actionSummary: `Captured mandatory doorstep EXIF pickup photo for ${bookingId}; unlocked Picked Up state`,
+              actorRole: 'Field Specialist',
+              moduleCode: 'Return Handover',
+              actionSummary: `Captured mandatory doorstep pickup photo for ${bookingId}; unlocked Picked Up state`,
               affectedRecordId: bookingId,
               priorValue: 'Return: Scheduled (Pickup Gate Locked)',
-              newValue: `Return: Picked Up (EXIF: ${exifTimestamp})`,
-              mandatoryReason: 'Contractual doorstep handover evidence captured.',
+              newValue: `Return: Picked Up (Timestamp: ${exifTimestamp})`,
+              mandatoryReason: 'Doorstep handover photo evidence captured.',
             },
             ...s.auditLogs,
           ],
         }));
 
         get().addToast({
-          title: 'EXIF Doorstep Pickup Photo Verified (FR-RET-002)',
+          title: 'Doorstep Pickup Photo Verified',
           description: 'Status transitioned to Picked Up — Under Inspection. Ready for 3-Way Comparison.',
-          ruleCode: 'BR-026',
           variant: 'success',
         });
       },
 
-      // ========================================================================
-      // 9. Three-Way Warehouse Return Inspection (FR-RET-003 to 008, BR-026)
-      // ========================================================================
       submitWarehouseInspection: async ({
         bookingId,
         warehousePhotoUrl,
@@ -1351,16 +1269,14 @@ export const useKaroRentStore = create<KaroRentState>()(
         proposedDeduction,
         wasPresentInDoorstepPickupPhoto,
       }) => {
-        set({ isSimulatingLatency: true, latencyActionLabel: 'Running Three-Way Evidence Comparison (BR-026)...' });
+        set({ isSimulatingLatency: true, latencyActionLabel: 'Running Three-Way Evidence Comparison...' });
         await simulateLatency(400);
 
-        // Enforce BR-026: If damage reported at warehouse was NOT present in doorstep pickup photo,
-        // it is presumed vendor transit damage and CANNOT be deducted from customer's security deposit!
-        const blockedByBR026 =
+        const blockedByDoorstepProtection =
           proposedDeduction > 0 &&
           (finding === 'Transit Damage (Vendor Fault)' || !wasPresentInDoorstepPickupPhoto);
 
-        const effectiveProposedDeduction = blockedByBR026 ? 0 : proposedDeduction;
+        const effectiveProposedDeduction = blockedByDoorstepProtection ? 0 : proposedDeduction;
 
         set((s) => ({
           isSimulatingLatency: false,
@@ -1374,15 +1290,15 @@ export const useKaroRentStore = create<KaroRentState>()(
                     ...b.returnRecord,
                     pickupStatus: effectiveProposedDeduction > 0 ? 'Under Inspection' : 'Finalised',
                     warehouseReturnPhoto: warehousePhotoUrl,
-                    warehouseInspectionFinding: blockedByBR026
+                    warehouseInspectionFinding: blockedByDoorstepProtection
                       ? 'Transit Damage (Vendor Fault)'
                       : finding,
-                    findingDescription: blockedByBR026
-                      ? `${findingDescription} — [AUTOMATIC BR-026 PROTECTION: Damage was NOT visible in the verified doorstep pickup photo. Presumed vendor transit damage; ₹${proposedDeduction} deduction blocked against customer deposit.]`
+                    findingDescription: blockedByDoorstepProtection
+                      ? `${findingDescription} — [DOORSTEP HANDOVER PROTECTION: Damage was NOT visible in the verified doorstep pickup photo. Presumed transit damage; ₹${proposedDeduction} deduction blocked against customer deposit.]`
                       : findingDescription,
                     proposedDeductionAmount: effectiveProposedDeduction,
                     approvedDeductionAmount: 0,
-                    transitDamageBlockedByBR026: blockedByBR026,
+                    transitDamageBlockedByBR026: blockedByDoorstepProtection,
                     customerResponse:
                       effectiveProposedDeduction > 0 ? 'Pending Customer Review' : 'Accepted',
                   },
@@ -1399,7 +1315,7 @@ export const useKaroRentStore = create<KaroRentState>()(
                     effectiveProposedDeduction > 0
                       ? 'Inspection Pending'
                       : 'Scheduled (14-Day Window)',
-                  settlementDueDate: '2026-11-11 (14 Days Post-Settlement per FR-DEP-006)',
+                  settlementDueDate: '2026-11-11 (14 Days Post-Settlement)',
                 }
               : d
           ),
@@ -1409,9 +1325,9 @@ export const useKaroRentStore = create<KaroRentState>()(
               timestamp: nowIST(),
               actorName: s.activePersona.name,
               actorRole: s.activePersona.roleBadge,
-              moduleCode: 'FR-RET-003 / BR-026',
-              actionSummary: blockedByBR026
-                ? `BR-026 blocked ₹${proposedDeduction} transit damage claim on ${bookingId}`
+              moduleCode: '3-Way Inspection',
+              actionSummary: blockedByDoorstepProtection
+                ? `Doorstep Photo Protection blocked ₹${proposedDeduction} transit damage claim on ${bookingId}`
                 : `Recorded 3-way inspection for ${bookingId} (${finding})`,
               affectedRecordId: bookingId,
               priorValue: `Proposed: ₹${proposedDeduction}`,
@@ -1422,28 +1338,26 @@ export const useKaroRentStore = create<KaroRentState>()(
           ],
         }));
 
-        if (blockedByBR026) {
+        if (blockedByDoorstepProtection) {
           get().addToast({
-            title: 'Customer Protected by BR-026 (Transit Damage Blocked)',
-            description: `Because the damage was not present in the doorstep EXIF pickup photo, ₹${proposedDeduction.toLocaleString('en-IN')} cannot be deducted from the customer's deposit.`,
-            ruleCode: 'BR-026',
+            title: 'Customer Protected (Transit Damage Blocked)',
+            description: `Because the damage was not present in the doorstep pickup photo, ₹${proposedDeduction.toLocaleString('en-IN')} cannot be deducted from the customer's deposit.`,
             variant: 'warning',
           });
         } else {
           get().addToast({
-            title: '3-Way Inspection Recorded (FR-RET-003)',
+            title: '3-Way Inspection Recorded',
             description:
               effectiveProposedDeduction > 0
-                ? `Proposed deduction of ₹${effectiveProposedDeduction.toLocaleString('en-IN')} sent to customer with dispute window.`
+                ? `Proposed deduction of ₹${effectiveProposedDeduction.toLocaleString('en-IN')} sent to customer with dispute option.`
                 : 'Zero deduction! Full deposit scheduled for refund within 14 days.',
-            ruleCode: 'FR-RET-003',
             variant: 'success',
           });
         }
       },
 
       customerDisputeInspectionFinding: async (bookingId, disputeReason) => {
-        set({ isSimulatingLatency: true, latencyActionLabel: 'Opening Formal Dispute Case & Freezing Deduction...' });
+        set({ isSimulatingLatency: true, latencyActionLabel: 'Opening Dispute Case & Freezing Deduction...' });
         await simulateLatency(350);
 
         const booking = get().bookings.find((b) => b.id === bookingId);
@@ -1463,7 +1377,7 @@ export const useKaroRentStore = create<KaroRentState>()(
           caseType: 'Return Damage Deduction',
           status: 'Under Platform Review',
           allegationSummary: booking.returnRecord.findingDescription || 'Disputed return inspection charge.',
-          policyClauseCited: 'FR-RET-005 / FR-DSP-003 (Customer Inspection Dispute & Deposit Hold)',
+          policyClauseCited: 'Customer Inspection Dispute & Deposit Hold',
           proposedChargeAmount: proposed,
           preDispatchPhoto: booking.returnRecord.preDispatchPhoto,
           pickupHandoverPhoto: booking.returnRecord.customerPremisePickupPhoto,
@@ -1506,16 +1420,12 @@ export const useKaroRentStore = create<KaroRentState>()(
         }));
 
         get().addToast({
-          title: `Dispute Case ${caseId} Opened (FR-DSP-001)`,
-          description: 'Proposed deduction is frozen and cannot be automatically deducted while under review.',
-          ruleCode: 'FR-DEP-006',
+          title: `Dispute Case ${caseId} Opened`,
+          description: 'Proposed deduction is frozen and cannot be deducted while under Mediator review.',
           variant: 'warning',
         });
       },
 
-      // ========================================================================
-      // 10. Platform Mediator Resolves Dispute & Settles Deposit (FR-DSP-004, FR-BLK-004)
-      // ========================================================================
       resolveDisputeAndSettleDeposit: async ({
         bookingId,
         finalApprovedDeduction,
@@ -1530,7 +1440,6 @@ export const useKaroRentStore = create<KaroRentState>()(
         const ledger = state.depositLedgers.find((d) => d.bookingId === bookingId);
         if (!booking || !ledger) return;
 
-        // Cap deduction at collected deposit; any excess generates a separate Post-Return Adjustment Invoice (FR-DEP-006 / FR-PAY-009)
         const cappedDeduction = Math.min(ledger.collectedDeposit, finalApprovedDeduction);
         const excessDamageBalance = Math.max(0, finalApprovedDeduction - ledger.collectedDeposit);
         const netRefund = Math.max(0, ledger.collectedDeposit - cappedDeduction);
@@ -1544,7 +1453,7 @@ export const useKaroRentStore = create<KaroRentState>()(
             customerName: booking.customerName,
             vendorId: booking.fulfillingVendorId,
             chargeType: 'POST_RETURN_ADJUSTMENT_INVOICE',
-            title: `5. Post-Return Unrecovered Damage Balance Invoice (Exceeds Collected Deposit per FR-DEP-006)`,
+            title: `5. Post-Return Unrecovered Damage Balance Invoice (Exceeds Collected Deposit)`,
             baseAmount: Math.round(excessDamageBalance / 1.18),
             taxAmount: excessDamageBalance - Math.round(excessDamageBalance / 1.18),
             totalPayable: excessDamageBalance,
@@ -1570,7 +1479,7 @@ export const useKaroRentStore = create<KaroRentState>()(
               bankOrPaymentFingerprint: customer?.paymentFingerprint || 'FP-VERIFIED',
               addressSnippet: booking.deliveryAddress,
             },
-            evidenceSummary: `Enrolled directly from Dispute Resolution (FR-DSP-005 / FR-BLK-004): ${mediatorDecisionNotes}`,
+            evidenceSummary: `Enrolled from Dispute Resolution: ${mediatorDecisionNotes}`,
             outstandingDuesAmount: excessDamageBalance,
             blockedAttemptsCount: 0,
             status: 'Active Blacklist',
@@ -1608,7 +1517,7 @@ export const useKaroRentStore = create<KaroRentState>()(
                   refundedAmount: netRefund,
                   refundStatus: 'Refund Processed',
                   refundProviderRef: `RZP_REFUND_${Math.floor(10000 + Math.random() * 89999)}`,
-                  settlementDueDate: 'Completed & Reconciled (14-Day Vault SLA Met)',
+                  settlementDueDate: 'Completed & Reconciled (14-Day Vault Guarantee Met)',
                 }
               : d
           ),
@@ -1636,8 +1545,8 @@ export const useKaroRentStore = create<KaroRentState>()(
               timestamp: nowIST(),
               actorName: s.activePersona.name,
               actorRole: s.activePersona.roleBadge,
-              moduleCode: enrollCustomerInBlacklist ? 'FR-DSP-005 / FR-BLK-004' : 'FR-DEP-005 / FR-DSP-004',
-              actionSummary: `Settled deposit for ${bookingId}: Deducted ₹${cappedDeduction}, Refunded ₹${netRefund}${enrollCustomerInBlacklist ? ' + Enrolled Client in Blacklist' : ''}`,
+              moduleCode: 'Deposit Settlement',
+              actionSummary: `Settled deposit for ${bookingId}: Deducted ₹${cappedDeduction}, Refunded ₹${netRefund}${enrollCustomerInBlacklist ? ' + Added Client to Risk Registry' : ''}`,
               affectedRecordId: bookingId,
               priorValue: `Held Deposit: ₹${ledger.collectedDeposit}`,
               newValue: `Net Refunded: ₹${netRefund} • Approved Deduction: ₹${cappedDeduction}`,
@@ -1650,16 +1559,12 @@ export const useKaroRentStore = create<KaroRentState>()(
         get().addToast({
           title: `Deposit Settled: ₹${netRefund.toLocaleString('en-IN')} Refunded`,
           description: enrollCustomerInBlacklist
-            ? 'Customer also enrolled into Unified Customer Blacklist (FR-DSP-005).'
-            : 'Segregated deposit ledger balanced and closed (FR-DEP-002).',
-          ruleCode: 'FR-DEP-005',
+            ? 'Customer also enrolled into the Trust & Risk Registry.'
+            : 'Segregated deposit vault ledger balanced and closed.',
           variant: 'success',
         });
       },
 
-      // ========================================================================
-      // 11. Vendor Submits Staged Inventory Change (FR-INV-010, BR-030)
-      // ========================================================================
       submitVendorStagedInventoryChange: async ({
         inventoryId,
         requestedPublicEnabled,
@@ -1685,7 +1590,6 @@ export const useKaroRentStore = create<KaroRentState>()(
         set((s) => ({
           isSimulatingLatency: false,
           latencyActionLabel: null,
-          // CRITICAL BR-030 / FR-INV-010: Do NOT alter livePublicEnabled or live declaredQuantity!
           virtualInventory: s.virtualInventory.map((item) =>
             item.id === inventoryId
               ? {
@@ -1713,7 +1617,7 @@ export const useKaroRentStore = create<KaroRentState>()(
           notifications: [
             {
               id: `NTF-${Date.now()}`,
-              eventCode: 'FR-INV-010 / BR-030',
+              eventCode: 'Catalog Staging',
               title: `Vendor Staged Inventory Request (${stagedReqId})`,
               message: `${inv.owningVendorName} requested ${reqType} on "${inv.productTitle}". Live display remains unchanged pending your decision.`,
               recipientRole: 'PLATFORM_ADMIN',
@@ -1731,7 +1635,7 @@ export const useKaroRentStore = create<KaroRentState>()(
               timestamp: nowIST(),
               actorName: s.activePersona.name,
               actorRole: s.activePersona.roleBadge,
-              moduleCode: 'FR-INV-010 / BR-030',
+              moduleCode: 'Inventory Staging',
               actionSummary: `Vendor submitted staged ${reqType} for ${inventoryId} (Live status untouched)`,
               affectedRecordId: `${inventoryId} / ${stagedReqId}`,
               priorValue: `Live Enabled: ${inv.livePublicEnabled} (Stock: ${inv.declaredQuantity})`,
@@ -1743,24 +1647,20 @@ export const useKaroRentStore = create<KaroRentState>()(
         }));
 
         get().addToast({
-          title: 'Staged for Platform Manager Approval (FR-INV-010)',
+          title: 'Staged for Platform Manager Approval',
           description:
-            'Per BR-030, your change is saved in Pending Admin Approval and has NOT altered the live customer catalog yet.',
-          ruleCode: 'BR-030',
+            'Your change is saved in Pending Admin Approval and will update the live customer catalog once approved.',
           variant: 'info',
         });
       },
 
-      // ========================================================================
-      // 12. Platform Manager Resolves Staged Inventory OR Reassigns Source (FR-INV-009..011)
-      // ========================================================================
       resolveStagedInventoryRequest: async ({
         inventoryId,
         decision,
         newSourceVendorId,
         adminReason,
       }) => {
-        set({ isSimulatingLatency: true, latencyActionLabel: 'Applying Platform Manager Inventory Governance...' });
+        set({ isSimulatingLatency: true, latencyActionLabel: 'Applying Catalog Governance Decision...' });
         await simulateLatency(380);
 
         const state = get();
@@ -1781,7 +1681,7 @@ export const useKaroRentStore = create<KaroRentState>()(
                     previousVendorSourceName: `${item.owningVendorName} (${item.owningVendorId})`,
                     owningVendorId: newVendor.id,
                     owningVendorName: newVendor.displayName,
-                    livePublicEnabled: true, // Keeps item enabled on platform without interruption (WF-02 Option B)!
+                    livePublicEnabled: true,
                     lastSourceChangedAt: nowIST(),
                     pendingStagedRequest: undefined,
                   }
@@ -1792,8 +1692,8 @@ export const useKaroRentStore = create<KaroRentState>()(
                 id: `AUD-${Date.now()}`,
                 timestamp: nowIST(),
                 actorName: s.activePersona.name,
-                actorRole: 'Platform Super Admin',
-                moduleCode: 'FR-INV-011 / BR-031 / EX-034',
+                actorRole: 'Platform Administrator',
+                moduleCode: 'Source Routing',
                 actionSummary: `Reassigned inventory source for ${inv.productTitle} (${inv.id})`,
                 affectedRecordId: inv.id,
                 priorValue: `Source: ${inv.owningVendorName} (${inv.owningVendorId})`,
@@ -1807,8 +1707,7 @@ export const useKaroRentStore = create<KaroRentState>()(
           get().addToast({
             title: `Inventory Source Reassigned to ${newVendor.displayName}`,
             description:
-              'Future bookings route to the new vendor source while existing active rentals retain their original vendor snapshot (FR-INV-011 / BR-031).',
-            ruleCode: 'FR-INV-011',
+              'Future bookings route to the new partner vendor while existing active rentals retain their original vendor snapshot.',
             variant: 'success',
           });
           return;
@@ -1838,8 +1737,8 @@ export const useKaroRentStore = create<KaroRentState>()(
                 id: `AUD-${Date.now()}`,
                 timestamp: nowIST(),
                 actorName: s.activePersona.name,
-                actorRole: 'Platform Super Admin',
-                moduleCode: 'FR-INV-009 / FR-INV-010',
+                actorRole: 'Platform Administrator',
+                moduleCode: 'Catalog Approval',
                 actionSummary: `Approved staged inventory update for ${inv.id}`,
                 affectedRecordId: inv.id,
                 priorValue: `Live Enabled: ${inv.livePublicEnabled}, Stock: ${inv.declaredQuantity}`,
@@ -1853,13 +1752,11 @@ export const useKaroRentStore = create<KaroRentState>()(
           get().addToast({
             title: 'Staged Inventory Update Approved & Live',
             description: `${inv.productTitle} is now ${req.requestedPublicEnabled ? 'ENABLED' : 'DISABLED'} on the live customer marketplace.`,
-            ruleCode: 'FR-INV-009',
             variant: 'success',
           });
           return;
         }
 
-        // REJECT
         set((s) => ({
           isSimulatingLatency: false,
           latencyActionLabel: null,
@@ -1871,8 +1768,8 @@ export const useKaroRentStore = create<KaroRentState>()(
               id: `AUD-${Date.now()}`,
               timestamp: nowIST(),
               actorName: s.activePersona.name,
-              actorRole: 'Platform Super Admin',
-              moduleCode: 'FR-INV-010',
+              actorRole: 'Platform Administrator',
+              moduleCode: 'Catalog Review',
               actionSummary: `Rejected staged inventory request for ${inv.id}; live status unchanged`,
               affectedRecordId: inv.id,
               priorValue: 'Staged Request Pending',
@@ -1884,16 +1781,12 @@ export const useKaroRentStore = create<KaroRentState>()(
         }));
 
         get().addToast({
-          title: 'Staged Inventory Request Rejected',
-          description: 'Live platform status remains untouched and vendor has been notified with your reason.',
-          ruleCode: 'FR-INV-010',
+          title: 'Staged Inventory Request Declined',
+          description: 'Live platform status remains untouched and the partner vendor has been notified.',
           variant: 'warning',
         });
       },
 
-      // ========================================================================
-      // 13. Update Master Platform Pricing & Rate Card (FR-PRC-001, BR-027)
-      // ========================================================================
       updateMasterProductPricing: async ({
         productId,
         baseMonthlyRent,
@@ -1902,7 +1795,7 @@ export const useKaroRentStore = create<KaroRentState>()(
         copperPipeRate,
         reason,
       }) => {
-        set({ isSimulatingLatency: true, latencyActionLabel: 'Updating Master Platform Rate Card (BR-027)...' });
+        set({ isSimulatingLatency: true, latencyActionLabel: 'Updating Master Platform Rate Card...' });
         await simulateLatency(340);
 
         const oldProd = get().masterProducts.find((p) => p.id === productId);
@@ -1932,8 +1825,8 @@ export const useKaroRentStore = create<KaroRentState>()(
               id: `AUD-${Date.now()}`,
               timestamp: nowIST(),
               actorName: s.activePersona.name,
-              actorRole: 'Platform Super Admin',
-              moduleCode: 'FR-PRC-001 / BR-027',
+              actorRole: 'Platform Administrator',
+              moduleCode: 'Master Rate Card',
               actionSummary: `Updated master platform rate card for ${oldProd.title}`,
               affectedRecordId: productId,
               priorValue: `Rent: ₹${oldProd.baseMonthlyRent}/mo • Deposit: ${oldProd.depositMonthsMultiple}x`,
@@ -1945,22 +1838,17 @@ export const useKaroRentStore = create<KaroRentState>()(
         }));
 
         get().addToast({
-          title: 'Master Platform Rate Card Updated (BR-027)',
-          description: 'New bookings will use the updated rate; existing accepted agreements retain their historical price snapshots (BR-006).',
-          ruleCode: 'FR-PRC-001',
+          title: 'Master Platform Rate Card Updated',
+          description: 'New bookings will use the updated rate; existing signed agreements retain their original price snapshots.',
           variant: 'success',
         });
       },
 
-      // ========================================================================
-      // 14. Vendor Onboarding, Duplicate/Blacklist Check & Termination (FR-VEN-001..015)
-      // ========================================================================
       submitNewVendorApplication: async (payload) => {
-        set({ isSimulatingLatency: true, latencyActionLabel: 'Cross-Checking Vendor Blacklist & Tax Identifiers (FR-VEN-002)...' });
+        set({ isSimulatingLatency: true, latencyActionLabel: 'Cross-Checking Vendor Risk Registry & Tax Identifiers...' });
         await simulateLatency(420);
 
         const state = get();
-        // Cross-check against Vendor Blacklist (FR-VEN-002 / FR-BLK-003 / EX-031)
         const matchedBlacklist = state.blacklist.find(
           (b) =>
             b.ledgerType === 'VENDOR_BLACKLIST' &&
@@ -1982,7 +1870,7 @@ export const useKaroRentStore = create<KaroRentState>()(
           if (matchedBlacklist.matchedIdentifiers.phone === payload.registeredPhone) {
             matchedFields.push(`Phone (${payload.registeredPhone})`);
           }
-          matchedFields.push('Identifier Cross-Match (FR-BLK-003)');
+          matchedFields.push('Identifier Cross-Match');
         }
 
         const newVendor: VendorRecord = {
@@ -2000,7 +1888,7 @@ export const useKaroRentStore = create<KaroRentState>()(
           operatingHours: 'Mon–Sat • 09:00 AM – 07:00 PM',
           status: 'Submitted',
           agreementState: 'Draft',
-          agreementVersion: 'PVA-v4.0-2026 (Includes Mandatory Doorstep Pickup Photo Clause)',
+          agreementVersion: 'Partner Vendor Master Agreement (2026 Edition)',
           agreementExpiryDate: '2027-10-28',
           mandatoryPickupPhotoClauseAccepted: true,
           blacklistMatchWarning: matchedBlacklist
@@ -2026,13 +1914,13 @@ export const useKaroRentStore = create<KaroRentState>()(
               timestamp: nowIST(),
               actorName: payload.authorisedContactName,
               actorRole: 'Vendor Applicant',
-              moduleCode: matchedBlacklist ? 'FR-VEN-002 / FR-BLK-003 / EX-031' : 'FR-VEN-001',
+              moduleCode: matchedBlacklist ? 'Vendor Risk Match' : 'Vendor Onboarding',
               actionSummary: matchedBlacklist
-                ? `Flagged vendor application ${newVendorId} (${payload.displayName}) — Blacklist Match Detected!`
+                ? `Flagged vendor application ${newVendorId} (${payload.displayName}) — Terminated Vendor Match!`
                 : `Submitted new vendor application ${newVendorId} (${payload.displayName})`,
               affectedRecordId: newVendorId,
               priorValue: 'New Application',
-              newValue: matchedBlacklist ? 'Status: Submitted [BLACKLIST MATCH WARNING]' : 'Status: Submitted',
+              newValue: matchedBlacklist ? 'Status: Submitted [RISK MATCH WARNING]' : 'Status: Submitted',
               mandatoryReason: 'Vendor onboarding submission.',
             },
             ...s.auditLogs,
@@ -2041,16 +1929,14 @@ export const useKaroRentStore = create<KaroRentState>()(
 
         if (matchedBlacklist) {
           get().addToast({
-            title: 'Blacklist Match — Terminated Vendor Detected! (FR-BLK-003)',
-            description: `Application ${newVendorId} matched identifiers of ${matchedBlacklist.entityName}. Flagged for Super Admin review.`,
-            ruleCode: 'EX-031',
+            title: 'Risk Registry Match — Terminated Vendor Detected!',
+            description: `Application ${newVendorId} matched identifiers of ${matchedBlacklist.entityName}. Flagged for Administrator review.`,
             variant: 'error',
           });
         } else {
           get().addToast({
             title: `Vendor Application ${newVendorId} Submitted`,
-            description: 'Awaiting Platform Administrator review and Platform–Vendor Agreement execution (FR-VEN-006).',
-            ruleCode: 'FR-VEN-001',
+            description: 'Awaiting Platform Administrator review and Partner Agreement execution.',
             variant: 'success',
           });
         }
@@ -2079,8 +1965,8 @@ export const useKaroRentStore = create<KaroRentState>()(
               id: `AUD-${Date.now()}`,
               timestamp: nowIST(),
               actorName: s.activePersona.name,
-              actorRole: 'Platform Super Admin',
-              moduleCode: 'FR-VEN-004 / FR-VEN-006',
+              actorRole: 'Platform Administrator',
+              moduleCode: 'Vendor Review',
               actionSummary: `Marked vendor ${vendorId} as ${decision}`,
               affectedRecordId: vendorId,
               priorValue: 'Status: Submitted',
@@ -2094,13 +1980,12 @@ export const useKaroRentStore = create<KaroRentState>()(
         get().addToast({
           title: `Vendor ${vendorId}: ${decision}`,
           description: reason,
-          ruleCode: 'FR-VEN-004',
           variant: decision === 'Approved' ? 'success' : 'warning',
         });
       },
 
       terminateVendorAndAssignContinuity: async (vendorId, continuityManager, reason) => {
-        set({ isSimulatingLatency: true, latencyActionLabel: 'Executing Trading Cutoff, Settlement Hold & Blacklist Enrollment...' });
+        set({ isSimulatingLatency: true, latencyActionLabel: 'Executing Trading Cutoff, Settlement Hold & Registry Enrollment...' });
         await simulateLatency(420);
 
         const vendor = get().vendors.find((v) => v.id === vendorId);
@@ -2121,12 +2006,12 @@ export const useKaroRentStore = create<KaroRentState>()(
             bankOrPaymentFingerprint: vendor.bankAccountMasked,
             addressSnippet: vendor.serviceAreas.join(', '),
           },
-          evidenceSummary: `Auto-enrolled upon vendor termination initiation (FR-VEN-015 / FR-BLK-002): ${reason}`,
+          evidenceSummary: `Auto-enrolled upon vendor termination initiation: ${reason}`,
           outstandingDuesAmount: 35000,
           blockedAttemptsCount: 0,
           status: 'Active Blacklist',
           effectiveTimestamp: nowIST(),
-          enrolledByActor: 'System Automatic Enrollment (FR-BLK-002)',
+          enrolledByActor: 'System Automatic Enrollment',
         };
 
         set((s) => ({
@@ -2144,11 +2029,9 @@ export const useKaroRentStore = create<KaroRentState>()(
                 }
               : v
           ),
-          // FR-VEN-010: Delist public listings unless reassigned
           virtualInventory: s.virtualInventory.map((inv) =>
             inv.owningVendorId === vendorId ? { ...inv, livePublicEnabled: false } : inv
           ),
-          // FR-VEN-013: Place automated hold on pending settlements
           settlements: s.settlements.map((st) =>
             st.vendorId === vendorId && st.status !== 'Paid'
               ? {
@@ -2165,12 +2048,12 @@ export const useKaroRentStore = create<KaroRentState>()(
               id: `AUD-${Date.now()}`,
               timestamp: nowIST(),
               actorName: s.activePersona.name,
-              actorRole: 'Platform Super Admin',
-              moduleCode: 'FR-VEN-010..015 / FR-BLK-002',
-              actionSummary: `Terminated vendor ${vendor.displayName}, assigned Continuity Manager (${continuityManager}), held payouts & enrolled in Vendor Blacklist`,
+              actorRole: 'Platform Administrator',
+              moduleCode: 'Vendor Termination',
+              actionSummary: `Terminated vendor ${vendor.displayName}, assigned Continuity Manager (${continuityManager}), held payouts & enrolled in Risk Registry`,
               affectedRecordId: vendorId,
               priorValue: `Status: ${vendor.status}`,
-              newValue: 'Status: Terminating — Continuity Active • Enrolled in Vendor Blacklist',
+              newValue: 'Status: Terminating — Continuity Active • Enrolled in Risk Registry',
               mandatoryReason: reason,
             },
             ...s.auditLogs,
@@ -2178,18 +2061,14 @@ export const useKaroRentStore = create<KaroRentState>()(
         }));
 
         get().addToast({
-          title: `Vendor ${vendor.displayName} Terminated & Blacklisted (FR-BLK-002)`,
-          description: `Public listings delisted, payouts placed on escrow hold (FR-VEN-013), and Continuity Manager assigned.`,
-          ruleCode: 'FR-VEN-015',
+          title: `Vendor ${vendor.displayName} Terminated`,
+          description: `Public listings delisted, payouts placed on escrow hold, and Continuity Manager assigned.`,
           variant: 'error',
         });
       },
 
-      // ========================================================================
-      // 15. Super Admin Blacklist Exception Override (FR-BLK-008)
-      // ========================================================================
       overrideBlacklistEntry: async (blacklistId, overrideReason) => {
-        set({ isSimulatingLatency: true, latencyActionLabel: 'Recording Super Admin Exception Override (FR-BLK-008)...' });
+        set({ isSimulatingLatency: true, latencyActionLabel: 'Recording Administrator Exception Override...' });
         await simulateLatency(350);
 
         const entry = get().blacklist.find((b) => b.id === blacklistId);
@@ -2222,9 +2101,9 @@ export const useKaroRentStore = create<KaroRentState>()(
               id: `AUD-${Date.now()}`,
               timestamp: nowIST(),
               actorName: s.activePersona.name,
-              actorRole: 'Platform Super Admin',
-              moduleCode: 'FR-BLK-008 / FR-ADM-004',
-              actionSummary: `Approved Blacklist Exception Override for ${entry.entityName} (${entry.id})`,
+              actorRole: 'Platform Administrator',
+              moduleCode: 'Risk Override',
+              actionSummary: `Approved Exception Override for ${entry.entityName} (${entry.id})`,
               affectedRecordId: entry.id,
               priorValue: 'Status: Active Blacklist',
               newValue: 'Status: Whitelisted / Exception Override',
@@ -2235,9 +2114,8 @@ export const useKaroRentStore = create<KaroRentState>()(
         }));
 
         get().addToast({
-          title: 'Blacklist Exception Override Logged (FR-BLK-008)',
-          description: `${entry.entityName} cleared with mandatory audit justification.`,
-          ruleCode: 'FR-BLK-008',
+          title: 'Exception Override Logged',
+          description: `${entry.entityName} cleared with documented justification.`,
           variant: 'success',
         });
       },
@@ -2257,7 +2135,7 @@ export const useKaroRentStore = create<KaroRentState>()(
                     b.workflowType === 'SITE_VISIT_MULTI_STEP'
                       ? 'Awaiting Site Visit Payment'
                       : 'Awaiting Customer Agreement',
-                  blacklistFlagReason: `Overridden by Super Admin (${s.activePersona.name}): ${overrideReason}`,
+                  blacklistFlagReason: `Overridden by Administrator (${s.activePersona.name}): ${overrideReason}`,
                 }
               : b
           ),
@@ -2266,8 +2144,8 @@ export const useKaroRentStore = create<KaroRentState>()(
               id: `AUD-${Date.now()}`,
               timestamp: nowIST(),
               actorName: s.activePersona.name,
-              actorRole: 'Platform Super Admin',
-              moduleCode: 'FR-BLK-008',
+              actorRole: 'Platform Administrator',
+              moduleCode: 'Risk Override',
               actionSummary: `Approved one-time booking override for flagged order ${bookingId}`,
               affectedRecordId: bookingId,
               priorValue: 'Status: Flagged — Blacklist Review',
@@ -2280,17 +2158,13 @@ export const useKaroRentStore = create<KaroRentState>()(
 
         get().addToast({
           title: `Booking ${bookingId} Override Approved`,
-          description: 'Order released from Blacklist Review with immutable audit trail.',
-          ruleCode: 'FR-BLK-008',
+          description: 'Order released for checkout progression with audit trail.',
           variant: 'success',
         });
       },
 
-      // ========================================================================
-      // 16. Finance Vendor Settlement Approval (Segregation of Duties FR-SET-008)
-      // ========================================================================
       approveAndReleaseVendorSettlement: async (settlementId) => {
-        set({ isSimulatingLatency: true, latencyActionLabel: 'Verifying Segregation of Duties & Executing Payout...' });
+        set({ isSimulatingLatency: true, latencyActionLabel: 'Verifying Dual-Control Approval & Executing Payout...' });
         await simulateLatency(380);
 
         const st = get().settlements.find((s) => s.id === settlementId);
@@ -2306,7 +2180,7 @@ export const useKaroRentStore = create<KaroRentState>()(
               ? {
                   ...item,
                   status: 'Paid',
-                  approvedByActor: `${s.activePersona.name} (Verified Distinct Approver — FR-SET-008)`,
+                  approvedByActor: `${s.activePersona.name} (Verified Dual-Control Approver)`,
                   payoutReference: utr,
                 }
               : item
@@ -2317,7 +2191,7 @@ export const useKaroRentStore = create<KaroRentState>()(
               timestamp: nowIST(),
               actorName: s.activePersona.name,
               actorRole: s.activePersona.roleBadge,
-              moduleCode: 'FR-SET-005 / FR-SET-008',
+              moduleCode: 'Vendor Payouts',
               actionSummary: `Approved & released vendor settlement ${settlementId} (₹${st.netVendorPayable.toLocaleString('en-IN')})`,
               affectedRecordId: settlementId,
               priorValue: `Status: ${st.status} (Prepared by: ${st.preparedByActor})`,
@@ -2330,15 +2204,11 @@ export const useKaroRentStore = create<KaroRentState>()(
 
         get().addToast({
           title: `Vendor Payout Executed: ₹${st.netVendorPayable.toLocaleString('en-IN')}`,
-          description: `Segregation of duties verified (Preparer ≠ Approver). UTR: ${utr}`,
-          ruleCode: 'FR-SET-008',
+          description: `Dual-control approval verified (Preparer ≠ Approver). UTR: ${utr}`,
           variant: 'success',
         });
       },
 
-      // ========================================================================
-      // 17. Service Tickets, Asset Swap & Support Escalations (FR-SRV, FR-SUP, OBD)
-      // ========================================================================
       createServiceTicket: async (bookingId, issueDescription, requestAssetSwap) => {
         set({ isSimulatingLatency: true, latencyActionLabel: 'Logging Maintenance / Asset Swap Ticket...' });
         await simulateLatency(300);
@@ -2371,11 +2241,10 @@ export const useKaroRentStore = create<KaroRentState>()(
         }));
 
         get().addToast({
-          title: `Service Ticket ${ticketId} Created (FR-SRV-001)`,
+          title: `Service Ticket ${ticketId} Created`,
           description: requestAssetSwap
-            ? 'Asset replacement requested with customer consent recorded (FR-SRV-004).'
-            : 'Assigned to fulfilling vendor service team.',
-          ruleCode: 'FR-SRV-001',
+            ? 'Asset replacement requested with customer consent recorded.'
+            : 'Assigned to fulfilling partner service team.',
           variant: 'success',
         });
       },
@@ -2413,7 +2282,7 @@ export const useKaroRentStore = create<KaroRentState>()(
                     {
                       id: `AMD-${Date.now()}`,
                       version: `v1.${a.amendments.length + 1} — Serialized Asset Swap Addendum`,
-                      reason: `Replaced unit ${ticket.currentAssetSerial} with ${replacementSerial} under ticket ${ticket.id} (FR-SRV-004).`,
+                      reason: `Replaced unit ${ticket.currentAssetSerial} with ${replacementSerial} under ticket ${ticket.id}.`,
                       changedFieldsSummary: `Asset Serial updated: ${ticket.currentAssetSerial} → ${replacementSerial}`,
                       createdAt: nowIST(),
                       signedByCustomer: true,
@@ -2426,15 +2295,14 @@ export const useKaroRentStore = create<KaroRentState>()(
         }));
 
         get().addToast({
-          title: `Asset Swapped to ${replacementSerial} (FR-SRV-004)`,
+          title: `Asset Swapped to ${replacementSerial}`,
           description: 'Agreement amended with new serial number and ₹250 downtime credit applied.',
-          ruleCode: 'FR-SRV-004',
           variant: 'success',
         });
       },
 
       escalateSupportTicket: async (ticketId, resolutionOrEscalationNote) => {
-        set({ isSimulatingLatency: true, latencyActionLabel: 'Updating Support Ticket & SLA Log...' });
+        set({ isSimulatingLatency: true, latencyActionLabel: 'Updating Support Ticket...' });
         await simulateLatency(280);
 
         set((s) => ({
@@ -2464,15 +2332,14 @@ export const useKaroRentStore = create<KaroRentState>()(
         }));
 
         get().addToast({
-          title: 'Support Ticket Updated (FR-SUP-004)',
+          title: 'Support Ticket Updated',
           description: resolutionOrEscalationNote,
-          ruleCode: 'FR-SUP-004',
           variant: 'info',
         });
       },
 
       updateObdDecision: async (obdId, selectedOption) => {
-        set({ isSimulatingLatency: true, latencyActionLabel: 'Versioning Stakeholder OBD Policy...' });
+        set({ isSimulatingLatency: true, latencyActionLabel: 'Updating Platform Governance Policy...' });
         await simulateLatency(260);
 
         set((s) => ({
@@ -2486,28 +2353,27 @@ export const useKaroRentStore = create<KaroRentState>()(
               id: `AUD-${Date.now()}`,
               timestamp: nowIST(),
               actorName: s.activePersona.name,
-              actorRole: 'Platform Super Admin',
-              moduleCode: `FR-ADM-006 / ${obdId}`,
-              actionSummary: `Updated Open Business Decision ${obdId} policy configuration`,
+              actorRole: 'Platform Administrator',
+              moduleCode: 'Policy Update',
+              actionSummary: `Updated governance policy ${obdId}`,
               affectedRecordId: obdId,
               priorValue: 'Prior Policy Version',
               newValue: selectedOption,
-              mandatoryReason: 'Stakeholder workshop policy sign-off (Section 18).',
+              mandatoryReason: 'Executive policy update.',
             },
             ...s.auditLogs,
           ],
         }));
 
         get().addToast({
-          title: `${obdId} Policy Updated (FR-ADM-006)`,
+          title: 'Governance Policy Updated',
           description: `Effective for new transactions; historical accepted transactions preserved.`,
-          ruleCode: obdId,
           variant: 'success',
         });
       },
     }),
     {
-      name: 'karorent-srs-v4-terracotta-hearth-storage',
+      name: 'karorent-live-platform-v2',
       partialize: (state) => ({
         darkMode: state.darkMode,
         customers: state.customers,

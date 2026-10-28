@@ -1,36 +1,31 @@
 import { z } from 'zod';
 
-// ============================================================================
-// SRS v4.0 Section 9.1 — Common Field & Business Rule Validation (Zod)
-// ============================================================================
-
 export const nonWhitespaceText = (fieldLabel: string, minLen = 3) =>
   z
     .string()
     .trim()
-    .min(minLen, `${fieldLabel} is required and cannot be empty or whitespace-only (SRS 9.1).`);
+    .min(minLen, `${fieldLabel} is required and cannot be empty.`);
 
 export const mandatoryReasonSchema = z
   .string()
   .trim()
-  .min(10, 'A clear, documented reason (at least 10 characters) is mandatory for audit traceability (SRS 9.1 / FR-ADM-004).');
+  .min(10, 'Please provide a clear, documented reason (at least 10 characters) for the audit log.');
 
 export const indianMobileSchema = z
   .string()
   .trim()
-  .regex(/^(\+91[\-\s]?)?[6-9]\d{9}$/, 'Enter a valid 10-digit Indian mobile number starting with 6–9 (FR-CUS-007).');
+  .regex(/^(\+91[\-\s]?)?[6-9]\d{9}$/, 'Enter a valid 10-digit Indian mobile number starting with 6–9.');
 
 export const gstinSchema = z
   .string()
   .trim()
   .regex(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/, 'Enter a valid 15-character GSTIN (e.g., 29AABCC1234D1Z5).');
 
-// Booking Checkout Validation (FR-BKG-001, FR-BKG-002, Section 9.1)
 export const bookingCheckoutSchema = z
   .object({
     quantity: z
       .number()
-      .int('Quantity must be a whole number (SRS 9.1).')
+      .int('Quantity must be a whole number.')
       .positive('Quantity must be at least 1 unit.'),
     maxAvailable: z.number(),
     startDate: z.string().min(1, 'Start date is required.'),
@@ -39,7 +34,7 @@ export const bookingCheckoutSchema = z
     recipientPhone: indianMobileSchema,
   })
   .refine((data) => data.quantity <= data.maxAvailable, {
-    message: 'Requested quantity exceeds available virtual inventory (FR-INV-005 / BR-004).',
+    message: 'Requested quantity exceeds available stock for the selected dates.',
     path: ['quantity'],
   })
   .refine(
@@ -49,12 +44,11 @@ export const bookingCheckoutSchema = z
       return selected >= today;
     },
     {
-      message: 'Rental start date must follow booking lead-time rules and cannot be in the past (SRS 9.1).',
+      message: 'Rental start date cannot be in the past.',
       path: ['startDate'],
     }
   );
 
-// AC Pre-Installation Site Visit Metric Validation (FR-FUL-008, FR-PRC-008)
 export const siteVisitMetricsSchema = z.object({
   feasible: z.boolean(),
   unfeasibleReason: z.string().optional(),
@@ -68,22 +62,20 @@ export const siteVisitMetricsSchema = z.object({
   technicianNotes: nonWhitespaceText('Site inspection notes', 5),
 });
 
-// Mandatory Return Pickup EXIF Photo Gate Validation (FR-RET-002, BR-026, EX-029)
 export const pickupPhotoGateSchema = z.object({
   photoUrl: z
     .string()
     .trim()
-    .min(5, 'Mandatory customer-premise pickup photo is required before marking Picked Up (FR-RET-002 / BR-026).'),
+    .min(5, 'A customer-premise pickup photo is required before marking the item as Picked Up.'),
   exifTimestamp: z
     .string()
     .trim()
-    .min(10, 'Verified system/EXIF timestamp is required at customer handover.'),
+    .min(10, 'Verified timestamp is required at customer handover.'),
   fileFormat: z.enum(['JPEG', 'PNG', 'MP4', 'PDF'], {
-    errorMap: () => ({ message: 'Unsupported file format. Only JPEG, PNG, PDF, or MP4 are permitted (FR-DSP-002).' }),
+    errorMap: () => ({ message: 'Unsupported file format. Only JPEG, PNG, PDF, or MP4 are permitted.' }),
   }),
 });
 
-// Vendor Onboarding Application Validation (FR-VEN-001, FR-VEN-002)
 export const vendorOnboardingSchema = z.object({
   legalBusinessName: nonWhitespaceText('Legal Business Name', 4),
   displayName: nonWhitespaceText('Storefront Display Name', 3),
@@ -99,14 +91,13 @@ export const vendorOnboardingSchema = z.object({
   serviceAreas: z.string().trim().min(3, 'Specify at least one service area/city.'),
   mandatoryPickupPhotoClauseAccepted: z.literal(true, {
     errorMap: () => ({
-      message: 'You must accept the mandatory customer-premise timestamped pickup photo clause (FR-VEN-005 / BR-026).',
+      message: 'You must accept the mandatory doorstep pickup photo verification clause.',
     }),
   }),
 });
 
-// Master Platform Pricing & Rate Card Update Validation (FR-PRC-001, BR-027)
 export const masterPricingSchema = z.object({
-  baseMonthlyRent: z.number().positive('Monthly rental rate must be greater than ₹0 (SRS 9.1).'),
+  baseMonthlyRent: z.number().positive('Monthly rental rate must be greater than ₹0.'),
   depositMonthsMultiple: z.number().min(1).max(12),
   siteVisitFee: z.number().min(0, 'Site visit fee must be non-negative.'),
   copperPipeRatePerMeter: z.number().min(0),

@@ -92,13 +92,13 @@ export const MarketplaceView: React.FC = () => {
           <div className="max-w-xl space-y-3.5">
             <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-pill bg-hearth-card/90 border border-hearth-border text-[11px] font-medium text-hearth-terracotta shadow-sm">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Theme 3: “Terracotta Hearth” • Platform-Guaranteed Rental Rates (BR-027)</span>
+              <span>Terracotta Hearth Collection • Platform-Guaranteed Rental Rates</span>
             </div>
             <h1 className="font-serif text-2xl sm:text-4xl font-bold text-[#1C1917] leading-tight">
               Thoughtful living, curated for your home & studio.
             </h1>
             <p className="text-xs sm:text-sm text-[#44403C] leading-relaxed">
-              Every rental is contracted directly with <strong>KaroRent</strong> (FR-AGR-001), priced transparently by our central rate card, and protected by our <strong>Segregated Security Deposit Vault</strong> with mandatory doorstep EXIF pickup verification (BR-026).
+              Every rental is contracted directly with <strong>KaroRent</strong>, priced transparently by our central rate card, and protected by our <strong>Segregated Security Deposit Vault</strong> with mandatory doorstep EXIF pickup verification.
             </p>
             <div className="flex flex-wrap items-center gap-2.5 pt-1">
               <button
@@ -113,14 +113,14 @@ export const MarketplaceView: React.FC = () => {
                 className="spring-btn px-4 py-2 rounded-pill bg-white/90 hover:bg-white text-[#1C1917] border border-[#E7E5E4] text-xs font-semibold flex items-center gap-1.5"
               >
                 <Eye className="w-3.5 h-3.5 text-hearth-terracotta" />
-                <span>View Theme 3 HD Design Reference</span>
+                <span>View Editorial Lookbook</span>
               </button>
               {!activePersona.isBlacklisted && (
                 <button
                   onClick={() => switchPersona('persona-cus-blk')}
                   className="px-3.5 py-2 rounded-pill bg-[#FEE2E2] hover:bg-[#FECACA] text-[#991B1B] text-[11px] font-medium transition-colors"
                 >
-                  Test Blacklist Checkout Intercept (FR-BLK-005)
+                  Simulate Restricted Account Checkout
                 </button>
               )}
             </div>
@@ -128,13 +128,13 @@ export const MarketplaceView: React.FC = () => {
         </div>
       </div>
 
-      {/* Tactile Horizontal Filter Ribbon & Rental Duration Slider (Exact Match to Theme 3 Screen A Mockup!) */}
+      {/* Tactile Horizontal Filter Ribbon & Rental Duration Slider */}
       <div className="rounded-3xl bg-hearth-card border border-hearth-border p-5 shadow-hearth space-y-4">
         <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-5">
-          {/* Category 999px Pill Chips */}
+          {/* Category Pill Chips */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1">
             <span className="text-[11px] font-mono text-hearth-taupe mr-1 shrink-0">
-              999px Pills:
+              Categories:
             </span>
             {CATEGORIES.map((category) => {
               const active = selectedCategory === category;
@@ -159,7 +159,7 @@ export const MarketplaceView: React.FC = () => {
             <div className="shrink-0">
               <div className="text-xs font-semibold text-hearth-ink">Rental Duration</div>
               <div className="text-[10px] text-hearth-taupe font-mono">
-                Dynamic Rate Plan (FR-PRC-001)
+                Dynamic Tenure Plan
               </div>
             </div>
             <div className="flex-1">
@@ -193,12 +193,12 @@ export const MarketplaceView: React.FC = () => {
           </div>
         </div>
 
-        {/* Sub-Ribbon: Dual-Path Workflow Filter (FR-CAT-003) & Comparison Tray */}
+        {/* Sub-Ribbon: Dual-Path Workflow Filter & Comparison Tray */}
         <div className="pt-3 border-t border-hearth-border flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs text-hearth-taupe flex items-center gap-1.5 mr-1">
               <SlidersHorizontal className="w-3.5 h-3.5 text-hearth-terracotta" />
-              <span>Booking Path (FR-CAT-003):</span>
+              <span>Booking Path:</span>
             </span>
 
             <button
@@ -243,7 +243,7 @@ export const MarketplaceView: React.FC = () => {
               className="spring-btn px-4 py-1.5 rounded-pill bg-hearth-sage text-white text-xs font-semibold flex items-center gap-2 shadow-sm"
             >
               <GitCompare className="w-3.5 h-3.5" />
-              <span>Compare Selected ({comparisonProductIds.length}/3) — FR-CAT-005</span>
+              <span>Compare Selected ({comparisonProductIds.length}/3)</span>
             </button>
           )}
         </div>
@@ -305,7 +305,7 @@ export const MarketplaceView: React.FC = () => {
                         ? 'bg-hearth-terracotta text-white border-hearth-terracotta'
                         : 'bg-[#FFFCF7]/90 text-[#1C1917] border-[#E7E5E4] hover:bg-white'
                     }`}
-                    title="Compare Product Offer (FR-CAT-005)"
+                    title="Compare Product Offer"
                   >
                     <GitCompare className="w-3.5 h-3.5" />
                   </button>
@@ -321,7 +321,7 @@ export const MarketplaceView: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Editorial Product Details & Partner Vendor Attribution (FR-CAT-004) */}
+                {/* Editorial Product Details & Partner Vendor Attribution */}
                 <div className="p-5 pb-4 space-y-2.5">
                   <div className="flex items-center justify-between text-[11px] text-hearth-taupe font-mono">
                     <span>{product.category.toUpperCase()}</span>
@@ -336,7 +336,7 @@ export const MarketplaceView: React.FC = () => {
                     {product.description}
                   </p>
 
-                  {/* Vendor Attribution & Source Transparency (FR-CAT-004 / FR-INV-011) */}
+                  {/* Vendor Attribution & Source Transparency */}
                   <div className="pt-1 flex items-center justify-between text-[11px] text-hearth-umber bg-hearth-oat/60 px-3 py-2 rounded-xl border border-hearth-border">
                     <div className="flex items-center gap-1.5 truncate">
                       <Store className="w-3.5 h-3.5 text-hearth-terracotta shrink-0" />
@@ -347,14 +347,14 @@ export const MarketplaceView: React.FC = () => {
                     {inv.pendingStagedRequest && (
                       <span
                         className="text-[9px] font-mono px-1.5 py-0.5 rounded-pill bg-[#FFEDD5] text-[#9A3412] shrink-0"
-                        title="Vendor submitted a staged change; live display remains unaffected until Platform Manager approval (BR-030)"
+                        title="Vendor submitted a staged change; live display remains unaffected until Platform Manager approval"
                       >
                         Staged Edit Pending
                       </span>
                     )}
                   </div>
 
-                  {/* Multi-Step Rate Card Preview Accordion (FR-PRC-001) */}
+                  {/* Multi-Step Rate Card Preview Accordion */}
                   {product.installationRateCard.length > 0 && (
                     <div>
                       <button
@@ -368,7 +368,7 @@ export const MarketplaceView: React.FC = () => {
                         <span className="flex items-center gap-1">
                           <Ruler className="w-3.5 h-3.5" />
                           <span>
-                            View Locked Platform Installation Rate Card (FR-PRC-001)
+                            View Locked Platform Installation Rate Card
                           </span>
                         </span>
                         <span>{isRateCardOpen ? 'Hide' : 'Show'}</span>
@@ -416,7 +416,7 @@ export const MarketplaceView: React.FC = () => {
                   </div>
                   <span className="text-[10px] font-mono text-hearth-taupe flex items-center gap-1">
                     <Lock className="w-3 h-3 text-hearth-terracotta" />
-                    BR-027
+                    Fixed Rate
                   </span>
                 </div>
 
@@ -448,14 +448,14 @@ export const MarketplaceView: React.FC = () => {
         })}
       </div>
 
-      {/* Product Comparison Modal (FR-CAT-005) */}
+      {/* Product Comparison Modal */}
       {showCompareModal && (
         <div className="fixed inset-0 z-50 bg-[#1C1917]/50 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="w-full max-w-4xl rounded-3xl bg-hearth-parchment border border-hearth-border shadow-hearth-lg p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-4 border-b border-hearth-border">
               <div>
                 <h3 className="font-serif text-xl font-bold text-hearth-ink">
-                  Side-by-Side Offer Comparison (FR-CAT-005)
+                  Side-by-Side Offer Comparison
                 </h3>
                 <p className="text-xs text-hearth-taupe">
                   Distinguishes workflow requirements, condition grades, and fulfilling vendor locations without implying identical service terms.
@@ -536,17 +536,17 @@ export const MarketplaceView: React.FC = () => {
         </div>
       )}
 
-      {/* Theme 3 High-Definition Visual Reference Modal */}
+      {/* Editorial Visual Lookbook Modal */}
       {showThemeMockupModal && (
         <div className="fixed inset-0 z-50 bg-[#1C1917]/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="w-full max-w-5xl rounded-3xl bg-hearth-parchment border border-hearth-border shadow-hearth-lg p-6 max-h-[90vh] overflow-y-auto space-y-5">
             <div className="flex items-center justify-between border-b border-hearth-border pb-3">
               <div>
                 <h3 className="font-serif text-xl font-bold text-hearth-ink">
-                  Theme 3: “Terracotta Hearth” — Official HD Design Specification Mockups
+                  “Terracotta Hearth” — Warm Editorial Lookbook & Platform Architecture
                 </h3>
                 <p className="text-xs text-hearth-taupe">
-                  From Conversation 7e971d04-5916-45d3-9534-e682cc3d3022 • Warm Alabaster Linen (#FAF8F5), Woven Oat (#F5F2EB), Sun-Baked Terracotta (#C2410C) & Botanical Sage (#2F5233)
+                  Crafted with Warm Alabaster Linen (#FAF8F5), Woven Oat (#F5F2EB), Sun-Baked Terracotta (#C2410C) & Botanical Sage (#2F5233)
                 </p>
               </div>
               <button
@@ -559,21 +559,21 @@ export const MarketplaceView: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <div className="text-xs font-semibold text-hearth-ink">
-                  Screen A: Warm Lifestyle Marketplace & Interior Catalog
+                  Warm Lifestyle Marketplace & Interior Catalog
                 </div>
                 <img
                   src="assets/theme3_terracotta_hearth_marketplace.jpg"
-                  alt="Theme 3 Marketplace Mockup"
+                  alt="Marketplace Lookbook"
                   className="w-full rounded-2xl border border-hearth-border shadow-sm"
                 />
               </div>
               <div className="space-y-2">
                 <div className="text-xs font-semibold text-hearth-ink">
-                  Screen B: Guided AC Site-Visit Storyboard, Stationery Agreement & Fair Deposit Console
+                  Guided AC Site-Visit Storyboard, Stationery Agreement & Fair Deposit Console
                 </div>
                 <img
                   src="assets/theme3_terracotta_hearth_console.jpg"
-                  alt="Theme 3 Console Mockup"
+                  alt="Console Lookbook"
                   className="w-full rounded-2xl border border-hearth-border shadow-sm"
                 />
               </div>

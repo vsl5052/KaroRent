@@ -57,14 +57,14 @@ export const WorkspaceSidebar: React.FC = () => {
     {
       id: 'MARKETPLACE',
       label: 'Lifestyle Catalog',
-      srsCode: 'FR-CAT / PRC',
+      srsCode: 'Curated Offerings',
       icon: <Home className="w-4 h-4" />,
       allowedRoles: ['CUSTOMER_INDIVIDUAL', 'CUSTOMER_BUSINESS', 'VENDOR_OWNER', 'FIELD_PERSONNEL', 'PLATFORM_ADMIN'],
     },
     {
       id: 'MY_RENTALS',
       label: 'My Rentals & AC Storyboard',
-      srsCode: 'WF-04 / FR-LIF',
+      srsCode: 'Orders & Home Visits',
       icon: <CalendarClock className="w-4 h-4" />,
       badgeCount: bookings.filter((b) => b.status === 'Final Bill Sent' || b.status === 'Awaiting Customer Agreement').length || undefined,
       badgeVariant: 'terracotta',
@@ -73,14 +73,14 @@ export const WorkspaceSidebar: React.FC = () => {
     {
       id: 'AGREEMENTS_ESIGN',
       label: 'Stationery E-Agreements',
-      srsCode: 'FR-AGR-001..009',
+      srsCode: 'Digital Contracts',
       icon: <FileSignature className="w-4 h-4" />,
       allowedRoles: ['CUSTOMER_INDIVIDUAL', 'CUSTOMER_BUSINESS', 'PLATFORM_ADMIN'],
     },
     {
       id: 'INVOICES_DEPOSITS',
       label: '5-Invoice & Deposit Vault',
-      srsCode: 'FR-PAY-011 / DEP',
+      srsCode: 'Invoices & Vault',
       icon: <ReceiptIndianRupee className="w-4 h-4" />,
       badgeVariant: 'sage',
       allowedRoles: ['CUSTOMER_INDIVIDUAL', 'CUSTOMER_BUSINESS', 'PLATFORM_ADMIN'],
@@ -88,7 +88,7 @@ export const WorkspaceSidebar: React.FC = () => {
     {
       id: 'THREE_WAY_INSPECTION',
       label: 'Returns & 3-Way Care',
-      srsCode: 'FR-RET / BR-026',
+      srsCode: 'Inspection & Refunds',
       icon: <Camera className="w-4 h-4" />,
       badgeCount: openDisputesCount || undefined,
       badgeVariant: 'terracotta',
@@ -97,7 +97,7 @@ export const WorkspaceSidebar: React.FC = () => {
     {
       id: 'VENDOR_PORTAL',
       label: 'Catalogue & Staged Edits',
-      srsCode: 'FR-INV-010 / VEN',
+      srsCode: 'Partner Inventory',
       icon: <Building2 className="w-4 h-4" />,
       badgeCount: stagedCount || undefined,
       badgeVariant: 'terracotta',
@@ -106,7 +106,7 @@ export const WorkspaceSidebar: React.FC = () => {
     {
       id: 'FIELD_OPERATIONS',
       label: 'Deliveries & Home Visits',
-      srsCode: 'FR-FUL-008 / RET-002',
+      srsCode: 'Dispatch & Pickups',
       icon: <Truck className="w-4 h-4" />,
       badgeCount: fieldJobsCount || undefined,
       badgeVariant: 'terracotta',
@@ -115,7 +115,7 @@ export const WorkspaceSidebar: React.FC = () => {
     {
       id: 'ADMIN_GOVERNANCE',
       label: 'Morning Triage & Source Control',
-      srsCode: 'FR-INV-009..011',
+      srsCode: 'Catalog & Pricing',
       icon: <Layers className="w-4 h-4" />,
       badgeCount: stagedCount || undefined,
       badgeVariant: 'terracotta',
@@ -124,7 +124,7 @@ export const WorkspaceSidebar: React.FC = () => {
     {
       id: 'BLACKLIST_REGISTRY',
       label: 'Trust & Blacklist Safeguards',
-      srsCode: 'FR-BLK-001..008',
+      srsCode: 'Risk & Watchlist',
       icon: <ShieldAlert className="w-4 h-4" />,
       badgeCount: activeBlacklistCount + flaggedBookingsCount,
       badgeVariant: 'crimson',
@@ -133,7 +133,7 @@ export const WorkspaceSidebar: React.FC = () => {
     {
       id: 'SETTLEMENTS_FINANCE',
       label: 'Commission & Settlements',
-      srsCode: 'FR-SET-001..008',
+      srsCode: 'Partner Payouts',
       icon: <WalletCards className="w-4 h-4" />,
       badgeCount: pendingSettlementsCount || undefined,
       badgeVariant: 'sage',
@@ -142,14 +142,14 @@ export const WorkspaceSidebar: React.FC = () => {
     {
       id: 'SUPPORT_DISPUTES',
       label: 'Support, SLA & Service Swaps',
-      srsCode: 'FR-SRV / SUP / DSP',
+      srsCode: 'Care & Maintenance',
       icon: <MessageSquareWarning className="w-4 h-4" />,
       allowedRoles: ['CUSTOMER_INDIVIDUAL', 'CUSTOMER_BUSINESS', 'VENDOR_OWNER', 'PLATFORM_ADMIN'],
     },
     {
       id: 'AUDIT_OBD_REPORTS',
-      label: 'Audit Trail, OBDs & Exports',
-      srsCode: 'FR-ADM / RPT / OBD',
+      label: 'Audit Trail, Policies & Exports',
+      srsCode: 'Audit & Governance',
       icon: <FileSpreadsheet className="w-4 h-4" />,
       allowedRoles: ['PLATFORM_ADMIN', 'VENDOR_OWNER'],
     },
@@ -182,12 +182,12 @@ export const WorkspaceSidebar: React.FC = () => {
           {activePersona.isTerminatedVendor && (
             <div className="mt-2 p-2 rounded-xl bg-[#FEE2E2] border border-[#FECACA] text-[10px] text-[#991B1B] font-medium flex items-center gap-1.5">
               <AlertOctagon className="w-3.5 h-3.5 shrink-0" />
-              <span>FR-VEN-014: Post-Termination Read-Only Mode Active</span>
+              <span>Post-Termination Read-Only Mode Active</span>
             </div>
           )}
         </div>
 
-        {/* Navigation Links (Matches Theme 3 Terracotta Hearth Console Sidebar) */}
+        {/* Navigation Links */}
         <div className="text-[10px] font-mono uppercase tracking-wider text-hearth-taupe px-3 mb-2">
           Guided Lifecycle Modules
         </div>
@@ -239,7 +239,7 @@ export const WorkspaceSidebar: React.FC = () => {
         </nav>
       </div>
 
-      {/* Theme 3 Palette Swatch Legend (Directly inspired by Theme 3 Console Mockup bottom-left!) */}
+      {/* Palette Swatch Legend */}
       <div className="hidden lg:block mt-6 pt-4 border-t border-hearth-border">
         <div className="p-3 rounded-2xl bg-hearth-card/80 border border-hearth-border flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-[#FAF8F5] border border-[#E7E5E4] shadow-inner shrink-0 flex items-center justify-center">
@@ -247,7 +247,7 @@ export const WorkspaceSidebar: React.FC = () => {
           </div>
           <div>
             <div className="text-[11px] font-semibold text-hearth-ink">
-              Theme 3: Terracotta Hearth
+              Terracotta Hearth Edition
             </div>
             <div className="text-[10px] font-mono text-hearth-taupe">
               Alabaster Linen (#FAF8F5)

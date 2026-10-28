@@ -58,7 +58,7 @@ export const BookingCheckoutModal: React.FC = () => {
   const gstOnDelivery = Math.round(deliveryFee * 0.18);
 
   const upfrontTotalDueNow = isMultiStep
-    ? product.siteVisitFee // Multi-step pays ₹499 Site Visit Fee first (FR-PRC-008)!
+    ? product.siteVisitFee // Multi-step pays ₹499 Site Visit Fee first!
     : totalMonthlyRent + gstOnRent + refundableDeposit + deliveryFee + gstOnDelivery;
 
   const handleCheckoutSubmit = async (e: React.FormEvent) => {
@@ -108,12 +108,12 @@ export const BookingCheckoutModal: React.FC = () => {
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-pill bg-hearth-apricot text-hearth-terracotta font-semibold border border-hearth-terracotta/30">
                 {isMultiStep
-                  ? 'WF-04 Path B • Multi-Step Site Visit Required'
-                  : 'WF-04 Path A • 1-Step Direct Home Booking'}
+                  ? 'Multi-Step Site Visit Required'
+                  : '1-Step Direct Home Booking'}
               </span>
               <span className="text-[10px] font-mono text-hearth-taupe flex items-center gap-1">
                 <Clock className="w-3 h-3 text-hearth-terracotta" />
-                OBD-01 Hold: 15:00m
+                Reservation Hold: 15:00m
               </span>
             </div>
             <h2 className="font-serif text-xl font-bold text-hearth-ink mt-1">
@@ -130,28 +130,28 @@ export const BookingCheckoutModal: React.FC = () => {
 
         {/* Scrollable Body */}
         <form onSubmit={handleCheckoutSubmit} className="p-6 overflow-y-auto space-y-5">
-          {/* Active Blacklist Warning Banner if user switched to Vikram Mehta (FR-BLK-005 / EX-032) */}
+          {/* Active Blacklist Warning Banner if user switched to Vikram Mehta */}
           {activePersona.isBlacklisted && (
             <div className="p-4 rounded-2xl bg-[#FEE2E2] border-2 border-[#DC2626] text-[#991B1B] flex items-start gap-3">
               <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
               <div className="text-xs space-y-1">
                 <div className="font-bold">
-                  Active Customer Blacklist Profile Detected ({activePersona.name}) — FR-BLK-005 / EX-032
+                  Restricted Customer Profile Detected ({activePersona.name})
                 </div>
                 <p>
-                  Submitting this booking will trigger pre-confirmation interception (FR-BKG-002), place the order in{' '}
+                  Submitting this booking will trigger pre-confirmation interception, place the order in{' '}
                   <strong>Flagged — Blacklist Review</strong>, prevent virtual stock allocation, and alert the Platform Super Administrator.
                 </p>
               </div>
             </div>
           )}
 
-          {/* Validation Errors (SRS Section 9.1) */}
+          {/* Validation Errors */}
           {validationErrors.length > 0 && (
             <div className="p-4 rounded-2xl bg-[#FEE2E2] border border-[#FECACA] text-[#991B1B] text-xs space-y-1">
               <div className="font-bold flex items-center gap-1.5">
                 <AlertTriangle className="w-4 h-4" />
-                <span>Please resolve validation errors (SRS Section 9.1):</span>
+                <span>Please resolve the following validation errors:</span>
               </div>
               <ul className="list-disc pl-5 space-y-0.5">
                 {validationErrors.map((err, i) => (
@@ -166,7 +166,7 @@ export const BookingCheckoutModal: React.FC = () => {
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-hearth-ink mb-1.5">
-                  Rental Duration Plan (FR-PRC-001) *
+                  Rental Duration Plan *
                 </label>
                 <div className="grid grid-cols-4 gap-2">
                   {([3, 6, 12, 24] as const).map((m) => (
@@ -215,7 +215,7 @@ export const BookingCheckoutModal: React.FC = () => {
 
               <div>
                 <label className="block text-xs font-semibold text-hearth-ink mb-1">
-                  Verified Recipient Mobile (FR-CUS-007) *
+                  Verified Recipient Mobile *
                 </label>
                 <input
                   type="text"
@@ -227,7 +227,7 @@ export const BookingCheckoutModal: React.FC = () => {
 
               <div>
                 <label className="block text-xs font-semibold text-hearth-ink mb-1">
-                  Snapshot Delivery Address (FR-CUS-002 / BR-006) *
+                  Snapshot Delivery Address *
                 </label>
                 <textarea
                   rows={2}
@@ -241,15 +241,15 @@ export const BookingCheckoutModal: React.FC = () => {
               </div>
             </div>
 
-            {/* Right Column: Transparent Itemised Quote Receipt (FR-PRC-002, BR-011) */}
+            {/* Right Column: Transparent Itemised Quote Receipt */}
             <div className="rounded-2xl bg-hearth-oat border border-hearth-border p-4 flex flex-col justify-between space-y-4">
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between border-b border-hearth-border pb-2">
                   <span className="font-serif font-bold text-sm text-hearth-ink">
-                    Itemised Platform Quote (FR-PRC-002)
+                    Itemised Platform Quote
                   </span>
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded-pill bg-hearth-card border border-hearth-border text-hearth-terracotta">
-                    BR-027 Locked
+                    Rate Locked
                   </span>
                 </div>
 
@@ -263,7 +263,7 @@ export const BookingCheckoutModal: React.FC = () => {
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span>GST on Rental (18% — FR-PAY-010):</span>
+                    <span>GST on Rental (18%):</span>
                     <span className="font-ledger">₹{gstOnRent.toLocaleString('en-IN')}</span>
                   </div>
                   <div className="flex justify-between">
@@ -273,7 +273,7 @@ export const BookingCheckoutModal: React.FC = () => {
                     </span>
                   </div>
 
-                  {/* Segregated Security Deposit Box (BR-011 / FR-DEP-001) */}
+                  {/* Segregated Security Deposit Box */}
                   <div className="p-2.5 rounded-xl bg-hearth-sageLight border border-hearth-sage/25 my-2">
                     <div className="flex justify-between font-semibold text-hearth-sage">
                       <span className="flex items-center gap-1">
@@ -285,7 +285,7 @@ export const BookingCheckoutModal: React.FC = () => {
                       </span>
                     </div>
                     <p className="text-[10px] text-hearth-taupe mt-0.5">
-                      BR-011: Tax-exempt (₹0 GST). Never conflated with rental revenue; refunded within 14 days of return closure.
+                      Tax-exempt (₹0 GST). Never conflated with rental revenue; refunded within 14 days of return closure.
                     </p>
                   </div>
 
@@ -294,7 +294,7 @@ export const BookingCheckoutModal: React.FC = () => {
                       <div className="font-semibold text-hearth-terracotta flex items-center justify-between">
                         <span className="flex items-center gap-1">
                           <Ruler className="w-3.5 h-3.5" />
-                          <span>Step 1 Upfront: Site Visit Fee (FR-PRC-008)</span>
+                          <span>Step 1 Upfront: Site Visit Fee</span>
                         </span>
                         <span className="font-ledger font-bold">₹{product.siteVisitFee}</span>
                       </div>
@@ -316,7 +316,7 @@ export const BookingCheckoutModal: React.FC = () => {
                   </span>
                 </div>
                 <p className="text-[10px] text-hearth-taupe mt-1">
-                  Generates distinct financial documents under FR-PAY-011.
+                  Generates distinct financial documents for rent, deposit, and delivery.
                 </p>
               </div>
             </div>
@@ -326,7 +326,7 @@ export const BookingCheckoutModal: React.FC = () => {
           <div className="pt-4 border-t border-hearth-border flex flex-wrap items-center justify-between gap-3">
             <div className="text-[11px] text-hearth-taupe flex items-center gap-1.5">
               <Lock className="w-3.5 h-3.5 text-hearth-sage" />
-              <span>Idempotent submission protection active (FR-BKG-009)</span>
+              <span>Duplicate-submission protection active</span>
             </div>
             <div className="flex items-center gap-2.5">
               <button
