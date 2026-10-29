@@ -2,15 +2,8 @@ import React, { useState } from 'react';
 import {
   AlertOctagon,
   Building2,
-  Camera,
-  CheckCircle2,
-  Clock,
-  FileCheck2,
   Lock,
   PackagePlus,
-  ShieldAlert,
-  Sparkles,
-  Upload,
 } from 'lucide-react';
 import { useKaroRentStore } from '../../store/useKaroRentStore';
 import { vendorOnboardingSchema } from '../../lib/validation';
@@ -21,11 +14,9 @@ export const VendorPortalView: React.FC = () => {
     vendors,
     virtualInventory,
     masterProducts,
-    bookings,
     submitVendorStagedInventoryChange,
     submitNewVendorApplication,
     isSimulatingLatency,
-    addToast,
   } = useKaroRentStore();
 
   const activeVendorId = activePersona.vendorId || 'VEN-201';
@@ -36,24 +27,20 @@ export const VendorPortalView: React.FC = () => {
     currentVendor.status === 'Terminated' ||
     Boolean(activePersona.isTerminatedVendor);
 
-  // Scope inventory & bookings strictly to owning vendor (BR-012)
   const vendorInventory = virtualInventory.filter(
     (i) => i.owningVendorId === currentVendor.id
   );
-  const vendorBookings = bookings.filter(
-    (b) => b.fulfillingVendorId === currentVendor.id
-  );
 
-  // Staged Inventory Edit State
+  // Inventory Edit State
   const [editingInvId, setEditingInvId] = useState<string | null>(null);
   const [reqEnabled, setReqEnabled] = useState<boolean>(true);
   const [reqStock, setReqStock] = useState<number>(12);
   const [reqImageUrl, setReqImageUrl] = useState<string>('');
   const [reqNotes, setReqNotes] = useState<string>(
-    'Updated warehouse physical count & uploaded fresh daylight studio image.'
+    'Updated warehouse stock count and product photos.'
   );
 
-  // New Vendor Onboarding Application Simulator (FR-VEN-001 / FR-VEN-002 / EX-031)
+  // Partner Registration Modal
   const [showOnboardingModal, setShowOnboardingModal] = useState(false);
   const [appLegalName, setAppLegalName] = useState(
     'HearthCraft Home Appliances Pvt Ltd'
@@ -69,12 +56,11 @@ export const VendorPortalView: React.FC = () => {
   const [appClauseAccepted, setAppClauseAccepted] = useState(true);
   const [appErrors, setAppErrors] = useState<string[]>([]);
 
-  const autofillBlacklistedVendorIdentifiers = () => {
-    // Prefills identifiers matching terminated vendor VEN-203 (Apex Urban Rentals) to test FR-VEN-002 / FR-BLK-003!
+  const autofillSampleDetails = () => {
     setAppLegalName('MetroBreeze Cooling Solutions LLP');
     setAppDisplayName('MetroBreeze Appliances');
-    setAppGstin('27AAAAP0091E1Z5'); // Matches blacklisted VEN-203!
-    setAppPan('AAAAP0091E'); // Matches blacklisted VEN-203!
+    setAppGstin('27AAAAP0091E1Z5');
+    setAppPan('AAAAP0091E');
     setAppPhone('+91 80999 00112');
     setAppEmail('suresh.reapply@metrobreeze.in');
     setAppContact('Suresh Menon');
@@ -122,7 +108,7 @@ export const VendorPortalView: React.FC = () => {
 
   return (
     <div className="space-y-7">
-      {/* Editorial Vendor Showroom Header Banner using local asset */}
+      {/* Header Banner */}
       <div className="relative rounded-3xl overflow-hidden border border-hearth-border shadow-hearth bg-[#F5EFE6]">
         <img
           src="assets/vendor_showroom_hero.jpg"
@@ -133,15 +119,13 @@ export const VendorPortalView: React.FC = () => {
           <div className="max-w-xl space-y-2.5">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-pill bg-hearth-card border border-hearth-border text-[11px] font-mono text-hearth-terracotta font-semibold">
               <Building2 className="w-3.5 h-3.5" />
-              <span>
-                Partner Vendor Workspace • {currentVendor.id} • Partner-Scoped View
-              </span>
+              <span>Vendor Portal • {currentVendor.id}</span>
             </div>
             <h1 className="font-serif text-2xl sm:text-3xl font-bold text-[#1C1917]">
               {currentVendor.legalBusinessName}
             </h1>
             <p className="text-xs text-[#44403C]">
-              Agreement: <strong>{currentVendor.agreementVersion}</strong> ({currentVendor.agreementState}) • Service Zones: {currentVendor.serviceAreas.join(', ')}
+              Service Areas: {currentVendor.serviceAreas.join(', ')}
             </p>
             <div className="flex flex-wrap items-center gap-2 pt-1">
               <button
@@ -149,72 +133,40 @@ export const VendorPortalView: React.FC = () => {
                 className="spring-btn px-4 py-2 rounded-pill bg-hearth-terracotta hover:bg-hearth-kiln text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm"
               >
                 <PackagePlus className="w-3.5 h-3.5" />
-                <span>New Partner Onboarding & Verification</span>
+                <span>Register New Partner</span>
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Post-Termination Read-Only Restriction Banner */}
+      {/* Restricted Banner */}
       {isReadOnlyTerminated && (
         <div className="p-5 rounded-3xl bg-[#FEE2E2] border-2 border-[#DC2626] text-[#991B1B] space-y-2 shadow-sm">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2 font-serif font-bold text-base">
               <AlertOctagon className="w-5 h-5" />
-              <span>
-                Post-Termination Read-Only Portal Mode Active
-              </span>
+              <span>Account Restricted (Read-Only)</span>
             </div>
             <span className="px-3 py-1 rounded-pill bg-[#991B1B] text-white text-xs font-mono font-semibold">
-              Escrow Hold: ₹{currentVendor.settlementHoldAmount.toLocaleString('en-IN')}
+              Held Payout: ₹{currentVendor.settlementHoldAmount.toLocaleString('en-IN')}
             </span>
           </div>
           <p className="text-xs leading-relaxed">
-            Your Platform–Vendor Agreement has been terminated. Public listings have been delisted or re-routed, and all catalogue/inventory editing permissions are revoked. You retain read-only visibility into active rental returns, inspection records, and your settlement hold ledger.
+            Your partner agreement has ended. Catalog editing is disabled, and you have read-only access to active returns and payout statements.
           </p>
-          <div className="text-xs font-mono bg-white/70 px-3 py-1.5 rounded-xl border border-[#FECACA]">
-            Assigned Continuity Manager: <strong>{currentVendor.continuityManager}</strong>
-          </div>
         </div>
       )}
 
-      {/* Staged Inventory Governance & Platform Pricing Lock Explanation Strip */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="p-4 rounded-2xl bg-hearth-card border border-hearth-border flex items-start gap-3">
-          <Clock className="w-5 h-5 text-hearth-terracotta shrink-0 mt-0.5" />
-          <div className="text-xs space-y-1">
-            <div className="font-serif font-bold text-hearth-ink">
-              Staged Inventory Governance
-            </div>
-            <p className="text-hearth-umber leading-relaxed">
-              When you add, update, enable, or disable an inventory item below, the change is staged in <strong>Pending Admin Approval</strong> and never directly alters the live customer catalog until the Platform Manager approves or reassigns the vendor source.
-            </p>
-          </div>
-        </div>
-
-        <div className="p-4 rounded-2xl bg-hearth-card border border-hearth-border flex items-start gap-3">
-          <Lock className="w-5 h-5 text-hearth-sage shrink-0 mt-0.5" />
-          <div className="text-xs space-y-1">
-            <div className="font-serif font-bold text-hearth-ink">
-              Platform-Controlled Rental Pricing & Rate Cards
-            </div>
-            <p className="text-hearth-umber leading-relaxed">
-              Monthly rental rates, 4× security deposit multiples, ₹499 site visit fees, and per-meter AC installation rates are centrally governed by KaroRent and locked in the vendor portal.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Vendor Virtual Inventory & Staged Edit Cards */}
+      {/* Vendor Inventory Cards */}
       <div className="space-y-4">
         <h2 className="font-serif text-xl font-bold text-hearth-ink">
-          Your Scoped Virtual Inventory & Staged Change Requests ({vendorInventory.length})
+          Inventory ({vendorInventory.length})
         </h2>
 
         {vendorInventory.length === 0 ? (
           <div className="p-8 rounded-3xl bg-hearth-card border border-hearth-border text-center text-xs text-hearth-taupe">
-            No active inventory items assigned to {currentVendor.displayName}. (Items from terminated vendor VEN-203 were re-routed to VEN-201).
+            No active inventory items assigned to {currentVendor.displayName}.
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -249,43 +201,43 @@ export const VendorPortalView: React.FC = () => {
                                   : 'bg-hearth-oat text-hearth-taupe border border-hearth-border'
                               }`}
                             >
-                              Live Catalog: {inv.livePublicEnabled ? 'ENABLED' : 'DISABLED'}
+                              {inv.livePublicEnabled ? 'Active' : 'Paused'}
                             </span>
                           </div>
                           <h3 className="font-serif font-bold text-base text-hearth-ink mt-1">
                             {inv.productTitle}
                           </h3>
                           <div className="text-[11px] text-hearth-taupe">
-                            Hub: {inv.serviceLocation} • Grade: {inv.conditionGrade}
+                            {inv.serviceLocation} • Condition: {inv.conditionGrade}
                           </div>
                         </div>
                       </div>
                     </div>
 
-                    {/* Locked Platform Rate Card Strip (FR-PRC-001) */}
+                    {/* Rate Strip */}
                     <div className="p-3 rounded-2xl bg-hearth-oat border border-hearth-border flex flex-wrap items-center justify-between gap-2 text-xs">
                       <div className="flex items-center gap-1.5 text-hearth-umber">
                         <Lock className="w-3.5 h-3.5 text-hearth-terracotta" />
                         <span>
-                          Platform Base Rent:{' '}
+                          Monthly Rent:{' '}
                           <strong className="font-ledger text-hearth-ink">
                             ₹{masterProd.baseMonthlyRent}/mo
                           </strong>{' '}
-                          • 4x Deposit:{' '}
+                          • Security Deposit:{' '}
                           <strong className="font-ledger">
                             ₹{masterProd.baseMonthlyRent * masterProd.depositMonthsMultiple}
                           </strong>
                         </span>
                       </div>
                       <span className="text-[10px] font-mono text-hearth-taupe">
-                        Read-Only (Platform Rate)
+                        Standard Pricing
                       </span>
                     </div>
 
-                    {/* Virtual Stock Telemetry Grid (FR-INV-002 / FR-INV-007) */}
+                    {/* Stock Grid */}
                     <div className="grid grid-cols-4 gap-2 text-center">
                       <div className="p-2.5 rounded-xl bg-hearth-oat/60 border border-hearth-border">
-                        <div className="text-[10px] text-hearth-taupe">Declared</div>
+                        <div className="text-[10px] text-hearth-taupe">Total</div>
                         <div className="font-ledger font-bold text-sm text-hearth-ink">
                           {inv.declaredQuantity}
                         </div>
@@ -303,45 +255,42 @@ export const VendorPortalView: React.FC = () => {
                         </div>
                       </div>
                       <div className="p-2.5 rounded-xl bg-hearth-apricot border border-hearth-terracotta/30">
-                        <div className="text-[10px] text-hearth-terracotta">Dispatched</div>
+                        <div className="text-[10px] text-hearth-terracotta">Rented</div>
                         <div className="font-ledger font-bold text-sm text-hearth-terracotta">
                           {inv.rentedQuantity}
                         </div>
                       </div>
                     </div>
 
-                    {/* Active Pending Staged Request Banner (FR-INV-010) */}
+                    {/* Pending Request Banner */}
                     {inv.pendingStagedRequest && (
                       <div className="p-3.5 rounded-2xl bg-[#FFEDD5] border border-[#FED7AA] text-[#9A3412] text-xs space-y-1">
                         <div className="font-bold flex items-center justify-between">
-                          <span>
-                            Staged Request {inv.pendingStagedRequest.id}:{' '}
-                            {inv.pendingStagedRequest.requestType}
-                          </span>
+                          <span>Update Request ({inv.pendingStagedRequest.id})</span>
                           <span className="font-mono text-[10px] px-2 py-0.5 rounded-pill bg-white/80">
-                            Pending Admin Approval
+                            Pending Approval
                           </span>
                         </div>
                         <p className="text-[11px]">
-                          Requested Display:{' '}
+                          Requested Status:{' '}
                           <strong>
                             {inv.pendingStagedRequest.requestedPublicEnabled
-                              ? 'ENABLE'
-                              : 'DISABLE'}
+                              ? 'Active'
+                              : 'Paused'}
                           </strong>{' '}
-                          | Requested Stock:{' '}
+                          | Stock:{' '}
                           <strong>
                             {inv.pendingStagedRequest.requestedDeclaredStock} units
                           </strong>
                         </p>
                         <p className="text-[10px] italic">
-                          Note: "{inv.pendingStagedRequest.vendorNotes}" — Live catalog remains unchanged until Platform Manager review.
+                          "{inv.pendingStagedRequest.vendorNotes}"
                         </p>
                       </div>
                     )}
                   </div>
 
-                  {/* Staged Edit Trigger / Form */}
+                  {/* Edit Trigger / Form */}
                   {!isReadOnlyTerminated && (
                     <div className="pt-3 border-t border-hearth-border">
                       {!isEditing ? (
@@ -355,21 +304,21 @@ export const VendorPortalView: React.FC = () => {
                             }}
                             className="spring-btn px-4 py-2 rounded-pill bg-hearth-terracotta hover:bg-hearth-kiln text-white text-xs font-semibold"
                           >
-                            Submit Staged Enable/Disable or Stock Update
+                            Update Stock or Status
                           </button>
                           <span className="text-[10px] font-mono text-hearth-taupe">
-                            {inv.serializedAssets.length} Serialized Assets Tracked
+                            {inv.serializedAssets.length} Units Tracked
                           </span>
                         </div>
                       ) : (
                         <div className="p-4 rounded-2xl bg-hearth-oat border border-hearth-border space-y-3">
                           <div className="text-xs font-bold text-hearth-ink">
-                            Stage Inventory Change for Platform Manager Approval
+                            Update Stock or Availability
                           </div>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                               <label className="block text-[11px] font-semibold text-hearth-ink mb-1">
-                                Requested Display Status
+                                Catalog Status
                               </label>
                               <select
                                 value={reqEnabled ? 'ENABLE' : 'DISABLE'}
@@ -378,17 +327,13 @@ export const VendorPortalView: React.FC = () => {
                                 }
                                 className="w-full px-3 py-1.5 rounded-xl bg-hearth-card border border-hearth-border text-xs"
                               >
-                                <option value="ENABLE">
-                                  Request Enable on Public Platform
-                                </option>
-                                <option value="DISABLE">
-                                  Request Disable (Triggers Admin Source Switch Option)
-                                </option>
+                                <option value="ENABLE">Active in Catalog</option>
+                                <option value="DISABLE">Pause Listing</option>
                               </select>
                             </div>
                             <div>
                               <label className="block text-[11px] font-semibold text-hearth-ink mb-1">
-                                Declared Stock Quantity
+                                Total Stock Quantity
                               </label>
                               <input
                                 type="number"
@@ -402,7 +347,7 @@ export const VendorPortalView: React.FC = () => {
 
                           <div>
                             <label className="block text-[11px] font-semibold text-hearth-ink mb-1">
-                              Upload New Item Image URL (Optional)
+                              New Product Image URL (Optional)
                             </label>
                             <input
                               type="text"
@@ -415,7 +360,7 @@ export const VendorPortalView: React.FC = () => {
 
                           <div>
                             <label className="block text-[11px] font-semibold text-hearth-ink mb-1">
-                              Reason / Operational Notes for Platform Manager *
+                              Notes *
                             </label>
                             <input
                               type="text"
@@ -446,7 +391,7 @@ export const VendorPortalView: React.FC = () => {
                               }}
                               className="px-4 py-1.5 rounded-pill bg-hearth-terracotta text-white text-xs font-semibold"
                             >
-                              Submit to Pending Admin Approval
+                              Save Changes
                             </button>
                           </div>
                         </div>
@@ -460,25 +405,25 @@ export const VendorPortalView: React.FC = () => {
         )}
       </div>
 
-      {/* New Vendor Onboarding & Blacklist Detection Modal */}
+      {/* Partner Registration Modal */}
       {showOnboardingModal && (
         <div className="fixed inset-0 z-50 bg-[#1C1917]/55 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="w-full max-w-2xl rounded-3xl bg-hearth-parchment border border-hearth-border shadow-hearth-lg p-6 max-h-[90vh] overflow-y-auto space-y-4">
             <div className="flex items-center justify-between border-b border-hearth-border pb-3">
               <div>
                 <h3 className="font-serif text-xl font-bold text-hearth-ink">
-                  Vendor Onboarding & Blacklist Duplicate Detection
+                  Partner Registration
                 </h3>
                 <p className="text-xs text-hearth-taupe">
-                  Evaluates GSTIN, PAN, Phone, Email, and Bank Payout Account against the Unified Vendor Blacklist.
+                  Submit business and payout details to register as a rental partner.
                 </p>
               </div>
               <button
                 type="button"
-                onClick={autofillBlacklistedVendorIdentifiers}
-                className="px-3 py-1.5 rounded-pill bg-[#FEE2E2] hover:bg-[#FECACA] text-[#991B1B] text-[11px] font-semibold shrink-0"
+                onClick={autofillSampleDetails}
+                className="px-3 py-1.5 rounded-pill bg-hearth-oat hover:bg-hearth-apricot text-hearth-ink border border-hearth-border text-[11px] font-semibold shrink-0"
               >
-                Autofill Terminated Vendor Match
+                Fill Sample Details
               </button>
             </div>
 
@@ -505,7 +450,7 @@ export const VendorPortalView: React.FC = () => {
                 </div>
                 <div>
                   <label className="block font-semibold text-hearth-ink mb-1">
-                    Storefront Display Name *
+                    Display Name *
                   </label>
                   <input
                     type="text"
@@ -516,7 +461,7 @@ export const VendorPortalView: React.FC = () => {
                 </div>
                 <div>
                   <label className="block font-semibold text-hearth-ink mb-1">
-                    15-Digit GSTIN / Tax ID *
+                    GSTIN *
                   </label>
                   <input
                     type="text"
@@ -527,7 +472,7 @@ export const VendorPortalView: React.FC = () => {
                 </div>
                 <div>
                   <label className="block font-semibold text-hearth-ink mb-1">
-                    10-Character PAN *
+                    PAN *
                   </label>
                   <input
                     type="text"
@@ -538,7 +483,7 @@ export const VendorPortalView: React.FC = () => {
                 </div>
                 <div>
                   <label className="block font-semibold text-hearth-ink mb-1">
-                    Registered Mobile *
+                    Mobile Number *
                   </label>
                   <input
                     type="text"
@@ -560,7 +505,7 @@ export const VendorPortalView: React.FC = () => {
                 </div>
                 <div>
                   <label className="block font-semibold text-hearth-ink mb-1">
-                    Authorised Contact Person *
+                    Contact Person *
                   </label>
                   <input
                     type="text"
@@ -571,7 +516,7 @@ export const VendorPortalView: React.FC = () => {
                 </div>
                 <div>
                   <label className="block font-semibold text-hearth-ink mb-1">
-                    Bank Payout Account & IFSC *
+                    Bank Account & IFSC *
                   </label>
                   <input
                     type="text"
@@ -584,7 +529,7 @@ export const VendorPortalView: React.FC = () => {
 
               <div>
                 <label className="block font-semibold text-hearth-ink mb-1">
-                  Service Coverage Areas (Comma Separated) *
+                  Service Areas (Comma Separated) *
                 </label>
                 <input
                   type="text"
@@ -602,7 +547,7 @@ export const VendorPortalView: React.FC = () => {
                   className="mt-0.5 rounded text-hearth-sage"
                 />
                 <span>
-                  <strong>Mandatory Operational Clause:</strong> We agree that our pickup personnel will capture a verified timestamped photograph of every returned product at the customer's premises before pickup, and accept that undocumented warehouse damage cannot be charged to the customer.
+                  We agree to take a photo of every returned item at the customer's doorstep before pickup.
                 </span>
               </label>
 
@@ -619,7 +564,7 @@ export const VendorPortalView: React.FC = () => {
                   disabled={isSimulatingLatency}
                   className="px-5 py-2 rounded-pill bg-hearth-terracotta text-white font-semibold"
                 >
-                  Submit Application & Run Blacklist Cross-Check
+                  Submit Application
                 </button>
               </div>
             </form>

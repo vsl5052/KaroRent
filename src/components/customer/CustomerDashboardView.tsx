@@ -1,17 +1,13 @@
 import React, { useState } from 'react';
 import {
-  AlertOctagon,
   ArrowRight,
   CalendarPlus,
   CheckCircle2,
   FileSignature,
-  HelpCircle,
   MapPin,
   ReceiptIndianRupee,
-  RefreshCw,
   Ruler,
   ShieldAlert,
-  Sparkles,
   Truck,
   UserCheck,
   Wrench,
@@ -40,9 +36,7 @@ export const CustomerDashboardView: React.FC = () => {
   const [serviceModalBookingId, setServiceModalBookingId] = useState<string | null>(null);
   const [serviceIssueText, setServiceIssueText] = useState('');
   const [requestSwap, setRequestSwap] = useState(false);
-  const [showClosureCheckModal, setShowClosureCheckModal] = useState(false);
 
-  // Scope rentals strictly to customer unless Platform Admin (BR-013)
   const scopedBookings =
     activePersona.role === 'PLATFORM_ADMIN'
       ? bookings
@@ -56,48 +50,30 @@ export const CustomerDashboardView: React.FC = () => {
     scopedBookings.find((b) => b.workflowType === 'SITE_VISIT_MULTI_STEP') ||
     bookings[0];
 
-  const activeRentalBlockers = scopedBookings.filter(
-    (b) =>
-      b.status === 'Active Rental' ||
-      b.status === 'Picked Up — Under Inspection' ||
-      b.status === 'Disputed' ||
-      b.status === 'Flagged — Blacklist Review'
-  );
-
   return (
     <div className="space-y-7">
-      {/* Top Header & Guided AC Site-Visit Storyboard */}
+      {/* Top Header & Installation Progress */}
       <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-5">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="font-serif text-2xl font-bold text-hearth-ink">
-              KaroRent Customer & Support Mediator Lifecycle Console
-            </h1>
-            <p className="text-xs text-hearth-umber mt-0.5">
-              Warm Editorial Lifestyle & Human-Centric Hospitality • Consolidated Multi-Vendor View
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowClosureCheckModal(true)}
-              className="px-3.5 py-1.5 rounded-pill bg-hearth-oat hover:bg-hearth-apricot border border-hearth-border text-xs font-medium text-hearth-umber"
-            >
-              Check Account Closure Eligibility
-            </button>
-          </div>
+        <div>
+          <h1 className="font-serif text-2xl font-bold text-hearth-ink">
+            My Rentals
+          </h1>
+          <p className="text-xs text-hearth-umber mt-0.5">
+            Track your active rentals, deliveries, and home installation visits.
+          </p>
         </div>
 
-        {/* 4-Stage Horizontal AC Site-Visit Milestone Stepper */}
+        {/* 4-Stage Installation Progress */}
         <div className="rounded-2xl bg-hearth-parchment border border-hearth-border p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
             <span className="text-xs font-semibold text-hearth-ink flex items-center gap-1.5">
               <Ruler className="w-4 h-4 text-hearth-terracotta" />
               <span>
-                Guided Multi-Step Appliance Journey ({featuredMultiStepBooking.id} — {featuredMultiStepBooking.productTitle})
+                Installation Progress — {featuredMultiStepBooking.productTitle}
               </span>
             </span>
-            <span className="text-[11px] font-mono text-hearth-terracotta font-semibold">
-              Multi-Step Installation • Status: {featuredMultiStepBooking.status}
+            <span className="text-[11px] text-hearth-terracotta font-semibold">
+              Status: {featuredMultiStepBooking.status}
             </span>
           </div>
 
@@ -108,7 +84,7 @@ export const CustomerDashboardView: React.FC = () => {
                 <CheckCircle2 className="w-4 h-4" />
               </div>
               <div>
-                <div className="text-xs font-bold text-hearth-ink">Site Visit</div>
+                <div className="text-xs font-bold text-hearth-ink">Home Visit Booked</div>
                 <div className="text-[11px] text-hearth-umber">
                   Paid (₹{featuredMultiStepBooking.siteVisitFee || 499})
                 </div>
@@ -125,10 +101,10 @@ export const CustomerDashboardView: React.FC = () => {
               </div>
               <div>
                 <div className="text-xs font-bold text-hearth-ink">
-                  Home Metrics Measured
+                  Measurements Taken
                 </div>
                 <div className="text-[11px] text-hearth-umber">
-                  ({featuredMultiStepBooking.siteVisit?.measuredCopperPipeMeters || 3.5}m Copper Pipe)
+                  {featuredMultiStepBooking.siteVisit?.measuredCopperPipeMeters || 3.5}m Piping
                 </div>
                 <span className="inline-block mt-1.5 px-2.5 py-0.5 rounded-pill bg-[#B85D3B] text-white text-[10px] font-semibold">
                   {featuredMultiStepBooking.siteVisit?.status.includes('Completed')
@@ -145,9 +121,9 @@ export const CustomerDashboardView: React.FC = () => {
               </div>
               <div>
                 <div className="text-xs font-bold text-hearth-ink">
-                  Final Transparent
+                  Estimate Approved
                 </div>
-                <div className="text-[11px] text-hearth-umber">Quote Accepted</div>
+                <div className="text-[11px] text-hearth-umber">Final Installation Quote</div>
                 <span className="inline-block mt-1.5 px-2.5 py-0.5 rounded-pill bg-[#B85D3B] text-white text-[10px] font-semibold">
                   {featuredMultiStepBooking.siteVisit?.customerQuoteDecision === 'Accepted'
                     ? 'Completed'
@@ -163,12 +139,12 @@ export const CustomerDashboardView: React.FC = () => {
               </div>
               <div>
                 <div className="text-xs font-bold text-hearth-ink">
-                  E-Agreement Signed
+                  Agreement & Setup
                 </div>
-                <div className="text-[11px] text-hearth-umber">& Setup Scheduled</div>
+                <div className="text-[11px] text-hearth-umber">Delivery & Activation</div>
                 <span className="inline-block mt-1.5 px-2.5 py-0.5 rounded-pill bg-[#B85D3B] text-white text-[10px] font-semibold">
                   {featuredMultiStepBooking.status === 'Active Rental'
-                    ? 'Completed'
+                    ? 'Active'
                     : featuredMultiStepBooking.status}
                 </span>
               </div>
@@ -177,13 +153,13 @@ export const CustomerDashboardView: React.FC = () => {
         </div>
       </div>
 
-      {/* Customer Account & Corporate Signatory Metadata Strip */}
+      {/* Customer Account Summary Strip */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="rounded-2xl bg-hearth-card border border-hearth-border p-4 flex items-start gap-3">
           <UserCheck className="w-5 h-5 text-hearth-terracotta shrink-0 mt-0.5" />
           <div className="text-xs space-y-1">
             <div className="font-serif font-bold text-hearth-ink">
-              Account Authority & KYC
+              Account Details
             </div>
             <div className="text-hearth-umber">
               <strong>{currentCustomer.fullName}</strong> ({currentCustomer.accountType})
@@ -193,11 +169,6 @@ export const CustomerDashboardView: React.FC = () => {
                 {currentCustomer.companyName} • GSTIN: {currentCustomer.gstinOrTaxId}
               </div>
             )}
-            {currentCustomer.authorisedSignatoryName && (
-              <div className="text-[10px] text-hearth-taupe">
-                Signatory: {currentCustomer.authorisedSignatoryName} | Recipient: {currentCustomer.operationalRecipientName}
-              </div>
-            )}
           </div>
         </div>
 
@@ -205,7 +176,7 @@ export const CustomerDashboardView: React.FC = () => {
           <MapPin className="w-5 h-5 text-hearth-sage shrink-0 mt-0.5" />
           <div className="text-xs space-y-1">
             <div className="font-serif font-bold text-hearth-ink">
-              Verified Delivery Addresses
+              Saved Addresses
             </div>
             {currentCustomer.addresses.map((addr) => (
               <div key={addr.id} className="text-[11px] text-hearth-umber">
@@ -218,31 +189,26 @@ export const CustomerDashboardView: React.FC = () => {
         <div className="rounded-2xl bg-hearth-card border border-hearth-border p-4 flex items-center justify-between gap-3">
           <div className="text-xs space-y-1">
             <div className="font-serif font-bold text-hearth-ink">
-              Stationery Agreements & 5-Invoice Vault
+              Payments & Deposits
             </div>
             <p className="text-[11px] text-hearth-umber">
-              Download immutable e-signed contracts or review segregated deposit balances.
+              View your invoices, receipts, and refundable security deposits.
             </p>
           </div>
           <button
             onClick={() => setActiveTab('INVOICES_DEPOSITS')}
             className="spring-btn shrink-0 px-3.5 py-2 rounded-pill bg-hearth-terracotta text-white text-xs font-semibold"
           >
-            Open Vault
+            View Payments
           </button>
         </div>
       </div>
 
-      {/* Consolidated Multi-Vendor Rental & Booking Cards */}
+      {/* Bookings & Active Rentals */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="font-serif text-xl font-bold text-hearth-ink">
-            Consolidated Bookings & Active Rentals Across All Partner Vendors ({scopedBookings.length})
-          </h2>
-          <span className="text-xs font-mono text-hearth-taupe">
-            Account-Scoped View
-          </span>
-        </div>
+        <h2 className="font-serif text-xl font-bold text-hearth-ink">
+          Your Orders ({scopedBookings.length})
+        </h2>
 
         <div className="space-y-4">
           {scopedBookings.map((booking) => {
@@ -278,8 +244,8 @@ export const CustomerDashboardView: React.FC = () => {
                       >
                         {booking.status}
                       </span>
-                      <span className="text-[11px] font-mono text-hearth-taupe">
-                        Fulfilled by: <strong>{booking.fulfillingVendorName}</strong> ({booking.fulfillingVendorId})
+                      <span className="text-[11px] text-hearth-taupe">
+                        Partner: <strong>{booking.fulfillingVendorName}</strong>
                       </span>
                     </div>
 
@@ -287,65 +253,59 @@ export const CustomerDashboardView: React.FC = () => {
                       {booking.productTitle}
                     </h3>
                     <p className="text-xs text-hearth-umber">
-                      Tenure: <strong>{booking.tenureMonths} Months</strong> ({booking.startDate} to {booking.endDate}) • Serial:{' '}
-                      <span className="font-mono font-semibold">
-                        {booking.allocatedSerial || 'Allocated at Dispatch'}
-                      </span>
+                      Plan: <strong>{booking.tenureMonths} Months</strong> ({booking.startDate} to {booking.endDate})
                     </p>
                     <p className="text-[11px] text-hearth-taupe">
-                      Snapshot Address: {booking.deliveryAddress}
+                      Address: {booking.deliveryAddress}
                     </p>
                   </div>
 
-                  {/* Right Financial Summary Pill */}
+                  {/* Right Financial Summary */}
                   <div className="rounded-2xl bg-hearth-oat border border-hearth-border px-4 py-3 text-right space-y-1">
                     <div className="text-xs text-hearth-taupe">
-                      Locked Platform Rate:{' '}
+                      Monthly Rent:{' '}
                       <strong className="font-ledger text-hearth-ink">
                         ₹{booking.monthlyRentRate.toLocaleString('en-IN')}/mo
                       </strong>
                     </div>
                     <div className="text-xs text-hearth-sage font-semibold">
-                      Segregated 4x Deposit:{' '}
+                      Refundable Deposit:{' '}
                       <span className="font-ledger">
                         ₹{booking.securityDepositAmount.toLocaleString('en-IN')}
                       </span>
                     </div>
                     {booking.installationMaterialFee > 0 && (
                       <div className="text-[11px] text-hearth-terracotta font-mono">
-                        Measured Rate-Card Setup: ₹{booking.installationMaterialFee}
+                        Installation Cost: ₹{booking.installationMaterialFee}
                       </div>
                     )}
                   </div>
                 </div>
 
-                {/* Blacklist Interception Alert Banner */}
+                {/* Account Review Banner */}
                 {isFlaggedBlacklist && (
                   <div className="p-4 rounded-2xl bg-[#FEE2E2] border border-[#FECACA] text-[#991B1B] text-xs flex items-start gap-3">
                     <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
                     <div className="space-y-1">
-                      <div className="font-bold">
-                        Booking Intercepted by Pre-Confirmation Risk Gate
-                      </div>
+                      <div className="font-bold">Order Held for Account Review</div>
                       <p>{booking.blacklistFlagReason}</p>
                     </div>
                   </div>
                 )}
 
-                {/* Post-Site Visit Final Quote Acceptance Banner */}
+                {/* Post-Visit Quote Acceptance Banner */}
                 {isFinalBillSent && booking.siteVisit && (
                   <div className="p-4 rounded-2xl bg-hearth-apricot border-2 border-hearth-terracotta/50 space-y-3">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div>
-                        <div className="text-xs font-bold text-hearth-terracotta uppercase font-mono">
-                          Action Required — Accept or Reject Post-Site Visit Final Charges
+                        <div className="text-xs font-bold text-hearth-terracotta">
+                          Installation Estimate Ready
                         </div>
                         <p className="text-xs text-hearth-ink mt-0.5">
-                          Field technician measured <strong>{booking.siteVisit.measuredCopperPipeMeters}m copper pipe</strong> • Calculated Installation Material Charge:{' '}
+                          Technician measured <strong>{booking.siteVisit.measuredCopperPipeMeters}m piping</strong> • Installation cost:{' '}
                           <strong className="font-ledger">
                             ₹{booking.siteVisit.calculatedMaterialCharges.toLocaleString('en-IN')}
-                          </strong>{' '}
-                          (strictly per Platform Rate Card).
+                          </strong>
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
@@ -355,7 +315,7 @@ export const CustomerDashboardView: React.FC = () => {
                           }
                           className="spring-btn px-4 py-2 rounded-pill bg-hearth-sage text-white text-xs font-semibold"
                         >
-                          Accept Final Quote
+                          Approve Estimate
                         </button>
                         <button
                           onClick={() =>
@@ -363,14 +323,14 @@ export const CustomerDashboardView: React.FC = () => {
                           }
                           className="px-4 py-2 rounded-pill bg-[#FEE2E2] text-[#991B1B] border border-[#FECACA] text-xs font-semibold"
                         >
-                          Reject & Cancel
+                          Decline & Cancel
                         </button>
                       </div>
                     </div>
                   </div>
                 )}
 
-                {/* Action Ribbon for each Booking */}
+                {/* Action Ribbon */}
                 <div className="pt-3 border-t border-hearth-border flex flex-wrap items-center justify-between gap-3">
                   <div className="flex flex-wrap items-center gap-2">
                     <button
@@ -382,8 +342,8 @@ export const CustomerDashboardView: React.FC = () => {
                       <FileSignature className="w-3.5 h-3.5 text-hearth-terracotta" />
                       <span>
                         {agreement?.status === 'Awaiting Signature'
-                          ? 'Review & E-Sign Agreement (Mandatory)'
-                          : `View Signed E-Agreement (${agreement?.id})`}
+                          ? 'Sign Agreement'
+                          : 'View Agreement'}
                       </span>
                     </button>
 
@@ -392,7 +352,7 @@ export const CustomerDashboardView: React.FC = () => {
                       className="px-3.5 py-1.5 rounded-pill bg-hearth-oat hover:bg-hearth-apricot border border-hearth-border text-xs font-medium text-hearth-umber flex items-center gap-1.5"
                     >
                       <ReceiptIndianRupee className="w-3.5 h-3.5 text-hearth-sage" />
-                      <span>5-Invoice Split & Deposit Ledger</span>
+                      <span>View Invoices</span>
                     </button>
 
                     {booking.returnRecord && (
@@ -400,13 +360,13 @@ export const CustomerDashboardView: React.FC = () => {
                         onClick={() => setActiveTab('THREE_WAY_INSPECTION')}
                         className="px-3.5 py-1.5 rounded-pill bg-hearth-sageLight text-hearth-sage border border-hearth-sage/30 text-xs font-semibold flex items-center gap-1.5"
                       >
-                        <span>View 3-Way Return Inspection</span>
+                        <span>Return Status</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                       </button>
                     )}
                   </div>
 
-                  {/* Lifecycle Actions for Active Rentals */}
+                  {/* Active Rental Actions */}
                   {booking.status === 'Active Rental' && (
                     <div className="flex flex-wrap items-center gap-2">
                       <button
@@ -414,7 +374,7 @@ export const CustomerDashboardView: React.FC = () => {
                         className="px-3 py-1.5 rounded-pill bg-hearth-apricot hover:bg-hearth-terracotta hover:text-white border border-hearth-terracotta/30 text-hearth-terracotta text-xs font-semibold flex items-center gap-1 transition-colors"
                       >
                         <CalendarPlus className="w-3.5 h-3.5" />
-                        <span>Extend +3 Mo</span>
+                        <span>Extend Plan (+3M)</span>
                       </button>
 
                       <button
@@ -422,7 +382,7 @@ export const CustomerDashboardView: React.FC = () => {
                         className="px-3 py-1.5 rounded-pill bg-hearth-oat hover:bg-hearth-apricot border border-hearth-border text-xs font-medium text-hearth-umber flex items-center gap-1"
                       >
                         <Wrench className="w-3.5 h-3.5 text-hearth-terracotta" />
-                        <span>Maintenance / Swap</span>
+                        <span>Request Support</span>
                       </button>
 
                       <button
@@ -430,7 +390,7 @@ export const CustomerDashboardView: React.FC = () => {
                         className="px-3.5 py-1.5 rounded-pill bg-hearth-terracotta hover:bg-hearth-kiln text-white text-xs font-semibold flex items-center gap-1"
                       >
                         <Truck className="w-3.5 h-3.5" />
-                        <span>Request Return Pickup</span>
+                        <span>Schedule Return</span>
                       </button>
                     </div>
                   )}
@@ -441,7 +401,7 @@ export const CustomerDashboardView: React.FC = () => {
         </div>
       </div>
 
-      {/* Return Pickup Request Modal */}
+      {/* Schedule Return Modal */}
       {returnModalBookingId && (
         <div className="fixed inset-0 z-50 bg-[#1C1917]/50 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="w-full max-w-md rounded-3xl bg-hearth-parchment border border-hearth-border p-6 shadow-hearth-lg space-y-4">
@@ -449,11 +409,11 @@ export const CustomerDashboardView: React.FC = () => {
               Schedule Return Pickup
             </h3>
             <p className="text-xs text-hearth-umber">
-              Under our <strong>Doorstep Handover Protection Policy</strong>, our field staff will capture a mandatory timestamped photograph of your item at your doorstep before pickup to guarantee fair deposit settlement.
+              Our pickup team will take a photo of the item at your doorstep during pickup to ensure a smooth deposit refund.
             </p>
             <div>
               <label className="block text-xs font-semibold text-hearth-ink mb-1">
-                Preferred Doorstep Pickup Slot *
+                Preferred Pickup Time *
               </label>
               <input
                 type="text"
@@ -479,29 +439,29 @@ export const CustomerDashboardView: React.FC = () => {
                 }}
                 className="px-5 py-2 rounded-pill bg-hearth-terracotta text-white text-xs font-semibold"
               >
-                Confirm Return Request
+                Confirm Pickup
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Service / Asset Replacement Request Modal */}
+      {/* Request Support Modal */}
       {serviceModalBookingId && (
         <div className="fixed inset-0 z-50 bg-[#1C1917]/50 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="w-full max-w-md rounded-3xl bg-hearth-parchment border border-hearth-border p-6 shadow-hearth-lg space-y-4">
             <h3 className="font-serif text-lg font-bold text-hearth-ink">
-              Raise Maintenance or Asset Swap Ticket
+              Request Maintenance or Replacement
             </h3>
             <div>
               <label className="block text-xs font-semibold text-hearth-ink mb-1">
-                Describe Issue or Service Requirement *
+                How can we help? *
               </label>
               <textarea
                 rows={3}
                 value={serviceIssueText}
                 onChange={(e) => setServiceIssueText(e.target.value)}
-                placeholder="e.g., Requesting filter replacement or unit swap due to compressor vibration..."
+                placeholder="Describe the issue..."
                 className="w-full px-3.5 py-2 rounded-xl bg-hearth-card border border-hearth-border text-xs text-hearth-ink"
               />
             </div>
@@ -512,9 +472,7 @@ export const CustomerDashboardView: React.FC = () => {
                 onChange={(e) => setRequestSwap(e.target.checked)}
                 className="rounded border-hearth-border text-hearth-terracotta"
               />
-              <span>
-                Request Replacement Asset Swap & Consent to Serial Addendum
-              </span>
+              <span>Request a replacement unit</span>
             </label>
             <div className="flex justify-end gap-2 pt-2">
               <button
@@ -527,7 +485,7 @@ export const CustomerDashboardView: React.FC = () => {
                 onClick={async () => {
                   if (serviceIssueText.trim().length < 5) {
                     addToast({
-                      title: 'Issue Description Required',
+                      title: 'Description Required',
                       description: 'Please enter at least 5 characters.',
                       variant: 'error',
                     });
@@ -543,42 +501,7 @@ export const CustomerDashboardView: React.FC = () => {
                 }}
                 className="px-5 py-2 rounded-pill bg-hearth-terracotta text-white text-xs font-semibold"
               >
-                Submit Service Ticket
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Account Closure Blocker Validation Modal */}
-      {showClosureCheckModal && (
-        <div className="fixed inset-0 z-50 bg-[#1C1917]/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-lg rounded-3xl bg-hearth-parchment border border-hearth-border p-6 shadow-hearth-lg space-y-4">
-            <div className="flex items-center gap-2.5 text-[#991B1B]">
-              <AlertOctagon className="w-5 h-5" />
-              <h3 className="font-serif text-lg font-bold">
-                Account Closure Pre-Flight Check
-              </h3>
-            </div>
-            <p className="text-xs text-hearth-umber leading-relaxed">
-              Under our <strong>Account Retention & Deposit Protection Policy</strong>, an account with active rentals, open return inspections, or unresolved deposit settlements cannot undergo immediate destructive closure, and signed contracts/invoices must be retained for statutory audit.
-            </p>
-            <div className="p-3.5 rounded-2xl bg-[#FEE2E2]/60 border border-[#FECACA] space-y-1.5 text-xs text-[#991B1B]">
-              <div className="font-bold">
-                Active Closure Blockers Detected ({activeRentalBlockers.length}):
-              </div>
-              {activeRentalBlockers.map((b) => (
-                <div key={b.id} className="font-mono text-[11px]">
-                  • {b.id}: {b.productTitle} — Status: <strong>{b.status}</strong>
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-end">
-              <button
-                onClick={() => setShowClosureCheckModal(false)}
-                className="px-5 py-2 rounded-pill bg-hearth-terracotta text-white text-xs font-semibold"
-              >
-                Understood
+                Submit Request
               </button>
             </div>
           </div>

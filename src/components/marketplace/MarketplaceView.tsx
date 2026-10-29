@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import {
   ArrowRight,
-  Check,
-  Eye,
   GitCompare,
-  Info,
-  Lock,
   Ruler,
   ShieldCheck,
   SlidersHorizontal,
@@ -42,17 +38,13 @@ export const MarketplaceView: React.FC = () => {
     comparisonProductIds,
     toggleCompareProduct,
     setActiveCheckoutProductId,
-    activePersona,
-    switchPersona,
     setActiveTab,
   } = useKaroRentStore();
 
   const [hoveredProductId, setHoveredProductId] = useState<string | null>(null);
   const [expandedRateCardProductId, setExpandedRateCardProductId] = useState<string | null>(null);
   const [showCompareModal, setShowCompareModal] = useState(false);
-  const [showThemeMockupModal, setShowThemeMockupModal] = useState(false);
 
-  // Only show products whose linked virtual inventory is livePublicEnabled (FR-INV-009 / FR-CAT-002)
   const publishedProducts = masterProducts.filter((product) => {
     const inv = virtualInventory.find((i) => i.productId === product.id);
     if (!inv || !inv.livePublicEnabled) return false;
@@ -81,61 +73,49 @@ export const MarketplaceView: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      {/* Editorial Lifestyle Hero Banner using local Terracotta Hearth illustration */}
+      {/* Lifestyle Hero Banner */}
       <div className="relative rounded-3xl overflow-hidden border border-hearth-border shadow-hearth bg-[#F5EFE6]">
         <img
           src="assets/client_hero_living.jpg"
-          alt="Terracotta Hearth Warm Editorial Living"
+          alt="Home & Studio Living"
           className="w-full h-[290px] sm:h-[320px] object-cover object-right opacity-95"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#FAF8F5] via-[#FAF8F5]/95 to-transparent flex items-center p-6 sm:p-10">
           <div className="max-w-xl space-y-3.5">
             <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-pill bg-hearth-card/90 border border-hearth-border text-[11px] font-medium text-hearth-terracotta shadow-sm">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Terracotta Hearth Collection • Platform-Guaranteed Rental Rates</span>
+              <span>Home & Studio Rentals</span>
             </div>
             <h1 className="font-serif text-2xl sm:text-4xl font-bold text-[#1C1917] leading-tight">
-              Thoughtful living, curated for your home & studio.
+              Thoughtful furniture & appliances for your home.
             </h1>
             <p className="text-xs sm:text-sm text-[#44403C] leading-relaxed">
-              Every rental is contracted directly with <strong>KaroRent</strong>, priced transparently by our central rate card, and protected by our <strong>Segregated Security Deposit Vault</strong> with mandatory doorstep EXIF pickup verification.
+              Flexible monthly plans with free maintenance, doorstep setup, and 100% refundable security deposits.
             </p>
             <div className="flex flex-wrap items-center gap-2.5 pt-1">
               <button
-                onClick={() => setActiveTab('THREE_WAY_INSPECTION')}
+                onClick={() => setActiveTab('MY_RENTALS')}
                 className="spring-btn px-4 py-2 rounded-pill bg-hearth-terracotta hover:bg-hearth-kiln text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm"
               >
-                <span>Explore 3-Way Deposit Protection</span>
+                <span>View My Rentals</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
               <button
-                onClick={() => setShowThemeMockupModal(true)}
+                onClick={() => setActiveTab('THREE_WAY_INSPECTION')}
                 className="spring-btn px-4 py-2 rounded-pill bg-white/90 hover:bg-white text-[#1C1917] border border-[#E7E5E4] text-xs font-semibold flex items-center gap-1.5"
               >
-                <Eye className="w-3.5 h-3.5 text-hearth-terracotta" />
-                <span>View Editorial Lookbook</span>
+                <span>Returns & Refunds</span>
               </button>
-              {!activePersona.isBlacklisted && (
-                <button
-                  onClick={() => switchPersona('persona-cus-blk')}
-                  className="px-3.5 py-2 rounded-pill bg-[#FEE2E2] hover:bg-[#FECACA] text-[#991B1B] text-[11px] font-medium transition-colors"
-                >
-                  Simulate Restricted Account Checkout
-                </button>
-              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Tactile Horizontal Filter Ribbon & Rental Duration Slider */}
+      {/* Category Filter & Rental Duration Slider */}
       <div className="rounded-3xl bg-hearth-card border border-hearth-border p-5 shadow-hearth space-y-4">
         <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-5">
-          {/* Category Pill Chips */}
+          {/* Category Pills */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1">
-            <span className="text-[11px] font-mono text-hearth-taupe mr-1 shrink-0">
-              Categories:
-            </span>
             {CATEGORIES.map((category) => {
               const active = selectedCategory === category;
               return (
@@ -154,12 +134,12 @@ export const MarketplaceView: React.FC = () => {
             })}
           </div>
 
-          {/* Interactive Rental Duration Slider (3 / 6 / 12 / 24 Months) */}
+          {/* Rental Duration Slider */}
           <div className="flex items-center gap-4 xl:border-l border-hearth-border xl:pl-6 min-w-[290px]">
             <div className="shrink-0">
               <div className="text-xs font-semibold text-hearth-ink">Rental Duration</div>
-              <div className="text-[10px] text-hearth-taupe font-mono">
-                Dynamic Tenure Plan
+              <div className="text-[10px] text-hearth-taupe">
+                Longer plans save more
               </div>
             </div>
             <div className="flex-1">
@@ -193,12 +173,12 @@ export const MarketplaceView: React.FC = () => {
           </div>
         </div>
 
-        {/* Sub-Ribbon: Dual-Path Workflow Filter & Comparison Tray */}
+        {/* Sub-Ribbon: Delivery Type Filter & Compare */}
         <div className="pt-3 border-t border-hearth-border flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs text-hearth-taupe flex items-center gap-1.5 mr-1">
               <SlidersHorizontal className="w-3.5 h-3.5 text-hearth-terracotta" />
-              <span>Booking Path:</span>
+              <span>Delivery Type:</span>
             </span>
 
             <button
@@ -209,7 +189,7 @@ export const MarketplaceView: React.FC = () => {
                   : 'bg-hearth-oat text-hearth-umber border-hearth-border'
               }`}
             >
-              All Offerings ({publishedProducts.length})
+              All ({publishedProducts.length})
             </button>
 
             <button
@@ -221,7 +201,7 @@ export const MarketplaceView: React.FC = () => {
               }`}
             >
               <span className="w-2 h-2 rounded-full bg-hearth-sage" />
-              <span>Instant Home Booking (1-Step)</span>
+              <span>Standard Delivery</span>
             </button>
 
             <button
@@ -233,7 +213,7 @@ export const MarketplaceView: React.FC = () => {
               }`}
             >
               <span className="w-2 h-2 rounded-full bg-hearth-terracotta" />
-              <span>Includes Guided Home Measurement Visit (Multi-Step)</span>
+              <span>Requires Home Measurement</span>
             </button>
           </div>
 
@@ -243,13 +223,13 @@ export const MarketplaceView: React.FC = () => {
               className="spring-btn px-4 py-1.5 rounded-pill bg-hearth-sage text-white text-xs font-semibold flex items-center gap-2 shadow-sm"
             >
               <GitCompare className="w-3.5 h-3.5" />
-              <span>Compare Selected ({comparisonProductIds.length}/3)</span>
+              <span>Compare ({comparisonProductIds.length})</span>
             </button>
           )}
         </div>
       </div>
 
-      {/* 3-Column Editorial Product Grid (Exact Match to Theme 3 Screen A Cards!) */}
+      {/* Product Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-7">
         {publishedProducts.map((product) => {
           const inv = virtualInventory.find((i) => i.productId === product.id)!;
@@ -268,7 +248,7 @@ export const MarketplaceView: React.FC = () => {
               onMouseLeave={() => setHoveredProductId(null)}
               className="spring-card rounded-[20px] bg-hearth-card border border-hearth-border shadow-hearth overflow-hidden flex flex-col justify-between"
             >
-              {/* Top Image Container with Floating Ivory Workflow Pill & Studio Hover Cross-Fade */}
+              {/* Image Container */}
               <div>
                 <div className="relative h-72 w-full overflow-hidden bg-hearth-oat">
                   <img
@@ -281,13 +261,11 @@ export const MarketplaceView: React.FC = () => {
                     className="w-full h-full object-cover transition-all duration-500"
                   />
 
-                  {/* Top-Left Floating Ivory Pill (Exact Match to Theme 3 Mockup) */}
+                  {/* Top-Left Delivery Badge */}
                   <div className="absolute top-4 left-4 right-14">
                     <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-pill bg-[#FFFCF7]/95 backdrop-blur-sm border border-[#E7E5E4] shadow-md text-xs font-semibold text-[#1C1917]">
                       <span>
-                        {isMultiStep
-                          ? 'Includes Guided Home Measurement Visit'
-                          : 'Instant Home Booking'}
+                        {isMultiStep ? 'Home Measurement Included' : 'Standard Delivery'}
                       </span>
                       <span
                         className={`w-2.5 h-2.5 rounded-full shrink-0 ${
@@ -297,7 +275,7 @@ export const MarketplaceView: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Top-Right Compare Toggle Button */}
+                  {/* Compare Button */}
                   <button
                     onClick={() => toggleCompareProduct(product.id)}
                     className={`absolute top-4 right-4 p-2 rounded-pill border text-xs transition-all shadow-sm ${
@@ -305,27 +283,23 @@ export const MarketplaceView: React.FC = () => {
                         ? 'bg-hearth-terracotta text-white border-hearth-terracotta'
                         : 'bg-[#FFFCF7]/90 text-[#1C1917] border-[#E7E5E4] hover:bg-white'
                     }`}
-                    title="Compare Product Offer"
+                    title="Compare Product"
                   >
                     <GitCompare className="w-3.5 h-3.5" />
                   </button>
 
-                  {/* Bottom-Left Virtual Stock & Condition Pill */}
-                  <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between gap-2">
-                    <span className="px-2.5 py-1 rounded-pill bg-[#1C1917]/80 backdrop-blur-sm text-white text-[10px] font-mono">
-                      {inv.conditionGrade} • {inv.availableQuantity} Units Available
-                    </span>
-                    <span className="px-2.5 py-1 rounded-pill bg-[#FFFCF7]/90 text-[#1C1917] text-[10px] font-medium">
-                      {isHovered ? 'Studio Condition View' : 'Hover for Studio View'}
+                  {/* Bottom Stock Pill */}
+                  <div className="absolute bottom-3 left-4">
+                    <span className="px-2.5 py-1 rounded-pill bg-[#1C1917]/80 backdrop-blur-sm text-white text-[10px]">
+                      {inv.availableQuantity} Available
                     </span>
                   </div>
                 </div>
 
-                {/* Editorial Product Details & Partner Vendor Attribution */}
+                {/* Product Details */}
                 <div className="p-5 pb-4 space-y-2.5">
-                  <div className="flex items-center justify-between text-[11px] text-hearth-taupe font-mono">
-                    <span>{product.category.toUpperCase()}</span>
-                    <span>SKU: {product.sku}</span>
+                  <div className="text-[11px] text-hearth-taupe font-medium uppercase tracking-wide">
+                    {product.category}
                   </div>
 
                   <h3 className="font-serif text-lg font-bold text-hearth-ink leading-snug">
@@ -336,25 +310,15 @@ export const MarketplaceView: React.FC = () => {
                     {product.description}
                   </p>
 
-                  {/* Vendor Attribution & Source Transparency */}
-                  <div className="pt-1 flex items-center justify-between text-[11px] text-hearth-umber bg-hearth-oat/60 px-3 py-2 rounded-xl border border-hearth-border">
-                    <div className="flex items-center gap-1.5 truncate">
-                      <Store className="w-3.5 h-3.5 text-hearth-terracotta shrink-0" />
-                      <span className="truncate">
-                        Fulfilled by <strong>{inv.owningVendorName}</strong>
-                      </span>
-                    </div>
-                    {inv.pendingStagedRequest && (
-                      <span
-                        className="text-[9px] font-mono px-1.5 py-0.5 rounded-pill bg-[#FFEDD5] text-[#9A3412] shrink-0"
-                        title="Vendor submitted a staged change; live display remains unaffected until Platform Manager approval"
-                      >
-                        Staged Edit Pending
-                      </span>
-                    )}
+                  {/* Vendor Line */}
+                  <div className="pt-1 flex items-center gap-1.5 text-[11px] text-hearth-umber bg-hearth-oat/60 px-3 py-2 rounded-xl border border-hearth-border">
+                    <Store className="w-3.5 h-3.5 text-hearth-terracotta shrink-0" />
+                    <span className="truncate">
+                      Partner: <strong>{inv.owningVendorName}</strong>
+                    </span>
                   </div>
 
-                  {/* Multi-Step Rate Card Preview Accordion */}
+                  {/* Installation Rates Accordion */}
                   {product.installationRateCard.length > 0 && (
                     <div>
                       <button
@@ -367,17 +331,15 @@ export const MarketplaceView: React.FC = () => {
                       >
                         <span className="flex items-center gap-1">
                           <Ruler className="w-3.5 h-3.5" />
-                          <span>
-                            View Locked Platform Installation Rate Card
-                          </span>
+                          <span>Installation Rates</span>
                         </span>
-                        <span>{isRateCardOpen ? 'Hide' : 'Show'}</span>
+                        <span>{isRateCardOpen ? 'Hide' : 'View'}</span>
                       </button>
 
                       {isRateCardOpen && (
                         <div className="mt-1.5 p-3 rounded-xl bg-hearth-apricot border border-hearth-terracotta/30 space-y-1.5 text-[11px]">
                           <div className="font-semibold text-hearth-ink flex items-center justify-between">
-                            <span>Pre-Installation Site Visit Fee:</span>
+                            <span>Home Measurement Visit:</span>
                             <span className="font-ledger">₹{product.siteVisitFee}</span>
                           </div>
                           {product.installationRateCard.map((rc) => (
@@ -402,34 +364,26 @@ export const MarketplaceView: React.FC = () => {
                 </div>
               </div>
 
-              {/* Bottom Pricing Ribbon & Sage-Green Deposit Vault Box (Exact Match to Theme 3 Screen A Mockup!) */}
+              {/* Bottom Pricing & CTA */}
               <div>
-                {/* Warm Oat Rate Strip */}
                 <div className="bg-[#EFE8D8] dark:bg-hearth-oat px-5 py-3 border-t border-b border-hearth-border flex items-baseline justify-between">
-                  <div>
-                    <span className="font-serif text-xl font-bold text-[#1C1917] dark:text-hearth-ink font-ledger">
-                      ₹{effectiveMonthlyRate.toLocaleString('en-IN')} / month
-                    </span>
-                    <span className="ml-1.5 text-[11px] text-[#44403C] dark:text-hearth-umber">
-                      (All-inclusive Platform Rate)
-                    </span>
-                  </div>
-                  <span className="text-[10px] font-mono text-hearth-taupe flex items-center gap-1">
-                    <Lock className="w-3 h-3 text-hearth-terracotta" />
-                    Fixed Rate
+                  <span className="font-serif text-xl font-bold text-[#1C1917] dark:text-hearth-ink font-ledger">
+                    ₹{effectiveMonthlyRate.toLocaleString('en-IN')} / month
+                  </span>
+                  <span className="text-[11px] text-hearth-taupe">
+                    {selectedTenureMonths} month plan
                   </span>
                 </div>
 
-                {/* Sage-Green Segregated Deposit Vault Footer & Sun-Baked Terracotta CTA */}
                 <div className="p-3.5 bg-hearth-card">
                   <div className="rounded-2xl bg-[#BCC8B8]/75 dark:bg-hearth-sageLight border border-[#9FB09A] px-3.5 py-2.5 flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 min-w-0">
                       <ShieldCheck className="w-4 h-4 text-[#2F5233] dark:text-emerald-400 shrink-0" />
                       <div className="text-[11px] leading-tight text-[#1C1917] dark:text-hearth-ink">
                         <span className="font-semibold font-ledger">
-                          ₹{depositAmount.toLocaleString('en-IN')} Refundable Deposit
+                          ₹{depositAmount.toLocaleString('en-IN')}
                         </span>{' '}
-                        • Protected in Segregated Vault & Refunded in 14 Days
+                        refundable deposit
                       </div>
                     </div>
 
@@ -438,7 +392,7 @@ export const MarketplaceView: React.FC = () => {
                       disabled={inv.availableQuantity <= 0}
                       className="spring-btn shrink-0 px-4 py-2 rounded-pill bg-[#C66B49] hover:bg-hearth-terracotta text-white text-xs font-semibold shadow-sm disabled:opacity-50"
                     >
-                      {inv.availableQuantity > 0 ? 'Reserve Item' : 'Out of Stock'}
+                      {inv.availableQuantity > 0 ? 'Rent Now' : 'Out of Stock'}
                     </button>
                   </div>
                 </div>
@@ -455,10 +409,10 @@ export const MarketplaceView: React.FC = () => {
             <div className="flex items-center justify-between pb-4 border-b border-hearth-border">
               <div>
                 <h3 className="font-serif text-xl font-bold text-hearth-ink">
-                  Side-by-Side Offer Comparison
+                  Compare Products
                 </h3>
                 <p className="text-xs text-hearth-taupe">
-                  Distinguishes workflow requirements, condition grades, and fulfilling vendor locations without implying identical service terms.
+                  Compare monthly rent, deposit, and delivery options side by side.
                 </p>
               </div>
               <button
@@ -487,33 +441,29 @@ export const MarketplaceView: React.FC = () => {
                     </div>
                     <div className="text-xs space-y-1.5 text-hearth-umber">
                       <div className="flex justify-between py-1 border-b border-hearth-border">
-                        <span className="text-hearth-taupe">Platform Rent:</span>
+                        <span className="text-hearth-taupe">Monthly Rent:</span>
                         <span className="font-ledger font-bold">₹{p.baseMonthlyRent}/mo</span>
                       </div>
                       <div className="flex justify-between py-1 border-b border-hearth-border">
-                        <span className="text-hearth-taupe">4x Vault Deposit:</span>
+                        <span className="text-hearth-taupe">Deposit:</span>
                         <span className="font-ledger">
                           ₹{(p.baseMonthlyRent * p.depositMonthsMultiple).toLocaleString('en-IN')}
                         </span>
                       </div>
                       <div className="flex justify-between py-1 border-b border-hearth-border">
-                        <span className="text-hearth-taupe">Booking Path:</span>
+                        <span className="text-hearth-taupe">Delivery:</span>
                         <span className="font-semibold text-hearth-terracotta">
                           {p.workflowType === 'SITE_VISIT_MULTI_STEP'
-                            ? 'Multi-Step Site Visit'
-                            : '1-Step Direct'}
+                            ? 'Home Measurement'
+                            : 'Standard Delivery'}
                         </span>
                       </div>
                       <div className="flex justify-between py-1 border-b border-hearth-border">
-                        <span className="text-hearth-taupe">Fulfilling Vendor:</span>
+                        <span className="text-hearth-taupe">Partner:</span>
                         <span>{inv.owningVendorName}</span>
                       </div>
-                      <div className="flex justify-between py-1 border-b border-hearth-border">
-                        <span className="text-hearth-taupe">Condition Grade:</span>
-                        <span>{inv.conditionGrade}</span>
-                      </div>
                       <div className="flex justify-between py-1">
-                        <span className="text-hearth-taupe">Available Stock:</span>
+                        <span className="text-hearth-taupe">In Stock:</span>
                         <span className="font-ledger font-semibold text-emerald-700">
                           {inv.availableQuantity} units
                         </span>
@@ -526,57 +476,11 @@ export const MarketplaceView: React.FC = () => {
                       }}
                       className="w-full py-2 rounded-pill bg-hearth-terracotta text-white text-xs font-semibold"
                     >
-                      Select This Offer
+                      Rent This Item
                     </button>
                   </div>
                 );
               })}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Editorial Visual Lookbook Modal */}
-      {showThemeMockupModal && (
-        <div className="fixed inset-0 z-50 bg-[#1C1917]/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-5xl rounded-3xl bg-hearth-parchment border border-hearth-border shadow-hearth-lg p-6 max-h-[90vh] overflow-y-auto space-y-5">
-            <div className="flex items-center justify-between border-b border-hearth-border pb-3">
-              <div>
-                <h3 className="font-serif text-xl font-bold text-hearth-ink">
-                  “Terracotta Hearth” — Warm Editorial Lookbook & Platform Architecture
-                </h3>
-                <p className="text-xs text-hearth-taupe">
-                  Crafted with Warm Alabaster Linen (#FAF8F5), Woven Oat (#F5F2EB), Sun-Baked Terracotta (#C2410C) & Botanical Sage (#2F5233)
-                </p>
-              </div>
-              <button
-                onClick={() => setShowThemeMockupModal(false)}
-                className="p-2 rounded-pill bg-hearth-oat hover:bg-hearth-apricot"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <div className="text-xs font-semibold text-hearth-ink">
-                  Warm Lifestyle Marketplace & Interior Catalog
-                </div>
-                <img
-                  src="assets/theme3_terracotta_hearth_marketplace.jpg"
-                  alt="Marketplace Lookbook"
-                  className="w-full rounded-2xl border border-hearth-border shadow-sm"
-                />
-              </div>
-              <div className="space-y-2">
-                <div className="text-xs font-semibold text-hearth-ink">
-                  Guided AC Site-Visit Storyboard, Stationery Agreement & Fair Deposit Console
-                </div>
-                <img
-                  src="assets/theme3_terracotta_hearth_console.jpg"
-                  alt="Console Lookbook"
-                  className="w-full rounded-2xl border border-hearth-border shadow-sm"
-                />
-              </div>
             </div>
           </div>
         </div>

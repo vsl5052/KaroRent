@@ -11,7 +11,6 @@ export const SupportDisputesView: React.FC = () => {
   const {
     serviceTickets,
     supportTickets,
-    disputeCases,
     activePersona,
     executeVendorAssetReplacement,
     escalateSupportTicket,
@@ -27,24 +26,21 @@ export const SupportDisputesView: React.FC = () => {
     <div className="space-y-8">
       {/* Header */}
       <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-2">
-        <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-pill bg-hearth-apricot text-hearth-terracotta font-semibold">
-          Service Concierge • Asset Swaps • SLA Escalations
-        </span>
         <h1 className="font-serif text-2xl font-bold text-hearth-ink">
-          Maintenance, Asset Replacement Swaps & Support SLA Concierge
+          Support
         </h1>
         <p className="text-xs text-hearth-umber">
-          Tracks serialized asset replacements with automatic contract addendum generation and enforces support privacy rules where internal platform notes remain hidden from customers and vendors.
+          Manage maintenance requests, item replacements, and customer inquiries.
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Maintenance & Asset Replacement Tickets */}
+        {/* Maintenance & Replacements */}
         <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-4">
           <h2 className="font-serif text-lg font-bold text-hearth-ink flex items-center gap-2">
             <Wrench className="w-5 h-5 text-hearth-terracotta" />
             <span>
-              Maintenance & Serialized Asset Swap Tickets ({serviceTickets.length})
+              Maintenance & Replacements ({serviceTickets.length})
             </span>
           </h2>
 
@@ -63,13 +59,13 @@ export const SupportDisputesView: React.FC = () => {
                   </span>
                 </div>
                 <div className="font-serif font-bold text-sm text-hearth-ink">
-                  {t.productTitle} — Current Serial: {t.currentAssetSerial}
+                  {t.productTitle} — Serial: {t.currentAssetSerial}
                 </div>
                 <p className="text-hearth-umber">{t.issueDescription}</p>
 
                 {t.replacementAssetSerial && (
                   <div className="p-2.5 rounded-xl bg-[#DCFCE7] text-[#166534] font-mono text-[11px]">
-                    ✓ Swapped to Serial {t.replacementAssetSerial} • Downtime Credit: ₹{t.downtimeCreditAmount}
+                    ✓ Replaced with {t.replacementAssetSerial} • Credit: ₹{t.downtimeCreditAmount}
                   </div>
                 )}
 
@@ -91,7 +87,7 @@ export const SupportDisputesView: React.FC = () => {
                         className="spring-btn px-3.5 py-1.5 rounded-pill bg-hearth-terracotta text-white text-xs font-semibold flex items-center gap-1"
                       >
                         <ArrowRightLeft className="w-3.5 h-3.5" />
-                        <span>Execute Asset Swap & Amend Contract</span>
+                        <span>Replace Item</span>
                       </button>
                     </div>
                   )}
@@ -100,12 +96,12 @@ export const SupportDisputesView: React.FC = () => {
           </div>
         </div>
 
-        {/* Customer Support & SLA Escalation Tickets */}
+        {/* Customer Inquiries */}
         <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-4">
           <h2 className="font-serif text-lg font-bold text-hearth-ink flex items-center gap-2">
             <MessageSquareWarning className="w-5 h-5 text-hearth-sage" />
             <span>
-              Customer Support & SLA Escalation Desk ({supportTickets.length})
+              Customer Inquiries ({supportTickets.length})
             </span>
           </h2>
 
@@ -113,7 +109,7 @@ export const SupportDisputesView: React.FC = () => {
             {supportTickets.map((st) => {
               const replyVal =
                 replyTextByTicket[st.id] ||
-                'Escalated/resolved with verified ledger confirmation.';
+                'We have reviewed your request and confirmed your details.';
 
               return (
                 <div
@@ -125,12 +121,11 @@ export const SupportDisputesView: React.FC = () => {
                       {st.id} • {st.category}
                     </span>
                     <span className="px-2.5 py-0.5 rounded-pill bg-[#DCFCE7] text-[#166534] font-semibold text-[10px]">
-                      {st.status} • SLA: {st.slaDeadline}
+                      {st.status}
                     </span>
                   </div>
                   <p className="text-hearth-umber font-medium">{st.description}</p>
 
-                  {/* Internal Admin Notes — Strictly Hidden from Customers/Vendors per FR-SUP-002! */}
                   {activePersona.role === 'PLATFORM_ADMIN' && (
                     <div className="p-2.5 rounded-xl bg-[#FFEDD5] border border-[#FED7AA] text-[#9A3412] text-[11px] flex items-center gap-1.5">
                       <Lock className="w-3.5 h-3.5 shrink-0" />
@@ -138,7 +133,7 @@ export const SupportDisputesView: React.FC = () => {
                     </div>
                   )}
 
-                  {/* Public Communication Thread */}
+                  {/* Messages */}
                   <div className="space-y-1.5 pl-3 border-l-2 border-hearth-terracotta/40">
                     {st.publicCommunicationLog.map((msg, i) => (
                       <div key={i} className="text-[11px]">
@@ -166,7 +161,7 @@ export const SupportDisputesView: React.FC = () => {
                       onClick={() => escalateSupportTicket(st.id, replyVal)}
                       className="px-4 py-1.5 rounded-pill bg-hearth-terracotta text-white text-xs font-semibold shrink-0"
                     >
-                      Post Update
+                      Send Reply
                     </button>
                   </div>
                 </div>

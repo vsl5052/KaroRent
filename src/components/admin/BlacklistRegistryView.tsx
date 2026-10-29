@@ -1,12 +1,8 @@
 import React, { useState } from 'react';
 import {
-  AlertOctagon,
-  CheckCircle2,
   Fingerprint,
   KeyRound,
   ShieldAlert,
-  ShieldCheck,
-  UserX,
 } from 'lucide-react';
 import { useKaroRentStore } from '../../store/useKaroRentStore';
 import { mandatoryReasonSchema } from '../../lib/validation';
@@ -26,10 +22,10 @@ export const BlacklistRegistryView: React.FC = () => {
   >('ALL');
   const [overrideTargetId, setOverrideTargetId] = useState<string | null>(null);
   const [overrideReason, setOverrideReason] = useState(
-    'Verified full settlement of ₹12,600 past-due damage invoice via NEFT UTR #994120; approved Super Admin exception override.'
+    'Verified full payment of overdue balance; account unblocked.'
   );
   const [bookingOverrideReason, setBookingOverrideReason] = useState(
-    'Customer cleared prior default balance and deposited additional security buffer; approved one-time booking release.'
+    'Customer cleared prior balance; approved order.'
   );
 
   const filteredBlacklist =
@@ -47,14 +43,11 @@ export const BlacklistRegistryView: React.FC = () => {
       <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-pill bg-[#FEE2E2] text-[#991B1B] font-semibold">
-              Trust & Safety Watchlist • Fraud & Evasion Interception
-            </span>
-            <h1 className="font-serif text-2xl font-bold text-hearth-ink mt-1">
-              Unified Vendor & Client Blacklist Registry & Evasion Radar
+            <h1 className="font-serif text-2xl font-bold text-hearth-ink">
+              Blocked Accounts
             </h1>
             <p className="text-xs text-hearth-umber">
-              Maintains two segregated, auditable risk ledgers: (1) <strong>Vendor Blacklist</strong> (auto-enrolled on contract termination) and (2) <strong>Customer Blacklist</strong> (severe payment default, heavy asset damage, or extreme policy breach).
+              Manage restricted customer and vendor accounts.
             </p>
           </div>
 
@@ -71,10 +64,10 @@ export const BlacklistRegistryView: React.FC = () => {
                   }`}
                 >
                   {f === 'ALL'
-                    ? `All Ledgers (${blacklist.length})`
+                    ? `All (${blacklist.length})`
                     : f === 'VENDOR_BLACKLIST'
-                    ? '1. Vendor Blacklist'
-                    : '2. Customer Blacklist'}
+                    ? 'Vendors'
+                    : 'Customers'}
                 </button>
               )
             )}
@@ -82,19 +75,16 @@ export const BlacklistRegistryView: React.FC = () => {
         </div>
       </div>
 
-      {/* Intercepted Client Bookings Queue */}
+      {/* Orders Held for Review */}
       {flaggedBookings.length > 0 && (
         <div className="rounded-3xl bg-[#FEE2E2]/35 border-2 border-[#DC2626] p-6 space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2 text-[#991B1B]">
               <ShieldAlert className="w-5 h-5" />
               <h2 className="font-serif text-lg font-bold">
-                Intercepted Client Bookings Held in “Flagged — Blacklist Review”
+                Orders Held for Review
               </h2>
             </div>
-            <span className="text-xs font-mono text-[#991B1B] font-semibold">
-              Inventory Allocation & Vendor Dispatch Blocked
-            </span>
           </div>
 
           <div className="space-y-3">
@@ -109,14 +99,14 @@ export const BlacklistRegistryView: React.FC = () => {
                       {b.id}
                     </span>
                     <span className="px-2.5 py-0.5 rounded-pill bg-[#FEE2E2] text-[#991B1B] font-semibold text-[10px]">
-                      {b.status}
+                      Held for Review
                     </span>
                     <span className="font-bold text-hearth-ink">
                       Customer: {b.customerName} ({b.customerId})
                     </span>
                   </div>
                   <div className="font-serif font-semibold text-sm text-hearth-ink">
-                    Attempted Product: {b.productTitle} (Deposit: ₹{b.securityDepositAmount.toLocaleString('en-IN')})
+                    {b.productTitle} (Deposit: ₹{b.securityDepositAmount.toLocaleString('en-IN')})
                   </div>
                   <div className="text-[#991B1B] text-[11px]">
                     {b.blacklistFlagReason}
@@ -128,7 +118,7 @@ export const BlacklistRegistryView: React.FC = () => {
                     type="text"
                     value={bookingOverrideReason}
                     onChange={(e) => setBookingOverrideReason(e.target.value)}
-                    placeholder="Mandatory Super Admin override reason..."
+                    placeholder="Reason for approval..."
                     className="px-3 py-1.5 rounded-xl bg-hearth-oat border border-hearth-border text-xs w-full sm:w-64"
                   />
                   <button
@@ -138,7 +128,7 @@ export const BlacklistRegistryView: React.FC = () => {
                     }
                     className="spring-btn px-4 py-2 rounded-pill bg-hearth-sage text-white text-xs font-semibold shrink-0"
                   >
-                    Approve One-Time Override
+                    Approve Order
                   </button>
                 </div>
               </div>
@@ -147,7 +137,7 @@ export const BlacklistRegistryView: React.FC = () => {
         </div>
       )}
 
-      {/* Unified Blacklist Cards with Identifier Fingerprints */}
+      {/* Blocked Account Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {filteredBlacklist.map((entry) => (
           <div
@@ -168,7 +158,7 @@ export const BlacklistRegistryView: React.FC = () => {
                           : 'bg-[#FEE2E2] text-[#991B1B] border border-[#FECACA]'
                       }`}
                     >
-                      {entry.ledgerType.replace('_', ' ')}
+                      {entry.ledgerType === 'VENDOR_BLACKLIST' ? 'Vendor' : 'Customer'}
                     </span>
                     <span
                       className={`px-2.5 py-0.5 rounded-pill text-[10px] font-semibold ${
@@ -177,20 +167,20 @@ export const BlacklistRegistryView: React.FC = () => {
                           : 'bg-[#DCFCE7] text-[#166534]'
                       }`}
                     >
-                      {entry.status}
+                      {entry.status === 'Active Blacklist' ? 'Blocked' : 'Unblocked'}
                     </span>
                   </div>
                   <h3 className="font-serif text-lg font-bold text-hearth-ink mt-1">
                     {entry.entityName} ({entry.entityId})
                   </h3>
                   <div className="text-xs text-hearth-terracotta font-semibold">
-                    Trigger Category: {entry.categoryReason} • Case/Ref: {entry.triggeringCaseOrBookingId}
+                    Reason: {entry.categoryReason} • Ref: {entry.triggeringCaseOrBookingId}
                   </div>
                 </div>
 
                 <div className="text-right font-mono text-xs">
                   <div className="text-[#991B1B] font-bold">
-                    Dues/Hold: ₹{entry.outstandingDuesAmount.toLocaleString('en-IN')}
+                    Balance: ₹{entry.outstandingDuesAmount.toLocaleString('en-IN')}
                   </div>
                   <div className="text-[10px] text-hearth-taupe">
                     Blocked Attempts: {entry.blockedAttemptsCount}
@@ -202,13 +192,11 @@ export const BlacklistRegistryView: React.FC = () => {
                 {entry.evidenceSummary}
               </p>
 
-              {/* Evasion & Duplicate Account Identifier Matrix */}
+              {/* Account Details */}
               <div className="p-3.5 rounded-2xl bg-hearth-parchment border border-hearth-border space-y-1.5 text-[11px] font-mono">
                 <div className="text-hearth-ink font-sans font-bold text-xs flex items-center gap-1.5">
                   <Fingerprint className="w-4 h-4 text-hearth-terracotta" />
-                  <span>
-                    Cross-Checked Evasion Identifiers
-                  </span>
+                  <span>Account Details</span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-hearth-umber">
                   <div>• Mobile: {entry.matchedIdentifiers.phone}</div>
@@ -217,10 +205,10 @@ export const BlacklistRegistryView: React.FC = () => {
                     <div>• GSTIN: {entry.matchedIdentifiers.taxIdOrGstin}</div>
                   )}
                   {entry.matchedIdentifiers.kycOrPan && (
-                    <div>• PAN/KYC: {entry.matchedIdentifiers.kycOrPan}</div>
+                    <div>• PAN/ID: {entry.matchedIdentifiers.kycOrPan}</div>
                   )}
                   <div className="sm:col-span-2">
-                    • Bank / Payment Instrument Fingerprint:{' '}
+                    • Bank / Payment:{' '}
                     <strong>{entry.matchedIdentifiers.bankOrPaymentFingerprint}</strong>
                   </div>
                 </div>
@@ -228,13 +216,13 @@ export const BlacklistRegistryView: React.FC = () => {
 
               {entry.overrideHistory && (
                 <div className="p-3 rounded-xl bg-[#DCFCE7] border border-[#BBF7D0] text-[#166534] text-xs">
-                  <strong>Whitelisted / Overridden by {entry.overrideHistory.overriddenByAdmin}:</strong>{' '}
+                  <strong>Unblocked by {entry.overrideHistory.overriddenByAdmin}:</strong>{' '}
                   {entry.overrideHistory.overrideReason} ({entry.overrideHistory.timestamp})
                 </div>
               )}
             </div>
 
-            {/* Super Admin Exception Override Controls */}
+            {/* Unblock Account Controls */}
             {entry.status === 'Active Blacklist' && (
               <div className="pt-3 border-t border-hearth-border">
                 {overrideTargetId !== entry.id ? (
@@ -243,12 +231,12 @@ export const BlacklistRegistryView: React.FC = () => {
                     className="px-4 py-2 rounded-pill bg-hearth-oat hover:bg-hearth-apricot border border-hearth-border text-xs font-semibold text-hearth-ink flex items-center gap-1.5"
                   >
                     <KeyRound className="w-3.5 h-3.5 text-hearth-terracotta" />
-                    <span>Super Admin Exception Override / Whitelist</span>
+                    <span>Unblock Account</span>
                   </button>
                 ) : (
                   <div className="space-y-2">
                     <label className="block text-[11px] font-semibold text-hearth-ink">
-                      Mandatory Super Admin Justification & Debt Clearance Proof *
+                      Reason for Unblocking *
                     </label>
                     <input
                       type="text"
@@ -269,7 +257,7 @@ export const BlacklistRegistryView: React.FC = () => {
                           const valid = mandatoryReasonSchema.safeParse(overrideReason);
                           if (!valid.success) {
                             addToast({
-                              title: 'Mandatory Override Reason Required',
+                              title: 'Reason Required',
                               description: valid.error.errors[0].message,
                               variant: 'error',
                             });
@@ -280,7 +268,7 @@ export const BlacklistRegistryView: React.FC = () => {
                         }}
                         className="px-4 py-1.5 rounded-pill bg-hearth-sage text-white text-xs font-semibold"
                       >
-                        Confirm Override & Log Audit
+                        Confirm Unblock
                       </button>
                     </div>
                   </div>

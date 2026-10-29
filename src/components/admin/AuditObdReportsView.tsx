@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import {
-  CheckSquare,
   Download,
-  FileSpreadsheet,
   History,
-  ShieldCheck,
-  Sliders,
 } from 'lucide-react';
 import { useKaroRentStore } from '../../store/useKaroRentStore';
 
@@ -14,9 +10,6 @@ export const AuditObdReportsView: React.FC = () => {
     auditLogs,
     obdDecisions,
     bookings,
-    invoices,
-    depositLedgers,
-    blacklist,
     activePersona,
     updateObdDecision,
     addToast,
@@ -35,7 +28,6 @@ export const AuditObdReportsView: React.FC = () => {
     );
   });
 
-  // Role-Scoped CSV Report Export
   const handleExportScopedReport = (reportType: string) => {
     const isVendor = activePersona.role === 'VENDOR_OWNER';
     const scopedBookings = isVendor
@@ -45,12 +37,11 @@ export const AuditObdReportsView: React.FC = () => {
     const csvRows = [
       ['Report Type', reportType],
       ['Exported By', `${activePersona.name} (${activePersona.roleBadge})`],
-      ['Data Scoping Rule', isVendor ? 'Partner-Isolated Scope' : 'Global Platform Scope'],
       [],
-      ['Booking ID', 'Customer', 'Product', 'Vendor Source', 'Status', 'Monthly Rent (INR)', '4x Vault Deposit (INR)'],
+      ['Order ID', 'Customer', 'Product', 'Partner', 'Status', 'Monthly Rent (INR)', 'Deposit (INR)'],
       ...scopedBookings.map((b) => [
         b.id,
-        isVendor ? 'Redacted/Job-Scoped' : b.customerName,
+        isVendor ? 'Customer' : b.customerName,
         b.productTitle,
         b.fulfillingVendorName,
         b.status,
@@ -65,62 +56,59 @@ export const AuditObdReportsView: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `KaroRent_${reportType}_${activePersona.role}.csv`;
+    a.download = `KaroRent_${reportType}.csv`;
     a.click();
     URL.revokeObjectURL(url);
 
     addToast({
-      title: `Exported ${reportType} Report`,
-      description: `Role-scoped CSV generated respecting partner privacy boundaries.`,
+      title: `Downloaded ${reportType} Report`,
+      description: `Your CSV file has been downloaded.`,
       variant: 'success',
     });
   };
 
   return (
     <div className="space-y-8">
-      {/* Top Exportable Reconciliation & Role-Scoped Reports Strip */}
+      {/* Header & Export Strip */}
       <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-pill bg-hearth-sageLight text-hearth-sage font-semibold">
-              Platform Compliance • Governance Policies • Audit Trail
-            </span>
-            <h1 className="font-serif text-2xl font-bold text-hearth-ink mt-1">
-              Role-Scoped Reconciliation Exports, Platform Policies & Audit Trail
+            <h1 className="font-serif text-2xl font-bold text-hearth-ink">
+              Reports & Logs
             </h1>
             <p className="text-xs text-hearth-umber">
-              Export role-scoped CSV manifests, configure versioned operational policies, and inspect the immutable actor/timestamp audit trail.
+              Download CSV reports, manage platform settings, and view activity history.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
             {[
-              'Reconciliation_5_Invoice_Ledger',
-              'Deposit_Vault_Settlement',
-              'Blacklist_Watchlist_Registry',
+              { id: 'Invoices', label: 'Export Invoices (CSV)' },
+              { id: 'Deposits', label: 'Export Deposits (CSV)' },
+              { id: 'Blocked_Accounts', label: 'Export Blocked Accounts (CSV)' },
             ].map((rep) => (
               <button
-                key={rep}
-                onClick={() => handleExportScopedReport(rep)}
+                key={rep.id}
+                onClick={() => handleExportScopedReport(rep.id)}
                 className="spring-btn px-3.5 py-2 rounded-pill bg-hearth-oat hover:bg-hearth-apricot border border-hearth-border text-xs font-semibold text-hearth-ink flex items-center gap-1.5"
               >
                 <Download className="w-3.5 h-3.5 text-hearth-terracotta" />
-                <span>Export {rep.replace(/_/g, ' ')} (CSV)</span>
+                <span>{rep.label}</span>
               </button>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Operational Governance Policy Configurator */}
+      {/* Platform Settings */}
       <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="font-serif text-lg font-bold text-hearth-ink">
-              Platform Governance & Operational Policy Matrix
+              Platform Settings
             </h2>
             <p className="text-xs text-hearth-taupe">
-              Changes to policy have effective dates and never retroactively rewrite historical accepted agreements or invoices.
+              Configure operational rules for new orders and payouts.
             </p>
           </div>
         </div>
@@ -132,15 +120,12 @@ export const AuditObdReportsView: React.FC = () => {
               className="p-4 rounded-2xl bg-hearth-oat border border-hearth-border space-y-2 text-xs"
             >
               <div className="flex items-center justify-between">
-                <span className="font-mono font-bold text-hearth-terracotta">
-                  {obd.id} • {obd.priority} Priority
+                <span className="font-serif font-bold text-sm text-hearth-ink">
+                  {obd.title}
                 </span>
                 <span className="px-2 py-0.5 rounded-pill bg-[#DCFCE7] text-[#166534] text-[10px] font-semibold">
-                  {obd.status} (Eff: {obd.effectiveDate})
+                  Active
                 </span>
-              </div>
-              <div className="font-serif font-bold text-sm text-hearth-ink">
-                {obd.title}
               </div>
               <select
                 value={obd.selectedOption}
@@ -154,31 +139,25 @@ export const AuditObdReportsView: React.FC = () => {
                   </option>
                 ))}
               </select>
-              <div className="text-[10px] font-mono text-hearth-taupe">
-                Policy Owner: {obd.ownerRole}
-              </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Immutable Audit Trail Table */}
+      {/* Activity Log Table */}
       <div className="rounded-3xl bg-hearth-card border border-hearth-border shadow-hearth overflow-hidden">
         <div className="px-6 py-4 bg-hearth-oat border-b border-hearth-border flex flex-wrap items-center justify-between gap-3">
           <div>
             <h3 className="font-serif font-bold text-base text-hearth-ink flex items-center gap-2">
               <History className="w-4 h-4 text-hearth-terracotta" />
-              <span>Immutable System Audit Trail</span>
+              <span>Activity Log</span>
             </h3>
-            <p className="text-[11px] text-hearth-taupe">
-              Records actor, timestamp, module category, affected record, prior/new state, and mandatory reason for every critical action.
-            </p>
           </div>
           <input
             type="text"
             value={auditSearch}
             onChange={(e) => setAuditSearch(e.target.value)}
-            placeholder="Filter audit trail by module, actor, or record..."
+            placeholder="Search activity..."
             className="px-3.5 py-1.5 rounded-pill bg-hearth-card border border-hearth-border text-xs w-72"
           />
         </div>
@@ -187,12 +166,12 @@ export const AuditObdReportsView: React.FC = () => {
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="border-b border-hearth-border bg-hearth-oat/50 text-[10px] font-mono uppercase text-hearth-taupe">
-                <th className="py-3 px-4">Timestamp (IST)</th>
-                <th className="py-3 px-4">Actor & Role</th>
-                <th className="py-3 px-4">Module</th>
-                <th className="py-3 px-4">Action & Affected Record</th>
-                <th className="py-3 px-4">Prior → New State</th>
-                <th className="py-3 px-4">Mandatory Reason</th>
+                <th className="py-3 px-4">Time</th>
+                <th className="py-3 px-4">User</th>
+                <th className="py-3 px-4">Category</th>
+                <th className="py-3 px-4">Action</th>
+                <th className="py-3 px-4">Change</th>
+                <th className="py-3 px-4">Notes</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-hearth-border">

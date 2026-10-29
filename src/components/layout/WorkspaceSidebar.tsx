@@ -4,7 +4,6 @@ import {
   Building2,
   CalendarClock,
   Camera,
-  CheckSquare,
   FileSignature,
   FileSpreadsheet,
   Home,
@@ -12,7 +11,6 @@ import {
   MessageSquareWarning,
   ReceiptIndianRupee,
   ShieldAlert,
-  Sparkles,
   Truck,
   WalletCards,
 } from 'lucide-react';
@@ -22,7 +20,6 @@ import { NavigationTab } from '../../types/srs';
 interface NavItemConfig {
   id: NavigationTab;
   label: string;
-  srsCode: string;
   icon: React.ReactNode;
   badgeCount?: number;
   badgeVariant?: 'terracotta' | 'crimson' | 'sage';
@@ -56,15 +53,13 @@ export const WorkspaceSidebar: React.FC = () => {
   const navItems: NavItemConfig[] = [
     {
       id: 'MARKETPLACE',
-      label: 'Lifestyle Catalog',
-      srsCode: 'Curated Offerings',
+      label: 'Catalog',
       icon: <Home className="w-4 h-4" />,
       allowedRoles: ['CUSTOMER_INDIVIDUAL', 'CUSTOMER_BUSINESS', 'VENDOR_OWNER', 'FIELD_PERSONNEL', 'PLATFORM_ADMIN'],
     },
     {
       id: 'MY_RENTALS',
-      label: 'My Rentals & AC Storyboard',
-      srsCode: 'Orders & Home Visits',
+      label: 'My Rentals',
       icon: <CalendarClock className="w-4 h-4" />,
       badgeCount: bookings.filter((b) => b.status === 'Final Bill Sent' || b.status === 'Awaiting Customer Agreement').length || undefined,
       badgeVariant: 'terracotta',
@@ -72,32 +67,34 @@ export const WorkspaceSidebar: React.FC = () => {
     },
     {
       id: 'AGREEMENTS_ESIGN',
-      label: 'Stationery E-Agreements',
-      srsCode: 'Digital Contracts',
+      label: 'Agreements',
       icon: <FileSignature className="w-4 h-4" />,
       allowedRoles: ['CUSTOMER_INDIVIDUAL', 'CUSTOMER_BUSINESS', 'PLATFORM_ADMIN'],
     },
     {
       id: 'INVOICES_DEPOSITS',
-      label: '5-Invoice & Deposit Vault',
-      srsCode: 'Invoices & Vault',
+      label: 'Payments & Deposits',
       icon: <ReceiptIndianRupee className="w-4 h-4" />,
       badgeVariant: 'sage',
       allowedRoles: ['CUSTOMER_INDIVIDUAL', 'CUSTOMER_BUSINESS', 'PLATFORM_ADMIN'],
     },
     {
       id: 'THREE_WAY_INSPECTION',
-      label: 'Returns & 3-Way Care',
-      srsCode: 'Inspection & Refunds',
+      label: 'Returns',
       icon: <Camera className="w-4 h-4" />,
       badgeCount: openDisputesCount || undefined,
       badgeVariant: 'terracotta',
       allowedRoles: ['CUSTOMER_INDIVIDUAL', 'CUSTOMER_BUSINESS', 'VENDOR_OWNER', 'PLATFORM_ADMIN'],
     },
     {
+      id: 'SUPPORT_DISPUTES',
+      label: 'Support',
+      icon: <MessageSquareWarning className="w-4 h-4" />,
+      allowedRoles: ['CUSTOMER_INDIVIDUAL', 'CUSTOMER_BUSINESS', 'VENDOR_OWNER', 'PLATFORM_ADMIN'],
+    },
+    {
       id: 'VENDOR_PORTAL',
-      label: 'Catalogue & Staged Edits',
-      srsCode: 'Partner Inventory',
+      label: 'Vendor Inventory',
       icon: <Building2 className="w-4 h-4" />,
       badgeCount: stagedCount || undefined,
       badgeVariant: 'terracotta',
@@ -105,17 +102,23 @@ export const WorkspaceSidebar: React.FC = () => {
     },
     {
       id: 'FIELD_OPERATIONS',
-      label: 'Deliveries & Home Visits',
-      srsCode: 'Dispatch & Pickups',
+      label: 'Deliveries & Visits',
       icon: <Truck className="w-4 h-4" />,
       badgeCount: fieldJobsCount || undefined,
       badgeVariant: 'terracotta',
       allowedRoles: ['FIELD_PERSONNEL', 'VENDOR_OWNER', 'PLATFORM_ADMIN'],
     },
     {
+      id: 'SETTLEMENTS_FINANCE',
+      label: 'Payouts',
+      icon: <WalletCards className="w-4 h-4" />,
+      badgeCount: pendingSettlementsCount || undefined,
+      badgeVariant: 'sage',
+      allowedRoles: ['VENDOR_OWNER', 'PLATFORM_ADMIN'],
+    },
+    {
       id: 'ADMIN_GOVERNANCE',
-      label: 'Morning Triage & Source Control',
-      srsCode: 'Catalog & Pricing',
+      label: 'Catalog & Vendors',
       icon: <Layers className="w-4 h-4" />,
       badgeCount: stagedCount || undefined,
       badgeVariant: 'terracotta',
@@ -123,33 +126,15 @@ export const WorkspaceSidebar: React.FC = () => {
     },
     {
       id: 'BLACKLIST_REGISTRY',
-      label: 'Trust & Blacklist Safeguards',
-      srsCode: 'Risk & Watchlist',
+      label: 'Blocked Accounts',
       icon: <ShieldAlert className="w-4 h-4" />,
       badgeCount: activeBlacklistCount + flaggedBookingsCount,
       badgeVariant: 'crimson',
       allowedRoles: ['PLATFORM_ADMIN'],
     },
     {
-      id: 'SETTLEMENTS_FINANCE',
-      label: 'Commission & Settlements',
-      srsCode: 'Partner Payouts',
-      icon: <WalletCards className="w-4 h-4" />,
-      badgeCount: pendingSettlementsCount || undefined,
-      badgeVariant: 'sage',
-      allowedRoles: ['VENDOR_OWNER', 'PLATFORM_ADMIN'],
-    },
-    {
-      id: 'SUPPORT_DISPUTES',
-      label: 'Support, SLA & Service Swaps',
-      srsCode: 'Care & Maintenance',
-      icon: <MessageSquareWarning className="w-4 h-4" />,
-      allowedRoles: ['CUSTOMER_INDIVIDUAL', 'CUSTOMER_BUSINESS', 'VENDOR_OWNER', 'PLATFORM_ADMIN'],
-    },
-    {
       id: 'AUDIT_OBD_REPORTS',
-      label: 'Audit Trail, Policies & Exports',
-      srsCode: 'Audit & Governance',
+      label: 'Reports & Logs',
       icon: <FileSpreadsheet className="w-4 h-4" />,
       allowedRoles: ['PLATFORM_ADMIN', 'VENDOR_OWNER'],
     },
@@ -160,36 +145,27 @@ export const WorkspaceSidebar: React.FC = () => {
   );
 
   return (
-    <aside className="w-full lg:w-[272px] shrink-0 bg-hearth-oat border-b lg:border-b-0 lg:border-r border-hearth-border p-4 flex flex-col justify-between">
+    <aside className="w-full lg:w-[248px] shrink-0 bg-hearth-oat border-b lg:border-b-0 lg:border-r border-hearth-border p-4 flex flex-col justify-between">
       <div>
-        {/* Active Persona & Scope Card */}
+        {/* Clean User Profile Card */}
         <div className="p-3.5 rounded-2xl bg-hearth-card border border-hearth-border shadow-sm mb-4">
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-pill bg-hearth-apricot text-hearth-terracotta font-semibold">
-              Active Workspace Scope
-            </span>
-            <Sparkles className="w-3.5 h-3.5 text-hearth-terracotta" />
-          </div>
-          <div className="font-serif font-semibold text-sm text-hearth-ink mt-1.5">
+          <div className="font-serif font-semibold text-sm text-hearth-ink">
             {activePersona.name}
           </div>
-          <div className="text-[11px] text-hearth-umber font-medium mt-0.5">
+          <div className="text-xs text-hearth-terracotta font-medium mt-0.5">
             {activePersona.roleBadge}
-          </div>
-          <div className="text-[10px] text-hearth-taupe mt-1 leading-snug">
-            {activePersona.subtitle}
           </div>
           {activePersona.isTerminatedVendor && (
             <div className="mt-2 p-2 rounded-xl bg-[#FEE2E2] border border-[#FECACA] text-[10px] text-[#991B1B] font-medium flex items-center gap-1.5">
               <AlertOctagon className="w-3.5 h-3.5 shrink-0" />
-              <span>Post-Termination Read-Only Mode Active</span>
+              <span>Read-Only Account</span>
             </div>
           )}
         </div>
 
         {/* Navigation Links */}
         <div className="text-[10px] font-mono uppercase tracking-wider text-hearth-taupe px-3 mb-2">
-          Guided Lifecycle Modules
+          Menu
         </div>
         <nav className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0">
           {visibleNavItems.map((item) => {
@@ -214,10 +190,7 @@ export const WorkspaceSidebar: React.FC = () => {
                   >
                     {item.icon}
                   </span>
-                  <div className="truncate">
-                    <div className="truncate leading-tight">{item.label}</div>
-                    <div className="text-[9px] font-mono text-hearth-taupe">{item.srsCode}</div>
-                  </div>
+                  <span className="truncate">{item.label}</span>
                 </div>
 
                 {item.badgeCount !== undefined && item.badgeCount > 0 && (
@@ -237,23 +210,6 @@ export const WorkspaceSidebar: React.FC = () => {
             );
           })}
         </nav>
-      </div>
-
-      {/* Palette Swatch Legend */}
-      <div className="hidden lg:block mt-6 pt-4 border-t border-hearth-border">
-        <div className="p-3 rounded-2xl bg-hearth-card/80 border border-hearth-border flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#FAF8F5] border border-[#E7E5E4] shadow-inner shrink-0 flex items-center justify-center">
-            <div className="w-3.5 h-3.5 rounded-full bg-hearth-terracotta" />
-          </div>
-          <div>
-            <div className="text-[11px] font-semibold text-hearth-ink">
-              Terracotta Hearth Edition
-            </div>
-            <div className="text-[10px] font-mono text-hearth-taupe">
-              Alabaster Linen (#FAF8F5)
-            </div>
-          </div>
-        </div>
       </div>
     </aside>
   );

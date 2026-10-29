@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  CheckCircle2,
-  Lock,
-  ShieldCheck,
-  WalletCards,
-} from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 import { useKaroRentStore } from '../../store/useKaroRentStore';
 
 export const SettlementsFinanceView: React.FC = () => {
@@ -15,7 +10,6 @@ export const SettlementsFinanceView: React.FC = () => {
     isSimulatingLatency,
   } = useKaroRentStore();
 
-  // Scope settlements for Vendor vs Platform Admin (BR-012)
   const scopedSettlements =
     activePersona.role === 'PLATFORM_ADMIN'
       ? settlements
@@ -24,14 +18,11 @@ export const SettlementsFinanceView: React.FC = () => {
   return (
     <div className="space-y-7">
       <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-2">
-        <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-pill bg-hearth-sageLight text-hearth-sage font-semibold">
-          Partner Settlements & Escrow Governance
-        </span>
         <h1 className="font-serif text-2xl font-bold text-hearth-ink">
-          Platform Commission, Vendor Settlements & Termination Escrow Holds
+          Vendor Payouts
         </h1>
         <p className="text-xs text-hearth-umber">
-          Vendor payable is calculated from reconciled customer rental collections less approved 12% platform commission. Enforces <strong>Dual-Control Segregation of Duties</strong> where the preparer cannot be the sole approver, and automatically locks payouts for terminating vendors.
+          Review partner earnings, platform fees, and payout status.
         </p>
       </div>
 
@@ -64,7 +55,7 @@ export const SettlementsFinanceView: React.FC = () => {
                           : 'bg-[#FFEDD5] text-[#9A3412]'
                       }`}
                     >
-                      {st.status}
+                      {isHeld ? 'On Hold' : st.status}
                     </span>
                   </div>
                   <h3 className="font-serif text-lg font-bold text-hearth-ink mt-1">
@@ -84,18 +75,16 @@ export const SettlementsFinanceView: React.FC = () => {
                       className="spring-btn px-5 py-2.5 rounded-pill bg-hearth-sage hover:bg-[#233E26] text-white text-xs font-semibold flex items-center gap-2 shadow-sm"
                     >
                       <ShieldCheck className="w-4 h-4" />
-                      <span>
-                        Approve & Execute NEFT Payout (Segregation Verified)
-                      </span>
+                      <span>Approve & Pay</span>
                     </button>
                   )}
               </div>
 
-              {/* Itemised Settlement Statement Breakdown */}
+              {/* Payout Breakdown */}
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs">
                 <div className="p-3 rounded-2xl bg-hearth-oat border border-hearth-border">
                   <div className="text-[10px] text-hearth-taupe">
-                    Gross Eligible Rent
+                    Gross Rent
                   </div>
                   <div className="font-ledger font-bold text-sm text-hearth-ink mt-0.5">
                     ₹{st.grossEligibleCollections.toLocaleString('en-IN')}
@@ -113,7 +102,7 @@ export const SettlementsFinanceView: React.FC = () => {
 
                 <div className="p-3 rounded-2xl bg-hearth-oat border border-hearth-border">
                   <div className="text-[10px] text-hearth-taupe">
-                    Refunds / Adjustments
+                    Adjustments
                   </div>
                   <div className="font-ledger font-bold text-sm text-hearth-ink mt-0.5">
                     ₹{st.refundsAndChargebacks.toLocaleString('en-IN')}
@@ -122,7 +111,7 @@ export const SettlementsFinanceView: React.FC = () => {
 
                 <div className="p-3 rounded-2xl bg-[#FEE2E2]/50 border border-[#FECACA]">
                   <div className="text-[10px] text-[#991B1B]">
-                    Termination Escrow Hold
+                    Held Amount
                   </div>
                   <div className="font-ledger font-bold text-sm text-[#991B1B] mt-0.5">
                     -₹{st.terminationHoldbackAmount.toLocaleString('en-IN')}
@@ -131,7 +120,7 @@ export const SettlementsFinanceView: React.FC = () => {
 
                 <div className="p-3 rounded-2xl bg-[#DCFCE7]/60 border border-[#BBF7D0]">
                   <div className="text-[10px] text-[#166534] font-semibold">
-                    Net Vendor Payable
+                    Net Payout
                   </div>
                   <div className="font-ledger font-bold text-base text-[#166534] mt-0.5">
                     ₹{st.netVendorPayable.toLocaleString('en-IN')}
@@ -141,7 +130,7 @@ export const SettlementsFinanceView: React.FC = () => {
 
               {st.payoutReference && (
                 <div className="text-[11px] font-mono text-hearth-sage">
-                  Reconciled Payout Reference: <strong>{st.payoutReference}</strong>
+                  Payment Ref: <strong>{st.payoutReference}</strong>
                 </div>
               )}
             </div>
