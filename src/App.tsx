@@ -20,13 +20,22 @@ import { SupportDisputesView } from './components/admin/SupportDisputesView';
 import { AuditObdReportsView } from './components/admin/AuditObdReportsView';
 
 export const App: React.FC = () => {
-  const { activeTab, darkMode } = useKaroRentStore();
+  const { activeTab, darkMode, activePersona } = useKaroRentStore();
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode);
   }, [darkMode]);
 
   const renderActiveView = () => {
+    if (
+      activePersona.role === 'VENDOR_OWNER' &&
+      (activeTab === 'MARKETPLACE' ||
+        activeTab === 'FOR_BUSINESS' ||
+        activeTab === 'AUDIT_OBD_REPORTS')
+    ) {
+      return <VendorPortalView />;
+    }
+
     switch (activeTab) {
       case 'MARKETPLACE':
         return <MarketplaceView />;

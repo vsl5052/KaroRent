@@ -20,17 +20,33 @@ const TAB_TITLES: Record<NavigationTab, string> = {
 };
 
 export const BreadcrumbStrip: React.FC = () => {
-  const { activeTab, setActiveTab, isSimulatingLatency, latencyActionLabel } =
-    useKaroRentStore();
+  const {
+    activeTab,
+    setActiveTab,
+    activePersona,
+    isSimulatingLatency,
+    latencyActionLabel,
+  } = useKaroRentStore();
 
-  const currentTitle = TAB_TITLES[activeTab];
+  const currentTitle =
+    activeTab === 'THREE_WAY_INSPECTION' && activePersona.role === 'VENDOR_OWNER'
+      ? 'Returned Products'
+      : TAB_TITLES[activeTab];
 
   return (
     <div className="w-full bg-hearth-card/70 border-b border-hearth-border px-4 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
       {/* Simple Breadcrumb */}
       <div className="flex items-center gap-1.5 text-hearth-taupe flex-wrap">
         <button
-          onClick={() => setActiveTab('MARKETPLACE')}
+          onClick={() =>
+            setActiveTab(
+              activePersona.role === 'VENDOR_OWNER'
+                ? 'VENDOR_PORTAL'
+                : activePersona.role === 'FIELD_PERSONNEL'
+                ? 'FIELD_OPERATIONS'
+                : 'MARKETPLACE'
+            )
+          }
           className="hover:text-hearth-terracotta transition-colors font-medium"
         >
           Home

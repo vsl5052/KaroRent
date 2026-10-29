@@ -271,16 +271,22 @@ export const ThreeWayInspectionView: React.FC = () => {
       <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="font-serif text-2xl font-bold text-hearth-ink">
-            Returns
+            {activePersona.role === 'VENDOR_OWNER'
+              ? 'Returned Products'
+              : 'Returns'}
           </h1>
           <p className="text-xs text-hearth-umber mt-0.5">
-            Review return pickup photos, item condition, and deposit refunds.
+            {activePersona.role === 'VENDOR_OWNER'
+              ? 'Review return pickup photos and log warehouse condition checks.'
+              : 'Review return pickup photos, item condition, and deposit refunds.'}
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <label className="text-xs font-semibold text-hearth-ink">
-            Select Return:
+            {activePersona.role === 'VENDOR_OWNER'
+              ? 'Select Returned Product:'
+              : 'Select Return:'}
           </label>
           <select
             value={selectedBookingId}
@@ -450,7 +456,11 @@ export const ThreeWayInspectionView: React.FC = () => {
 
       {/* Staff & Admin Inspection Controls */}
       {isStaffOrAdmin && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div
+          className={`grid grid-cols-1 ${
+            activePersona.role === 'PLATFORM_ADMIN' ? 'lg:grid-cols-2' : ''
+          } gap-6`}
+        >
           {/* Warehouse Inspection Form */}
           <form
             onSubmit={handleRunWarehouseInspection}
@@ -530,63 +540,67 @@ export const ThreeWayInspectionView: React.FC = () => {
             </button>
           </form>
 
-          {/* Final Refund Approval */}
-          <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-4">
-            <div className="flex items-center gap-2">
-              <Gavel className="w-4 h-4 text-hearth-sage" />
-              <h3 className="font-serif text-base font-bold text-hearth-ink">
-                Finalize Deposit Refund
-              </h3>
-            </div>
+          {/* Final Refund Approval (Platform Operator Only) */}
+          {activePersona.role === 'PLATFORM_ADMIN' && (
+            <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-4">
+              <div className="flex items-center gap-2">
+                <Gavel className="w-4 h-4 text-hearth-sage" />
+                <h3 className="font-serif text-base font-bold text-hearth-ink">
+                  Finalize Deposit Refund
+                </h3>
+              </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-hearth-ink mb-1">
-                Approved Deduction (₹)
-              </label>
-              <input
-                type="number"
-                min={0}
-                value={mediatorApprovedAmount}
-                onChange={(e) => setMediatorApprovedAmount(Number(e.target.value))}
-                className="w-full px-3 py-2 rounded-xl bg-hearth-oat border border-hearth-border text-xs font-ledger text-hearth-ink"
-              />
-            </div>
+              <div>
+                <label className="block text-xs font-semibold text-hearth-ink mb-1">
+                  Approved Deduction (₹)
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  value={mediatorApprovedAmount}
+                  onChange={(e) =>
+                    setMediatorApprovedAmount(Number(e.target.value))
+                  }
+                  className="w-full px-3 py-2 rounded-xl bg-hearth-oat border border-hearth-border text-xs font-ledger text-hearth-ink"
+                />
+              </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-hearth-ink mb-1">
-                Resolution Notes *
-              </label>
-              <input
-                type="text"
-                value={mediatorNotes}
-                onChange={(e) => setMediatorNotes(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-hearth-oat border border-hearth-border text-xs text-hearth-ink"
-              />
-            </div>
+              <div>
+                <label className="block text-xs font-semibold text-hearth-ink mb-1">
+                  Resolution Notes *
+                </label>
+                <input
+                  type="text"
+                  value={mediatorNotes}
+                  onChange={(e) => setMediatorNotes(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-hearth-oat border border-hearth-border text-xs text-hearth-ink"
+                />
+              </div>
 
-            {activePersona.role === 'PLATFORM_ADMIN' && (
               <label className="flex items-center gap-2.5 p-3 rounded-xl bg-[#FEE2E2]/60 border border-[#FECACA] text-xs text-[#991B1B] cursor-pointer">
                 <input
                   type="checkbox"
                   checked={triggerBlacklistOnResolve}
-                  onChange={(e) => setTriggerBlacklistOnResolve(e.target.checked)}
+                  onChange={(e) =>
+                    setTriggerBlacklistOnResolve(e.target.checked)
+                  }
                   className="rounded text-[#991B1B]"
                 />
                 <span>
                   Block customer account due to severe damage or loss
                 </span>
               </label>
-            )}
 
-            <button
-              type="button"
-              disabled={isSimulatingLatency}
-              onClick={handleMediatorDecision}
-              className="spring-btn w-full py-2.5 rounded-pill bg-hearth-sage hover:bg-[#233E26] text-white text-xs font-semibold shadow-sm"
-            >
-              Confirm & Issue Refund
-            </button>
-          </div>
+              <button
+                type="button"
+                disabled={isSimulatingLatency}
+                onClick={handleMediatorDecision}
+                className="spring-btn w-full py-2.5 rounded-pill bg-hearth-sage hover:bg-[#233E26] text-white text-xs font-semibold shadow-sm"
+              >
+                Confirm & Issue Refund
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

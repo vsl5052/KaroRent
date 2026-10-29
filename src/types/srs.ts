@@ -199,6 +199,20 @@ export interface SerializedAsset {
   lastInspectionDate: string;
 }
 
+export interface VendorProductRateEntry {
+  id: string;
+  inventoryId: string;
+  productId: string;
+  productTitle: string;
+  category: ProductCategory;
+  vendorId: string;
+  vendorName: string;
+  agreedMonthlyRate: number;
+  returnedUnitCount: number;
+  returnInProgressCount: number;
+  effectiveDate: string;
+}
+
 export interface VirtualInventoryItem {
   id: string;
   productId: string;

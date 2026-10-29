@@ -17,6 +17,7 @@ import {
   SegregatedDepositLedger,
   ServiceMaintenanceTicket,
   SupportComplaintTicket,
+  VendorProductRateEntry,
   VendorRecord,
   VendorSettlementStatement,
   VirtualInventoryItem,
@@ -37,6 +38,7 @@ import {
   INITIAL_SERVICE_TICKETS,
   INITIAL_SETTLEMENTS,
   INITIAL_SUPPORT_TICKETS,
+  INITIAL_VENDOR_PRODUCT_RATES,
   INITIAL_VENDORS,
   INITIAL_VIRTUAL_INVENTORY,
 } from '../data/mockData';
@@ -71,6 +73,7 @@ interface KaroRentState {
   vendors: VendorRecord[];
   masterProducts: PlatformMasterProduct[];
   virtualInventory: VirtualInventoryItem[];
+  vendorProductRates: VendorProductRateEntry[];
   bookings: BookingOrder[];
   agreements: RentalAgreementRecord[];
   invoices: FinancialInvoiceDocument[];
@@ -188,6 +191,17 @@ interface KaroRentState {
     serviceAreas: string;
   }) => Promise<void>;
 
+  registerNewVendorProduct: (payload: {
+    productTitle: string;
+    category: ProductCategory;
+    agreedMonthlyRate: number;
+    declaredQuantity: number;
+    conditionGrade: 'Brand New' | 'Certified Mint' | 'Good — Refurbished';
+    serviceLocation: string;
+    imageUrl: string;
+    vendorNotes: string;
+  }) => Promise<void>;
+
   reviewVendorApplication: (vendorId: string, decision: 'Approved' | 'Rejected' | 'Clarification Required', reason: string) => Promise<void>;
   terminateVendorAndAssignContinuity: (vendorId: string, continuityManager: string, reason: string) => Promise<void>;
   overrideBlacklistEntry: (blacklistId: string, overrideReason: string) => Promise<void>;
@@ -230,6 +244,7 @@ export const useKaroRentStore = create<KaroRentState>()(
       vendors: INITIAL_VENDORS,
       masterProducts: INITIAL_MASTER_PRODUCTS,
       virtualInventory: INITIAL_VIRTUAL_INVENTORY,
+      vendorProductRates: INITIAL_VENDOR_PRODUCT_RATES,
       bookings: INITIAL_BOOKINGS,
       agreements: INITIAL_AGREEMENTS,
       invoices: INITIAL_INVOICES,
@@ -317,6 +332,7 @@ export const useKaroRentStore = create<KaroRentState>()(
           vendors: INITIAL_VENDORS,
           masterProducts: INITIAL_MASTER_PRODUCTS,
           virtualInventory: INITIAL_VIRTUAL_INVENTORY,
+          vendorProductRates: INITIAL_VENDOR_PRODUCT_RATES,
           bookings: INITIAL_BOOKINGS,
           agreements: INITIAL_AGREEMENTS,
           invoices: INITIAL_INVOICES,
@@ -2383,15 +2399,155 @@ export const useKaroRentStore = create<KaroRentState>()(
           variant: 'success',
         });
       },
+
+      registerNewVendorProduct: async ({
+        productTitle,
+        category,
+        agreedMonthlyRate,
+        declaredQuantity,
+        conditionGrade,
+        serviceLocation,
+        imageUrl,
+        vendorNotes,
+      }) => {
+        const state = get();
+        if (state.isSimulatingLatency) return;
+        set({
+          isSimulatingLatency: true,
+          latencyActionLabel: 'Registering Product & Agreed Rate...',
+        });
+        await simulateLatency(360);
+
+        const activeVendorId = state.activePersona.vendorId || 'VEN-201';
+        const currentVendor =
+          state.vendors.find((v) => v.id === activeVendorId) || state.vendors[0];
+
+        const suffix = Math.floor(510 + Math.random() * 480);
+        const newProductId = `PRD-${suffix}`;
+        const newInvId = `INV-${suffix}`;
+        const newRateId = `VPR-${suffix}`;
+        const websiteBaseRent = Math.round(agreedMonthlyRate * 1.3);
+
+        const newMasterProduct: PlatformMasterProduct = {
+          id: newProductId,
+          sku: `KR-${category.slice(0, 3).toUpperCase()}-${suffix}`,
+          title: productTitle,
+          category,
+          workflowType:
+            category === 'Cooling & Air' || category === 'IT & AV Equipment'
+              ? 'SITE_VISIT_MULTI_STEP'
+              : 'DIRECT_1_STEP',
+          description: vendorNotes,
+          specifications: [conditionGrade, serviceLocation],
+          lifestyleImage:
+            imageUrl ||
+            'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=900&q=85',
+          studioImage:
+            imageUrl ||
+            'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=900&q=85',
+          baseMonthlyRent: websiteBaseRent,
+          tenureMultipliers: {
+            1: 1.05,
+            3: 1.0,
+            6: 0.92,
+            12: 0.85,
+            24: 0.78,
+          },
+          depositMonthsMultiple: 4,
+          standardDeliveryFee: 450,
+          siteVisitFee: 499,
+          installationRateCard: [],
+        };
+
+        const newInventoryItem: VirtualInventoryItem = {
+          id: newInvId,
+          productId: newProductId,
+          productTitle,
+          category,
+          workflowType: newMasterProduct.workflowType,
+          owningVendorId: currentVendor.id,
+          owningVendorName: currentVendor.displayName,
+          serviceLocation,
+          conditionGrade,
+          declaredQuantity,
+          availableQuantity: declaredQuantity,
+          reservedQuantity: 0,
+          rentedQuantity: 0,
+          maintenanceOrDamagedQuantity: 0,
+          physicalCountVerified: declaredQuantity,
+          livePublicEnabled: false,
+          pendingStagedRequest: {
+            id: `STG-${suffix}`,
+            inventoryId: newInvId,
+            vendorId: currentVendor.id,
+            vendorName: currentVendor.displayName,
+            requestType: 'NEW_LISTING',
+            priorPublicEnabled: false,
+            requestedPublicEnabled: true,
+            priorDeclaredStock: 0,
+            requestedDeclaredStock: declaredQuantity,
+            uploadedImages: [newMasterProduct.lifestyleImage],
+            vendorNotes,
+            submittedAt: nowIST(),
+            status: 'Pending Admin Approval',
+          },
+          itemImages: [newMasterProduct.lifestyleImage],
+          serializedAssets: [],
+        };
+
+        const newRateEntry: VendorProductRateEntry = {
+          id: newRateId,
+          inventoryId: newInvId,
+          productId: newProductId,
+          productTitle,
+          category,
+          vendorId: currentVendor.id,
+          vendorName: currentVendor.displayName,
+          agreedMonthlyRate,
+          returnedUnitCount: 0,
+          returnInProgressCount: 0,
+          effectiveDate: '2026-10-29',
+        };
+
+        set((s) => ({
+          isSimulatingLatency: false,
+          latencyActionLabel: null,
+          masterProducts: [newMasterProduct, ...s.masterProducts],
+          virtualInventory: [newInventoryItem, ...s.virtualInventory],
+          vendorProductRates: [newRateEntry, ...s.vendorProductRates],
+          notifications: [
+            {
+              id: `NTF-${Date.now()}`,
+              eventCode: 'New Product',
+              title: `New Product Registered (${newInvId})`,
+              message: `${currentVendor.displayName} registered "${productTitle}" (${declaredQuantity} units) at an agreed vendor rate of ₹${agreedMonthlyRate}/mo.`,
+              recipientRole: 'PLATFORM_ADMIN',
+              category: 'Inventory Approval',
+              priority: 'high',
+              read: false,
+              timestamp: 'Just now',
+              linkedView: 'ADMIN_GOVERNANCE',
+            },
+            ...s.notifications,
+          ],
+        }));
+
+        get().addToast({
+          title: `Product Registered (${newInvId})`,
+          description: `"${productTitle}" saved with agreed vendor rate ₹${agreedMonthlyRate.toLocaleString('en-IN')}/mo and sent for catalog activation.`,
+          variant: 'success',
+        });
+      },
     }),
     {
-      name: 'karorent-live-platform-v6',
+      name: 'karorent-live-platform-v7',
       partialize: (state) => ({
         darkMode: state.darkMode,
         customers: state.customers,
         vendors: state.vendors,
         masterProducts: state.masterProducts,
         virtualInventory: state.virtualInventory,
+        vendorProductRates: state.vendorProductRates,
         bookings: state.bookings,
         agreements: state.agreements,
         invoices: state.invoices,

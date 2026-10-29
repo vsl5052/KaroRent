@@ -2,20 +2,30 @@ import React, { useState } from 'react';
 import {
   AlertOctagon,
   Building2,
-  Lock,
+  Handshake,
   PackagePlus,
+  X,
 } from 'lucide-react';
 import { useKaroRentStore } from '../../store/useKaroRentStore';
-import { vendorOnboardingSchema } from '../../lib/validation';
+import { ProductCategory } from '../../types/srs';
+
+const PRODUCT_CATEGORIES: ProductCategory[] = [
+  'Living Room',
+  'Cooling & Air',
+  'Water Purifiers',
+  'Study & WFH',
+  'Kitchen & Appliances',
+  'IT & AV Equipment',
+];
 
 export const VendorPortalView: React.FC = () => {
   const {
     activePersona,
     vendors,
     virtualInventory,
-    masterProducts,
+    vendorProductRates,
     submitVendorStagedInventoryChange,
-    submitNewVendorApplication,
+    registerNewVendorProduct,
     isSimulatingLatency,
   } = useKaroRentStore();
 
@@ -40,70 +50,73 @@ export const VendorPortalView: React.FC = () => {
     'Updated warehouse stock count and product photos.'
   );
 
-  // Partner Registration Modal
-  const [showOnboardingModal, setShowOnboardingModal] = useState(false);
-  const [appLegalName, setAppLegalName] = useState(
-    'HearthCraft Home Appliances Pvt Ltd'
+  // Register New Product Modal State
+  const [showNewProductModal, setShowNewProductModal] = useState(false);
+  const [newTitle, setNewTitle] = useState(
+    'Scandinavian Ashwood 6-Seater Dining Table Set'
   );
-  const [appDisplayName, setAppDisplayName] = useState('HearthCraft Living');
-  const [appGstin, setAppGstin] = useState('29AABCH9911K1Z4');
-  const [appPan, setAppPan] = useState('AABCH9911K');
-  const [appPhone, setAppPhone] = useState('+91 98451 66778');
-  const [appEmail, setAppEmail] = useState('onboarding@hearthcraft.in');
-  const [appContact, setAppContact] = useState('Kiran Rao');
-  const [appBank, setAppBank] = useState('HDFC •••• 6102 (IFSC: HDFC0000240)');
-  const [appAreas, setAppAreas] = useState('Indiranagar, Whitefield, Jayanagar');
-  const [appClauseAccepted, setAppClauseAccepted] = useState(true);
-  const [appErrors, setAppErrors] = useState<string[]>([]);
+  const [newCategory, setNewCategory] =
+    useState<ProductCategory>('Living Room');
+  const [newAgreedRate, setNewAgreedRate] = useState<number>(1550);
+  const [newQuantity, setNewQuantity] = useState<number>(10);
+  const [newCondition, setNewCondition] = useState<
+    'Brand New' | 'Certified Mint' | 'Good — Refurbished'
+  >('Brand New');
+  const [newLocation, setNewLocation] = useState(
+    'Indiranagar & East Bengaluru Hub'
+  );
+  const [newImageUrl, setNewImageUrl] = useState(
+    'https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=900&q=85'
+  );
+  const [newNotes, setNewNotes] = useState(
+    'Solid ashwood dining table with 6 upholstered chairs. Agreed partner rate locked with KaroRent.'
+  );
+  const [formError, setFormError] = useState<string | null>(null);
 
-  const autofillSampleDetails = () => {
-    setAppLegalName('MetroBreeze Cooling Solutions LLP');
-    setAppDisplayName('MetroBreeze Appliances');
-    setAppGstin('27AAAAP0091E1Z5');
-    setAppPan('AAAAP0091E');
-    setAppPhone('+91 80999 00112');
-    setAppEmail('suresh.reapply@metrobreeze.in');
-    setAppContact('Suresh Menon');
-    setAppBank('AXIS •••• 4921 (IFSC: UTIB0000119)');
-    setAppAreas('HSR Layout, Indiranagar');
-    setAppClauseAccepted(true);
+  const autofillSampleProduct = () => {
+    setNewTitle('Smart Front-Load 8kg Inverter Washing Machine');
+    setNewCategory('Kitchen & Appliances');
+    setNewAgreedRate(1180);
+    setNewQuantity(14);
+    setNewCondition('Brand New');
+    setNewLocation('Indiranagar, HSR & Whitefield Hub');
+    setNewImageUrl(
+      'https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?auto=format&fit=crop&w=900&q=85'
+    );
+    setNewNotes(
+      '8kg steam-wash inverter drum with inlet/drain hose kit. Ready for immediate dispatch.'
+    );
+    setFormError(null);
   };
 
-  const handleOnboardingSubmit = async (e: React.FormEvent) => {
+  const handleRegisterProductSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setAppErrors([]);
+    setFormError(null);
 
-    const parsed = vendorOnboardingSchema.safeParse({
-      legalBusinessName: appLegalName,
-      displayName: appDisplayName,
-      taxIdGstin: appGstin,
-      panNumber: appPan,
-      registeredPhone: appPhone,
-      email: appEmail,
-      authorisedContactName: appContact,
-      bankAccountMasked: appBank,
-      serviceAreas: appAreas,
-      mandatoryPickupPhotoClauseAccepted: appClauseAccepted,
-    });
-
-    if (!parsed.success) {
-      setAppErrors(parsed.error.errors.map((err) => err.message));
+    if (
+      !newTitle.trim() ||
+      newAgreedRate <= 0 ||
+      newQuantity <= 0 ||
+      !newLocation.trim()
+    ) {
+      setFormError(
+        'Please provide a valid product name, agreed monthly rate, stock quantity, and service location.'
+      );
       return;
     }
 
-    await submitNewVendorApplication({
-      legalBusinessName: appLegalName,
-      displayName: appDisplayName,
-      taxIdGstin: appGstin,
-      panNumber: appPan,
-      registeredPhone: appPhone,
-      email: appEmail,
-      authorisedContactName: appContact,
-      bankAccountMasked: appBank,
-      serviceAreas: appAreas,
+    await registerNewVendorProduct({
+      productTitle: newTitle.trim(),
+      category: newCategory,
+      agreedMonthlyRate: newAgreedRate,
+      declaredQuantity: newQuantity,
+      conditionGrade: newCondition,
+      serviceLocation: newLocation.trim(),
+      imageUrl: newImageUrl.trim(),
+      vendorNotes: newNotes.trim(),
     });
 
-    setShowOnboardingModal(false);
+    setShowNewProductModal(false);
   };
 
   return (
@@ -119,7 +132,7 @@ export const VendorPortalView: React.FC = () => {
           <div className="max-w-xl space-y-2.5">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-pill bg-hearth-card border border-hearth-border text-[11px] font-mono text-hearth-terracotta font-semibold">
               <Building2 className="w-3.5 h-3.5" />
-              <span>Vendor Portal • {currentVendor.id}</span>
+              <span>Vendor Inventory • {currentVendor.id}</span>
             </div>
             <h1 className="font-serif text-2xl sm:text-3xl font-bold text-[#1C1917]">
               {currentVendor.legalBusinessName}
@@ -127,15 +140,17 @@ export const VendorPortalView: React.FC = () => {
             <p className="text-xs text-[#44403C]">
               Service Areas: {currentVendor.serviceAreas.join(', ')}
             </p>
-            <div className="flex flex-wrap items-center gap-2 pt-1">
-              <button
-                onClick={() => setShowOnboardingModal(true)}
-                className="spring-btn px-4 py-2 rounded-pill bg-hearth-terracotta hover:bg-hearth-kiln text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm"
-              >
-                <PackagePlus className="w-3.5 h-3.5" />
-                <span>Register New Partner</span>
-              </button>
-            </div>
+            {!isReadOnlyTerminated && (
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <button
+                  onClick={() => setShowNewProductModal(true)}
+                  className="spring-btn px-4 py-2 rounded-pill bg-hearth-terracotta hover:bg-hearth-kiln text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm"
+                >
+                  <PackagePlus className="w-3.5 h-3.5" />
+                  <span>Register New Product</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -149,11 +164,13 @@ export const VendorPortalView: React.FC = () => {
               <span>Account Restricted (Read-Only)</span>
             </div>
             <span className="px-3 py-1 rounded-pill bg-[#991B1B] text-white text-xs font-mono font-semibold">
-              Held Payout: ₹{currentVendor.settlementHoldAmount.toLocaleString('en-IN')}
+              Held Payout: ₹
+              {currentVendor.settlementHoldAmount.toLocaleString('en-IN')}
             </span>
           </div>
           <p className="text-xs leading-relaxed">
-            Your partner agreement has ended. Catalog editing is disabled, and you have read-only access to active returns and payout statements.
+            Your partner agreement has ended. Inventory editing is disabled, and
+            you have read-only access to active returns and payout statements.
           </p>
         </div>
       )}
@@ -161,7 +178,7 @@ export const VendorPortalView: React.FC = () => {
       {/* Vendor Inventory Cards */}
       <div className="space-y-4">
         <h2 className="font-serif text-xl font-bold text-hearth-ink">
-          Inventory ({vendorInventory.length})
+          Registered Products ({vendorInventory.length})
         </h2>
 
         {vendorInventory.length === 0 ? (
@@ -171,9 +188,10 @@ export const VendorPortalView: React.FC = () => {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {vendorInventory.map((inv) => {
-              const masterProd = masterProducts.find(
-                (p) => p.id === inv.productId
-              )!;
+              const rateEntry = vendorProductRates.find(
+                (r) => r.inventoryId === inv.id
+              );
+              const agreedRate = rateEntry?.agreedMonthlyRate || 1200;
               const isEditing = editingInvId === inv.id;
 
               return (
@@ -193,6 +211,9 @@ export const VendorPortalView: React.FC = () => {
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="font-mono text-xs font-bold text-hearth-ink">
                               {inv.id}
+                            </span>
+                            <span className="px-2 py-0.5 rounded-pill bg-hearth-oat border border-hearth-border text-[10px] font-medium text-hearth-umber">
+                              {inv.category}
                             </span>
                             <span
                               className={`px-2.5 py-0.5 rounded-pill text-[10px] font-semibold ${
@@ -214,23 +235,19 @@ export const VendorPortalView: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Rate Strip */}
-                    <div className="p-3 rounded-2xl bg-hearth-oat border border-hearth-border flex flex-wrap items-center justify-between gap-2 text-xs">
-                      <div className="flex items-center gap-1.5 text-hearth-umber">
-                        <Lock className="w-3.5 h-3.5 text-hearth-terracotta" />
+                    {/* Platform-Vendor Agreed Rate Strip (Separate from Website Retail Rent) */}
+                    <div className="p-3.5 rounded-2xl bg-hearth-oat border border-hearth-border flex flex-wrap items-center justify-between gap-2 text-xs">
+                      <div className="flex items-center gap-2 text-hearth-umber">
+                        <Handshake className="w-4 h-4 text-hearth-terracotta shrink-0" />
                         <span>
-                          Monthly Rent:{' '}
-                          <strong className="font-ledger text-hearth-ink">
-                            ₹{masterProd.baseMonthlyRent}/mo
-                          </strong>{' '}
-                          • Security Deposit:{' '}
-                          <strong className="font-ledger">
-                            ₹{masterProd.baseMonthlyRent * masterProd.depositMonthsMultiple}
+                          Agreed Platform–Vendor Rate:{' '}
+                          <strong className="font-ledger text-sm text-hearth-ink">
+                            ₹{agreedRate.toLocaleString('en-IN')} / unit / mo
                           </strong>
                         </span>
                       </div>
-                      <span className="text-[10px] font-mono text-hearth-taupe">
-                        Standard Pricing
+                      <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-pill bg-hearth-card border border-hearth-border text-hearth-terracotta font-semibold">
+                        Partner Rate DB ({rateEntry?.id || 'VPR'})
                       </span>
                     </div>
 
@@ -307,7 +324,8 @@ export const VendorPortalView: React.FC = () => {
                             Update Stock or Status
                           </button>
                           <span className="text-[10px] font-mono text-hearth-taupe">
-                            {inv.serializedAssets.length} Units Tracked
+                            Monthly Active Value: ₹
+                            {(inv.rentedQuantity * agreedRate).toLocaleString('en-IN')}
                           </span>
                         </div>
                       ) : (
@@ -318,7 +336,7 @@ export const VendorPortalView: React.FC = () => {
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                               <label className="block text-[11px] font-semibold text-hearth-ink mb-1">
-                                Catalog Status
+                                Product Status
                               </label>
                               <select
                                 value={reqEnabled ? 'ENABLE' : 'DISABLE'}
@@ -327,8 +345,8 @@ export const VendorPortalView: React.FC = () => {
                                 }
                                 className="w-full px-3 py-1.5 rounded-xl bg-hearth-card border border-hearth-border text-xs"
                               >
-                                <option value="ENABLE">Active in Catalog</option>
-                                <option value="DISABLE">Pause Listing</option>
+                                <option value="ENABLE">Active</option>
+                                <option value="DISABLE">Paused</option>
                               </select>
                             </div>
                             <div>
@@ -405,166 +423,171 @@ export const VendorPortalView: React.FC = () => {
         )}
       </div>
 
-      {/* Partner Registration Modal */}
-      {showOnboardingModal && (
+      {/* Register New Product Modal */}
+      {showNewProductModal && (
         <div className="fixed inset-0 z-50 bg-[#1C1917]/55 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="w-full max-w-2xl rounded-3xl bg-hearth-parchment border border-hearth-border shadow-hearth-lg p-6 max-h-[90vh] overflow-y-auto space-y-4">
             <div className="flex items-center justify-between border-b border-hearth-border pb-3">
               <div>
                 <h3 className="font-serif text-xl font-bold text-hearth-ink">
-                  Partner Registration
+                  Register New Product
                 </h3>
                 <p className="text-xs text-hearth-taupe">
-                  Submit business and payout details to register as a rental partner.
+                  Add a new product to your inventory with the monthly rate agreed with KaroRent.
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={autofillSampleDetails}
-                className="px-3 py-1.5 rounded-pill bg-hearth-oat hover:bg-hearth-apricot text-hearth-ink border border-hearth-border text-[11px] font-semibold shrink-0"
-              >
-                Fill Sample Details
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={autofillSampleProduct}
+                  className="px-3 py-1.5 rounded-pill bg-hearth-oat hover:bg-hearth-apricot text-hearth-ink border border-hearth-border text-[11px] font-semibold shrink-0"
+                >
+                  Fill Sample Product
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowNewProductModal(false)}
+                  className="p-1.5 rounded-pill bg-hearth-card hover:bg-hearth-apricot border border-hearth-border"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
-            {appErrors.length > 0 && (
-              <div className="p-3.5 rounded-2xl bg-[#FEE2E2] border border-[#FECACA] text-[#991B1B] text-xs space-y-1">
-                {appErrors.map((err, idx) => (
-                  <div key={idx}>• {err}</div>
-                ))}
+            {formError && (
+              <div className="p-3.5 rounded-2xl bg-[#FEE2E2] border border-[#FECACA] text-[#991B1B] text-xs font-medium">
+                {formError}
               </div>
             )}
 
-            <form onSubmit={handleOnboardingSubmit} className="space-y-3 text-xs">
+            <form onSubmit={handleRegisterProductSubmit} className="space-y-3.5 text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
+                <div className="sm:col-span-2">
                   <label className="block font-semibold text-hearth-ink mb-1">
-                    Legal Business Name *
+                    Product Name *
                   </label>
                   <input
                     type="text"
-                    value={appLegalName}
-                    onChange={(e) => setAppLegalName(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-hearth-card border border-hearth-border"
+                    value={newTitle}
+                    onChange={(e) => setNewTitle(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl bg-hearth-card border border-hearth-border text-hearth-ink"
                   />
                 </div>
+
                 <div>
                   <label className="block font-semibold text-hearth-ink mb-1">
-                    Display Name *
+                    Category *
+                  </label>
+                  <select
+                    value={newCategory}
+                    onChange={(e) =>
+                      setNewCategory(e.target.value as ProductCategory)
+                    }
+                    className="w-full px-3.5 py-2 rounded-xl bg-hearth-card border border-hearth-border text-hearth-ink"
+                  >
+                    {PRODUCT_CATEGORIES.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-hearth-ink mb-1">
+                    Agreed Platform–Vendor Rate (₹ / unit / mo) *
+                  </label>
+                  <input
+                    type="number"
+                    min={100}
+                    value={newAgreedRate}
+                    onChange={(e) => setNewAgreedRate(Number(e.target.value))}
+                    className="w-full px-3.5 py-2 rounded-xl bg-hearth-card border border-hearth-border font-ledger font-bold text-hearth-ink"
+                  />
+                  <span className="text-[10px] text-hearth-taupe">
+                    Stored in the Partner Rate Database (separate from customer website pricing)
+                  </span>
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-hearth-ink mb-1">
+                    Initial Stock Quantity *
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    value={newQuantity}
+                    onChange={(e) => setNewQuantity(Number(e.target.value))}
+                    className="w-full px-3.5 py-2 rounded-xl bg-hearth-card border border-hearth-border font-ledger text-hearth-ink"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-hearth-ink mb-1">
+                    Condition Grade *
+                  </label>
+                  <select
+                    value={newCondition}
+                    onChange={(e) => setNewCondition(e.target.value as any)}
+                    className="w-full px-3.5 py-2 rounded-xl bg-hearth-card border border-hearth-border text-hearth-ink"
+                  >
+                    <option value="Brand New">Brand New</option>
+                    <option value="Certified Mint">Certified Mint</option>
+                    <option value="Good — Refurbished">Good — Refurbished</option>
+                  </select>
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="block font-semibold text-hearth-ink mb-1">
+                    Warehouse / Service Hub *
                   </label>
                   <input
                     type="text"
-                    value={appDisplayName}
-                    onChange={(e) => setAppDisplayName(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-hearth-card border border-hearth-border"
+                    value={newLocation}
+                    onChange={(e) => setNewLocation(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl bg-hearth-card border border-hearth-border text-hearth-ink"
                   />
                 </div>
-                <div>
+
+                <div className="sm:col-span-2">
                   <label className="block font-semibold text-hearth-ink mb-1">
-                    GSTIN *
+                    Product Image URL *
                   </label>
                   <input
                     type="text"
-                    value={appGstin}
-                    onChange={(e) => setAppGstin(e.target.value.toUpperCase())}
-                    className="w-full px-3 py-2 rounded-xl bg-hearth-card border border-hearth-border font-mono"
+                    value={newImageUrl}
+                    onChange={(e) => setNewImageUrl(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl bg-hearth-card border border-hearth-border font-mono text-hearth-ink"
                   />
                 </div>
-                <div>
+
+                <div className="sm:col-span-2">
                   <label className="block font-semibold text-hearth-ink mb-1">
-                    PAN *
+                    Product Specifications & Notes *
                   </label>
-                  <input
-                    type="text"
-                    value={appPan}
-                    onChange={(e) => setAppPan(e.target.value.toUpperCase())}
-                    className="w-full px-3 py-2 rounded-xl bg-hearth-card border border-hearth-border font-mono"
-                  />
-                </div>
-                <div>
-                  <label className="block font-semibold text-hearth-ink mb-1">
-                    Mobile Number *
-                  </label>
-                  <input
-                    type="text"
-                    value={appPhone}
-                    onChange={(e) => setAppPhone(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-hearth-card border border-hearth-border font-mono"
-                  />
-                </div>
-                <div>
-                  <label className="block font-semibold text-hearth-ink mb-1">
-                    Business Email *
-                  </label>
-                  <input
-                    type="email"
-                    value={appEmail}
-                    onChange={(e) => setAppEmail(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-hearth-card border border-hearth-border"
-                  />
-                </div>
-                <div>
-                  <label className="block font-semibold text-hearth-ink mb-1">
-                    Contact Person *
-                  </label>
-                  <input
-                    type="text"
-                    value={appContact}
-                    onChange={(e) => setAppContact(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-hearth-card border border-hearth-border"
-                  />
-                </div>
-                <div>
-                  <label className="block font-semibold text-hearth-ink mb-1">
-                    Bank Account & IFSC *
-                  </label>
-                  <input
-                    type="text"
-                    value={appBank}
-                    onChange={(e) => setAppBank(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-hearth-card border border-hearth-border font-mono"
+                  <textarea
+                    rows={2}
+                    value={newNotes}
+                    onChange={(e) => setNewNotes(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl bg-hearth-card border border-hearth-border text-hearth-ink"
                   />
                 </div>
               </div>
-
-              <div>
-                <label className="block font-semibold text-hearth-ink mb-1">
-                  Service Areas (Comma Separated) *
-                </label>
-                <input
-                  type="text"
-                  value={appAreas}
-                  onChange={(e) => setAppAreas(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-hearth-card border border-hearth-border"
-                />
-              </div>
-
-              <label className="flex items-start gap-2 p-3 rounded-xl bg-hearth-sageLight border border-hearth-sage/30 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={appClauseAccepted}
-                  onChange={(e) => setAppClauseAccepted(e.target.checked)}
-                  className="mt-0.5 rounded text-hearth-sage"
-                />
-                <span>
-                  We agree to take a photo of every returned item at the customer's doorstep before pickup.
-                </span>
-              </label>
 
               <div className="flex justify-end gap-2 pt-3 border-t border-hearth-border">
                 <button
                   type="button"
-                  onClick={() => setShowOnboardingModal(false)}
-                  className="px-4 py-2 rounded-pill bg-hearth-oat"
+                  onClick={() => setShowNewProductModal(false)}
+                  className="px-4 py-2 rounded-pill bg-hearth-oat text-hearth-umber font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSimulatingLatency}
-                  className="px-5 py-2 rounded-pill bg-hearth-terracotta text-white font-semibold"
+                  className="spring-btn px-5 py-2 rounded-pill bg-hearth-terracotta hover:bg-hearth-kiln text-white font-semibold shadow-sm"
                 >
-                  Submit Application
+                  {isSimulatingLatency ? 'Registering...' : 'Register Product'}
                 </button>
               </div>
             </form>

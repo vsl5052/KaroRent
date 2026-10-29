@@ -60,7 +60,15 @@ export const TopEditorialHeader: React.FC = () => {
       {/* Left: Brand Wordmark + Location Selector */}
       <div className="flex items-center gap-4">
         <button
-          onClick={() => setActiveTab('MARKETPLACE')}
+          onClick={() =>
+            setActiveTab(
+              activePersona.role === 'VENDOR_OWNER'
+                ? 'VENDOR_PORTAL'
+                : activePersona.role === 'FIELD_PERSONNEL'
+                ? 'FIELD_OPERATIONS'
+                : 'MARKETPLACE'
+            )
+          }
           className="flex items-center gap-2.5 text-left group focus:outline-none"
         >
           <div className="w-9 h-9 rounded-xl bg-hearth-terracotta text-white flex items-center justify-center font-serif font-bold text-xl shadow-sm group-hover:bg-hearth-kiln transition-colors">
@@ -71,105 +79,116 @@ export const TopEditorialHeader: React.FC = () => {
           </span>
         </button>
 
-        {/* Location Selector Pill */}
-        <div className="relative hidden xl:block">
-          <button
-            onClick={() => setShowLocationMenu(!showLocationMenu)}
-            className="flex items-center gap-2 px-4 py-2 rounded-pill bg-hearth-oat hover:bg-hearth-apricot border border-hearth-border text-xs font-medium text-hearth-ink transition-colors"
-          >
-            <MapPin className="w-3.5 h-3.5 text-hearth-terracotta shrink-0" />
-            <span>{selectedLocation.split(' (')[0]}</span>
-            <ChevronDown className="w-3.5 h-3.5 text-hearth-taupe" />
-          </button>
+        {/* Location Selector Pill (Customer & Admin only) */}
+        {activePersona.role !== 'VENDOR_OWNER' &&
+          activePersona.role !== 'FIELD_PERSONNEL' && (
+            <div className="relative hidden xl:block">
+              <button
+                onClick={() => setShowLocationMenu(!showLocationMenu)}
+                className="flex items-center gap-2 px-4 py-2 rounded-pill bg-hearth-oat hover:bg-hearth-apricot border border-hearth-border text-xs font-medium text-hearth-ink transition-colors"
+              >
+                <MapPin className="w-3.5 h-3.5 text-hearth-terracotta shrink-0" />
+                <span>{selectedLocation.split(' (')[0]}</span>
+                <ChevronDown className="w-3.5 h-3.5 text-hearth-taupe" />
+              </button>
 
-          {showLocationMenu && (
-            <div className="absolute left-0 mt-2 w-64 rounded-2xl bg-hearth-card border border-hearth-border shadow-hearth-lg p-2 z-50">
-              <div className="px-3 py-1.5 text-[11px] font-medium text-hearth-taupe">
-                Delivery Area
-              </div>
-              {LOCATIONS.map((loc) => (
-                <button
-                  key={loc}
-                  onClick={() => {
-                    setSelectedLocation(loc);
-                    setShowLocationMenu(false);
-                  }}
-                  className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between transition-colors ${
-                    selectedLocation === loc
-                      ? 'bg-hearth-apricot text-hearth-terracotta font-semibold'
-                      : 'hover:bg-hearth-oat text-hearth-umber'
-                  }`}
-                >
-                  <span>{loc}</span>
-                  {selectedLocation === loc && (
-                    <span className="w-2 h-2 rounded-full bg-hearth-terracotta" />
-                  )}
-                </button>
-              ))}
+              {showLocationMenu && (
+                <div className="absolute left-0 mt-2 w-64 rounded-2xl bg-hearth-card border border-hearth-border shadow-hearth-lg p-2 z-50">
+                  <div className="px-3 py-1.5 text-[11px] font-medium text-hearth-taupe">
+                    Delivery Area
+                  </div>
+                  {LOCATIONS.map((loc) => (
+                    <button
+                      key={loc}
+                      onClick={() => {
+                        setSelectedLocation(loc);
+                        setShowLocationMenu(false);
+                      }}
+                      className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between transition-colors ${
+                        selectedLocation === loc
+                          ? 'bg-hearth-apricot text-hearth-terracotta font-semibold'
+                          : 'hover:bg-hearth-oat text-hearth-umber'
+                      }`}
+                    >
+                      <span>{loc}</span>
+                      {selectedLocation === loc && (
+                        <span className="w-2 h-2 rounded-full bg-hearth-terracotta" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
-        </div>
       </div>
 
-      {/* Center: Search Bar */}
-      <div className="flex-1 max-w-md mx-2">
-        <div className="relative flex items-center">
-          <Search className="w-4 h-4 text-hearth-taupe absolute left-3.5 pointer-events-none" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              if (activeTab !== 'MARKETPLACE') setActiveTab('MARKETPLACE');
-            }}
-            placeholder="Search furniture, appliances, or home essentials..."
-            className="w-full pl-10 pr-4 py-2 rounded-pill bg-hearth-oat/80 focus:bg-hearth-card border border-hearth-border focus:border-hearth-terracotta text-xs text-hearth-ink placeholder:text-hearth-taupe focus:outline-none transition-all"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="absolute right-3 text-[11px] text-hearth-taupe hover:text-hearth-ink"
-            >
-              Clear
-            </button>
-          )}
+      {/* Center: Search Bar (Customer & Admin only) */}
+      {activePersona.role !== 'VENDOR_OWNER' &&
+      activePersona.role !== 'FIELD_PERSONNEL' ? (
+        <div className="flex-1 max-w-md mx-2">
+          <div className="relative flex items-center">
+            <Search className="w-4 h-4 text-hearth-taupe absolute left-3.5 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                if (activeTab !== 'MARKETPLACE') setActiveTab('MARKETPLACE');
+              }}
+              placeholder="Search furniture, appliances, or home essentials..."
+              className="w-full pl-10 pr-4 py-2 rounded-pill bg-hearth-oat/80 focus:bg-hearth-card border border-hearth-border focus:border-hearth-terracotta text-xs text-hearth-ink placeholder:text-hearth-taupe focus:outline-none transition-all"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 text-[11px] text-hearth-taupe hover:text-hearth-ink"
+              >
+                Clear
+              </button>
+            )}
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="flex-1" />
+      )}
 
       {/* Right: Quick Links, Profile Switcher, Notifications, Theme Toggle */}
       <div className="flex items-center gap-2.5">
-        <nav className="hidden md:flex items-center gap-1 mr-1">
-          <button
-            onClick={() => setActiveTab('MARKETPLACE')}
-            className={`px-3.5 py-1.5 rounded-pill text-xs font-medium transition-colors ${
-              activeTab === 'MARKETPLACE'
-                ? 'bg-hearth-apricot text-hearth-terracotta font-semibold'
-                : 'text-hearth-umber hover:bg-hearth-oat'
-            }`}
-          >
-            Catalog
-          </button>
-          <button
-            onClick={() => setActiveTab('MY_RENTALS')}
-            className={`px-3.5 py-1.5 rounded-pill text-xs font-medium transition-colors ${
-              activeTab === 'MY_RENTALS'
-                ? 'bg-hearth-apricot text-hearth-terracotta font-semibold'
-                : 'text-hearth-umber hover:bg-hearth-oat'
-            }`}
-          >
-            My Orders
-          </button>
-          <button
-            onClick={() => setActiveTab('FOR_BUSINESS')}
-            className={`px-3.5 py-1.5 rounded-pill text-xs font-medium transition-colors ${
-              activeTab === 'FOR_BUSINESS'
-                ? 'bg-hearth-apricot text-hearth-terracotta font-semibold'
-                : 'text-hearth-umber hover:bg-hearth-oat'
-            }`}
-          >
-            For Business
-          </button>
-        </nav>
+        {activePersona.role !== 'VENDOR_OWNER' &&
+          activePersona.role !== 'FIELD_PERSONNEL' && (
+            <nav className="hidden md:flex items-center gap-1 mr-1">
+              <button
+                onClick={() => setActiveTab('MARKETPLACE')}
+                className={`px-3.5 py-1.5 rounded-pill text-xs font-medium transition-colors ${
+                  activeTab === 'MARKETPLACE'
+                    ? 'bg-hearth-apricot text-hearth-terracotta font-semibold'
+                    : 'text-hearth-umber hover:bg-hearth-oat'
+                }`}
+              >
+                Catalog
+              </button>
+              <button
+                onClick={() => setActiveTab('MY_RENTALS')}
+                className={`px-3.5 py-1.5 rounded-pill text-xs font-medium transition-colors ${
+                  activeTab === 'MY_RENTALS'
+                    ? 'bg-hearth-apricot text-hearth-terracotta font-semibold'
+                    : 'text-hearth-umber hover:bg-hearth-oat'
+                }`}
+              >
+                My Orders
+              </button>
+              <button
+                onClick={() => setActiveTab('FOR_BUSINESS')}
+                className={`px-3.5 py-1.5 rounded-pill text-xs font-medium transition-colors ${
+                  activeTab === 'FOR_BUSINESS'
+                    ? 'bg-hearth-apricot text-hearth-terracotta font-semibold'
+                    : 'text-hearth-umber hover:bg-hearth-oat'
+                }`}
+              >
+                For Business
+              </button>
+            </nav>
+          )}
 
         {/* Account Switcher */}
         <div className="relative">

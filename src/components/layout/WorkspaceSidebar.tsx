@@ -55,7 +55,7 @@ export const WorkspaceSidebar: React.FC = () => {
       id: 'MARKETPLACE',
       label: 'Catalog',
       icon: <Home className="w-4 h-4" />,
-      allowedRoles: ['CUSTOMER_INDIVIDUAL', 'CUSTOMER_BUSINESS', 'VENDOR_OWNER', 'FIELD_PERSONNEL', 'PLATFORM_ADMIN'],
+      allowedRoles: ['CUSTOMER_INDIVIDUAL', 'CUSTOMER_BUSINESS', 'PLATFORM_ADMIN'],
     },
     {
       id: 'MY_RENTALS',
@@ -80,7 +80,7 @@ export const WorkspaceSidebar: React.FC = () => {
     },
     {
       id: 'THREE_WAY_INSPECTION',
-      label: 'Returns',
+      label: activePersona.role === 'VENDOR_OWNER' ? 'Returned Products' : 'Returns',
       icon: <Camera className="w-4 h-4" />,
       badgeCount: openDisputesCount || undefined,
       badgeVariant: 'terracotta',
@@ -136,7 +136,7 @@ export const WorkspaceSidebar: React.FC = () => {
       id: 'AUDIT_OBD_REPORTS',
       label: 'Reports & Logs',
       icon: <FileSpreadsheet className="w-4 h-4" />,
-      allowedRoles: ['PLATFORM_ADMIN', 'VENDOR_OWNER'],
+      allowedRoles: ['PLATFORM_ADMIN'],
     },
   ];
 
