@@ -164,9 +164,63 @@ export const WorkspaceSidebar: React.FC = () => {
     },
   ];
 
-  const visibleNavItems = navItems.filter((item) =>
-    item.allowedRoles.includes(activePersona.role)
-  );
+  // Logical, chronological top-to-bottom tab order tailored per persona
+  const roleNavOrder: Record<string, NavigationTab[]> = {
+    CUSTOMER_INDIVIDUAL: [
+      'MARKETPLACE',
+      'MY_RENTALS',
+      'AGREEMENTS_ESIGN',
+      'INVOICES_DEPOSITS',
+      'THREE_WAY_INSPECTION',
+      'SUPPORT_DISPUTES',
+    ],
+    CUSTOMER_BUSINESS: [
+      'MARKETPLACE',
+      'MY_RENTALS',
+      'AGREEMENTS_ESIGN',
+      'INVOICES_DEPOSITS',
+      'THREE_WAY_INSPECTION',
+      'SUPPORT_DISPUTES',
+    ],
+    VENDOR_OWNER: [
+      'VENDOR_PORTAL',
+      'VENDOR_STAFF',
+      'ASSIGN_DELIVERIES',
+      'FIELD_OPERATIONS',
+      'THREE_WAY_INSPECTION',
+      'SETTLEMENTS_FINANCE',
+      'SUPPORT_DISPUTES',
+    ],
+    FIELD_PERSONNEL: [
+      'FIELD_OPERATIONS',
+    ],
+    PLATFORM_ADMIN: [
+      'ADMIN_GOVERNANCE',
+      'VENDOR_PORTAL',
+      'ASSIGN_DELIVERIES',
+      'FIELD_OPERATIONS',
+      'THREE_WAY_INSPECTION',
+      'VENDOR_STAFF',
+      'SETTLEMENTS_FINANCE',
+      'MARKETPLACE',
+      'MY_RENTALS',
+      'AGREEMENTS_ESIGN',
+      'INVOICES_DEPOSITS',
+      'BLACKLIST_REGISTRY',
+      'AUDIT_OBD_REPORTS',
+      'SUPPORT_DISPUTES',
+    ],
+  };
+
+  const currentRoleOrder = roleNavOrder[activePersona.role];
+
+  const visibleNavItems = currentRoleOrder
+    ? currentRoleOrder
+        .map((tabId) => navItems.find((item) => item.id === tabId))
+        .filter((item): item is NavItemConfig =>
+          Boolean(item && item.allowedRoles.includes(activePersona.role))
+        )
+    : navItems.filter((item) => item.allowedRoles.includes(activePersona.role));
 
   return (
     <aside className="w-full lg:w-[248px] shrink-0 bg-hearth-oat border-b lg:border-b-0 lg:border-r border-hearth-border p-4 flex flex-col justify-between">
