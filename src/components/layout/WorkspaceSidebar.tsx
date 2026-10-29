@@ -34,6 +34,7 @@ export const WorkspaceSidebar: React.FC = () => {
     activePersona,
     virtualInventory,
     bookings,
+    serviceTickets,
     blacklist,
     settlements,
     disputeCases,
@@ -42,12 +43,55 @@ export const WorkspaceSidebar: React.FC = () => {
   const stagedCount = virtualInventory.filter((i) => i.pendingStagedRequest).length;
   const activeBlacklistCount = blacklist.filter((b) => b.status === 'Active Blacklist').length;
   const flaggedBookingsCount = bookings.filter((b) => b.status === 'Flagged — Blacklist Review').length;
-  const fieldJobsCount = bookings.filter(
-    (b) =>
-      b.status === 'Site Visit Scheduled' ||
-      b.status === 'Confirmed' ||
-      b.status === 'Pickup Scheduled'
-  ).length;
+
+  const techAssignedCount =
+    bookings.filter((b) => {
+      if (b.status === 'Flagged — Blacklist Review') return false;
+      const name = activePersona.name.toLowerCase().trim();
+      const phone = (activePersona.phone || '').replace(/\D/g, '');
+      const aTech = b.deliveryAssignment;
+      const sTech = b.siteVisit?.assignedTechnician;
+      const pTech = b.returnRecord?.assignedPickupStaff;
+      if (
+        aTech &&
+        (aTech.technicianPhone.replace(/\D/g, '') === phone ||
+          aTech.technicianName.toLowerCase().trim() === name)
+      )
+        return true;
+      if (sTech && sTech.toLowerCase().trim().includes(name)) return true;
+      if (pTech && pTech.toLowerCase().trim().includes(name)) return true;
+      return false;
+    }).length +
+    serviceTickets.filter((st) => {
+      const name = activePersona.name.toLowerCase().trim();
+      const phone = (activePersona.phone || '').replace(/\D/g, '');
+      return (
+        st.status !== 'Resolved' &&
+        st.status !== 'Closed' &&
+        ((st.assignedTechnicianPhone &&
+          st.assignedTechnicianPhone.replace(/\D/g, '') === phone) ||
+          (st.assignedTechnicianName &&
+            st.assignedTechnicianName.toLowerCase().trim().includes(name)))
+      );
+    }).length;
+
+  const fieldJobsCount =
+    activePersona.role === 'FIELD_PERSONNEL'
+      ? techAssignedCount
+      : activePersona.role === 'VENDOR_OWNER'
+      ? bookings.filter(
+          (b) =>
+            b.fulfillingVendorId === activePersona.vendorId &&
+            (b.status === 'Site Visit Scheduled' ||
+              b.status === 'Confirmed' ||
+              b.status === 'Pickup Scheduled')
+        ).length
+      : bookings.filter(
+          (b) =>
+            b.status === 'Site Visit Scheduled' ||
+            b.status === 'Confirmed' ||
+            b.status === 'Pickup Scheduled'
+        ).length;
   const pendingSettlementsCount = settlements.filter((s) => s.status === 'Pending Approval').length;
   const openDisputesCount = disputeCases.filter((d) => d.status !== 'Decided' && d.status !== 'Closed').length;
   const unassignedDeliveriesCount = bookings.filter(
