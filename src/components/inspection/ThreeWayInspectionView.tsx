@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   AlertTriangle,
   Camera,
+  CheckCircle2,
   ChevronLeft,
   ChevronRight,
   Gavel,
@@ -132,6 +133,7 @@ export const ThreeWayInspectionView: React.FC = () => {
   const {
     bookings,
     depositLedgers,
+    disputeCases,
     activePersona,
     submitWarehouseInspection,
     customerDisputeInspectionFinding,
@@ -204,6 +206,10 @@ export const ThreeWayInspectionView: React.FC = () => {
     returnRec.warehouseReturnPhotos.length > 0
       ? returnRec.warehouseReturnPhotos
       : [returnRec.warehouseReturnPhoto || returnRec.preDispatchPhoto];
+
+  const linkedDispute = disputeCases.find((d) => d.bookingId === activeBooking.id);
+  const hasCustomerDispute = returnRec.customerResponse === 'Disputed' || Boolean(linkedDispute);
+  const disputeNotes = returnRec.customerDisputeNotes || linkedDispute?.customerResponseText;
 
   const handleRunWarehouseInspection = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -411,134 +417,181 @@ export const ThreeWayInspectionView: React.FC = () => {
             </span>
           </div>
 
-          <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <span className="text-xs text-hearth-taupe">
-              Status: <strong>{returnRec.customerResponse || 'Approved'}</strong> • Refunded within 14 days
-            </span>
-            <button
-              onClick={() => setShowDisputeInput(!showDisputeInput)}
-              className="spring-btn px-5 py-2 rounded-pill bg-[#B85D3B] hover:bg-hearth-terracotta text-white text-xs font-semibold shadow-sm"
-            >
-              Raise a Dispute
-            </button>
-          </div>
-
-          {showDisputeInput && (
-            <div className="mt-4 p-4 rounded-2xl bg-hearth-card border border-hearth-border space-y-3">
-              <div className="text-xs font-bold text-hearth-ink">
-                Tell us why you disagree with this inspection
-              </div>
-              <textarea
-                rows={2}
-                value={disputeReason}
-                onChange={(e) => setDisputeReason(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-hearth-oat border border-hearth-border text-xs text-hearth-ink"
-              />
-              <div className="flex justify-end gap-2">
-                <button
-                  onClick={() => setShowDisputeInput(false)}
-                  className="px-3 py-1.5 rounded-pill bg-hearth-oat text-xs"
+          {activePersona.role === 'PLATFORM_ADMIN' ? (
+            <div className="pt-3 border-t border-hearth-border space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-hearth-taupe font-medium">Customer Dispute Status:</span>
+                <span
+                  className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${
+                    hasCustomerDispute
+                      ? 'bg-[#FEE2E2] text-[#991B1B] border-[#FECACA]'
+                      : 'bg-[#DCFCE7] text-[#166534] border-[#86EFAC]'
+                  }`}
                 >
-                  Cancel
-                </button>
-                <button
-                  disabled={isSimulatingLatency}
-                  onClick={handleCustomerDispute}
-                  className="px-4 py-1.5 rounded-pill bg-hearth-terracotta text-white text-xs font-semibold"
-                >
-                  Submit Dispute
-                </button>
+                  {hasCustomerDispute ? 'Dispute Raised by Customer' : 'No Dispute Raised'}
+                </span>
               </div>
+              {hasCustomerDispute ? (
+                <div className="p-3.5 rounded-2xl bg-[#FEF2F2] border border-[#FECACA] space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#991B1B]">
+                      <AlertTriangle className="w-3.5 h-3.5" />
+                      Customer Raised Dispute
+                    </span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white text-[#991B1B] font-semibold border border-[#FECACA]">
+                      {linkedDispute?.id || 'DSP-ACTIVE'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-[#7F1D1D] italic bg-white/70 p-2.5 rounded-xl border border-[#FECACA]/60">
+                    "{disputeNotes || 'Customer raised an objection against the proposed deductions.'}"
+                  </p>
+                  <div className="flex items-center justify-between text-[11px] text-[#991B1B]">
+                    <span>Customer: <strong>{activeBooking.customerName}</strong></span>
+                    <span>Disputed Deduction: <strong>₹{currentDeduction.toLocaleString('en-IN')}</strong></span>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-[11px] text-hearth-taupe flex items-center gap-1.5 py-1">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-hearth-sage" />
+                  <span>The customer has not raised any dispute regarding this inspection or deduction.</span>
+                </div>
+              )}
             </div>
+          ) : activePersona.role === 'VENDOR_OWNER' ? (
+            <div className="pt-2 flex items-center justify-between text-xs text-hearth-taupe">
+              <span>Customer Status: <strong>{returnRec.customerResponse || 'Pending Review'}</strong></span>
+              <span>Deposit settlement governed by platform</span>
+            </div>
+          ) : (
+            <>
+              <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <span className="text-xs text-hearth-taupe">
+                  Status: <strong>{returnRec.customerResponse || 'Approved'}</strong> • Refunded within 14 days
+                </span>
+                <button
+                  onClick={() => setShowDisputeInput(!showDisputeInput)}
+                  className="spring-btn px-5 py-2 rounded-pill bg-[#B85D3B] hover:bg-hearth-terracotta text-white text-xs font-semibold shadow-sm"
+                >
+                  Raise a Dispute
+                </button>
+              </div>
+
+              {showDisputeInput && (
+                <div className="mt-4 p-4 rounded-2xl bg-hearth-card border border-hearth-border space-y-3">
+                  <div className="text-xs font-bold text-hearth-ink">
+                    Tell us why you disagree with this inspection
+                  </div>
+                  <textarea
+                    rows={2}
+                    value={disputeReason}
+                    onChange={(e) => setDisputeReason(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-hearth-oat border border-hearth-border text-xs text-hearth-ink"
+                  />
+                  <div className="flex justify-end gap-2">
+                    <button
+                      onClick={() => setShowDisputeInput(false)}
+                      className="px-3 py-1.5 rounded-pill bg-hearth-oat text-xs"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      disabled={isSimulatingLatency}
+                      onClick={handleCustomerDispute}
+                      className="px-4 py-1.5 rounded-pill bg-hearth-terracotta text-white text-xs font-semibold"
+                    >
+                      Submit Dispute
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
 
       {/* Staff & Admin Inspection Controls */}
       {isStaffOrAdmin && (
-        <div
-          className={`grid grid-cols-1 ${
-            activePersona.role === 'PLATFORM_ADMIN' ? 'lg:grid-cols-2' : ''
-          } gap-6`}
-        >
-          {/* Warehouse Inspection Form */}
-          <form
-            onSubmit={handleRunWarehouseInspection}
-            className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-4"
-          >
-            <div className="flex items-center gap-2">
-              <Camera className="w-4 h-4 text-hearth-terracotta" />
-              <h3 className="font-serif text-base font-bold text-hearth-ink">
-                Log Warehouse Inspection
-              </h3>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-semibold text-hearth-ink mb-1">
-                  Item Condition
-                </label>
-                <select
-                  value={findingType}
-                  onChange={(e) => setFindingType(e.target.value as any)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] text-xs font-semibold text-[#166534] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#166534]/30 cursor-pointer transition-all"
-                >
-                  <option value="Normal Wear" className="bg-white text-hearth-ink font-sans font-normal">Normal Wear (₹0 Charge)</option>
-                  <option value="Customer Damage" className="bg-white text-hearth-ink font-sans font-normal">Customer Damage</option>
-                  <option value="Transit Damage (Vendor Fault)" className="bg-white text-hearth-ink font-sans font-normal">
-                    Transit Damage (₹0 Customer Charge)
-                  </option>
-                  <option value="Missing Accessory" className="bg-white text-hearth-ink font-sans font-normal">Missing Accessory</option>
-                  <option value="Severe Damage / Loss" className="bg-white text-hearth-ink font-sans font-normal">Severe Damage / Loss</option>
-                </select>
+        <div className="grid grid-cols-1 gap-6">
+          {/* Warehouse Inspection Form (Vendor Only - Admin is read-only for warehouse logs) */}
+          {activePersona.role !== 'PLATFORM_ADMIN' && (
+            <form
+              onSubmit={handleRunWarehouseInspection}
+              className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-4"
+            >
+              <div className="flex items-center gap-2">
+                <Camera className="w-4 h-4 text-hearth-terracotta" />
+                <h3 className="font-serif text-base font-bold text-hearth-ink">
+                  Log Warehouse Inspection
+                </h3>
               </div>
 
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-hearth-ink mb-1">
+                    Item Condition
+                  </label>
+                  <select
+                    value={findingType}
+                    onChange={(e) => setFindingType(e.target.value as any)}
+                    className="w-full px-3 py-2 rounded-xl bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] text-xs font-semibold text-[#166534] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#166534]/30 cursor-pointer transition-all"
+                  >
+                    <option value="Normal Wear" className="bg-white text-hearth-ink font-sans font-normal">Normal Wear (₹0 Charge)</option>
+                    <option value="Customer Damage" className="bg-white text-hearth-ink font-sans font-normal">Customer Damage</option>
+                    <option value="Transit Damage (Vendor Fault)" className="bg-white text-hearth-ink font-sans font-normal">
+                      Transit Damage (₹0 Customer Charge)
+                    </option>
+                    <option value="Missing Accessory" className="bg-white text-hearth-ink font-sans font-normal">Missing Accessory</option>
+                    <option value="Severe Damage / Loss" className="bg-white text-hearth-ink font-sans font-normal">Severe Damage / Loss</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-hearth-ink mb-1">
+                    Deduction Amount (₹)
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={proposedAmount}
+                    onChange={(e) => setProposedAmount(Number(e.target.value))}
+                    className="w-full px-3 py-2 rounded-xl bg-hearth-oat border border-hearth-border text-xs font-ledger text-hearth-ink"
+                  />
+                </div>
+              </div>
+
+              <label className="flex items-center gap-2.5 p-3 rounded-xl bg-hearth-sageLight border border-hearth-sage/30 text-xs text-hearth-ink cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={wasInPickupPhoto}
+                  onChange={(e) => setWasInPickupPhoto(e.target.checked)}
+                  className="rounded text-hearth-sage"
+                />
+                <span>
+                  Damage was visible in the doorstep pickup photo
+                </span>
+              </label>
+
               <div>
                 <label className="block text-xs font-semibold text-hearth-ink mb-1">
-                  Deduction Amount (₹)
+                  Inspection Notes *
                 </label>
                 <input
-                  type="number"
-                  min={0}
-                  value={proposedAmount}
-                  onChange={(e) => setProposedAmount(Number(e.target.value))}
-                  className="w-full px-3 py-2 rounded-xl bg-hearth-oat border border-hearth-border text-xs font-ledger text-hearth-ink"
+                  type="text"
+                  value={inspectionNotes}
+                  onChange={(e) => setInspectionNotes(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-hearth-oat border border-hearth-border text-xs text-hearth-ink"
                 />
               </div>
-            </div>
 
-            <label className="flex items-center gap-2.5 p-3 rounded-xl bg-hearth-sageLight border border-hearth-sage/30 text-xs text-hearth-ink cursor-pointer">
-              <input
-                type="checkbox"
-                checked={wasInPickupPhoto}
-                onChange={(e) => setWasInPickupPhoto(e.target.checked)}
-                className="rounded text-hearth-sage"
-              />
-              <span>
-                Damage was visible in the doorstep pickup photo
-              </span>
-            </label>
-
-            <div>
-              <label className="block text-xs font-semibold text-hearth-ink mb-1">
-                Inspection Notes *
-              </label>
-              <input
-                type="text"
-                value={inspectionNotes}
-                onChange={(e) => setInspectionNotes(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-hearth-oat border border-hearth-border text-xs text-hearth-ink"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={isSimulatingLatency}
-              className="spring-btn w-full py-2.5 rounded-pill bg-hearth-terracotta hover:bg-hearth-kiln text-white text-xs font-semibold shadow-sm"
-            >
-              Save Inspection
-            </button>
-          </form>
+              <button
+                type="submit"
+                disabled={isSimulatingLatency}
+                className="spring-btn w-full py-2.5 rounded-pill bg-hearth-terracotta hover:bg-hearth-kiln text-white text-xs font-semibold shadow-sm"
+              >
+                Save Inspection
+              </button>
+            </form>
+          )}
 
           {/* Final Refund Approval (Platform Operator Only) */}
           {activePersona.role === 'PLATFORM_ADMIN' && (

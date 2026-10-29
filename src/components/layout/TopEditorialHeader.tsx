@@ -188,16 +188,18 @@ export const TopEditorialHeader: React.FC = () => {
               >
                 Catalog
               </button>
-              <button
-                onClick={() => setActiveTab('MY_RENTALS')}
-                className={`px-3.5 py-1.5 rounded-pill text-xs font-medium transition-colors ${
-                  activeTab === 'MY_RENTALS'
-                    ? 'bg-hearth-apricot text-hearth-terracotta font-semibold'
-                    : 'text-hearth-umber hover:bg-hearth-oat'
-                }`}
-              >
-                My Orders
-              </button>
+              {activePersona.role !== 'PLATFORM_ADMIN' && (
+                <button
+                  onClick={() => setActiveTab('MY_RENTALS')}
+                  className={`px-3.5 py-1.5 rounded-pill text-xs font-medium transition-colors ${
+                    activeTab === 'MY_RENTALS'
+                      ? 'bg-hearth-apricot text-hearth-terracotta font-semibold'
+                      : 'text-hearth-umber hover:bg-hearth-oat'
+                  }`}
+                >
+                  My Orders
+                </button>
+              )}
               <button
                 onClick={() => setActiveTab('FOR_BUSINESS')}
                 className={`px-3.5 py-1.5 rounded-pill text-xs font-medium transition-colors ${

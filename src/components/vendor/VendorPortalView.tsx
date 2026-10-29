@@ -150,26 +150,31 @@ export const VendorPortalView: React.FC = () => {
               Service Areas: {currentVendor.serviceAreas.join(', ')}
             </p>
             <div className="flex flex-wrap items-center gap-2 pt-1">
-              <button
-                onClick={() => setShowNewProductModal(true)}
-                className="spring-btn px-4 py-2 rounded-pill bg-hearth-terracotta hover:bg-hearth-kiln text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm"
-              >
-                <PackagePlus className="w-3.5 h-3.5" />
-                <span>Register New Product</span>
-              </button>
+              {activePersona.role !== 'PLATFORM_ADMIN' && (
+                <button
+                  onClick={() => setShowNewProductModal(true)}
+                  className="spring-btn px-4 py-2 rounded-pill bg-hearth-terracotta hover:bg-hearth-kiln text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm"
+                >
+                  <PackagePlus className="w-3.5 h-3.5" />
+                  <span>Register New Product</span>
+                </button>
+              )}
 
               {activePersona.role === 'PLATFORM_ADMIN' && (
-                <select
-                  value={selectedAdminVendorId}
-                  onChange={(e) => setSelectedAdminVendorId(e.target.value)}
-                  className="px-3.5 py-2 rounded-pill bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] text-xs font-mono font-bold text-[#166534] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#166534]/30 cursor-pointer transition-all"
-                >
-                  {vendors.map((v) => (
-                    <option key={v.id} value={v.id} className="bg-white text-hearth-ink font-sans font-normal">
-                      {v.id} — {v.displayName}
-                    </option>
-                  ))}
-                </select>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-medium text-hearth-taupe">Vendor:</span>
+                  <select
+                    value={selectedAdminVendorId}
+                    onChange={(e) => setSelectedAdminVendorId(e.target.value)}
+                    className="px-3.5 py-2 rounded-pill bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] text-xs font-mono font-bold text-[#166534] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#166534]/30 cursor-pointer transition-all"
+                  >
+                    {vendors.map((v) => (
+                      <option key={v.id} value={v.id} className="bg-white text-hearth-ink font-sans font-normal">
+                        {v.id} — {v.displayName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               )}
             </div>
           </div>
@@ -333,9 +338,19 @@ export const VendorPortalView: React.FC = () => {
                     )}
                   </div>
 
-                  {/* Edit Trigger / Form */}
+                  {/* Edit Trigger / Form (Vendor only; Admin is read-only) */}
                   <div className="pt-3 border-t border-hearth-border">
-                    {!isEditing ? (
+                    {activePersona.role === 'PLATFORM_ADMIN' ? (
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-hearth-sand text-hearth-taupe text-[11px] font-medium border border-hearth-border">
+                          Read-Only View (Vendor Managed)
+                        </span>
+                        <span className="text-[10px] font-mono text-hearth-taupe">
+                          Monthly Active Value: ₹
+                          {(inv.rentedQuantity * agreedRate).toLocaleString('en-IN')}
+                        </span>
+                      </div>
+                    ) : !isEditing ? (
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <button
                           onClick={() => {

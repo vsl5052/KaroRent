@@ -14,6 +14,7 @@ export const AdminGovernanceView: React.FC = () => {
   const {
     virtualInventory,
     vendors,
+    vendorProductRates,
     masterProducts,
     bookings,
     depositLedgers,
@@ -33,17 +34,6 @@ export const AdminGovernanceView: React.FC = () => {
     'INV-503':
       'Verified stock count and product photos; approved for catalog.',
   });
-  const [targetVendorByInv, setTargetVendorByInv] = useState<Record<string, string>>({
-    'INV-502': 'VEN-202',
-    'INV-503': 'VEN-201',
-  });
-
-  // Partner Reassignment State
-  const [directSwitchInvId, setDirectSwitchInvId] = useState<string>('INV-501');
-  const [directSwitchNewVendorId, setDirectSwitchNewVendorId] = useState<string>('VEN-202');
-  const [directSwitchReason, setDirectSwitchReason] = useState<string>(
-    'Balancing delivery load in Indiranagar.'
-  );
 
   // Product Pricing Editor State
   const [selectedPricingProductId, setSelectedPricingProductId] =
@@ -175,10 +165,6 @@ export const AdminGovernanceView: React.FC = () => {
               const reasonVal =
                 adminReasonByInv[inv.id] ||
                 'Reviewed vendor inventory update.';
-              const targetVenId =
-                targetVendorByInv[inv.id] ||
-                eligibleVendors.find((v) => v.id !== inv.owningVendorId)?.id ||
-                'VEN-202';
 
               return (
                 <div
@@ -248,28 +234,6 @@ export const AdminGovernanceView: React.FC = () => {
                   <div className="space-y-3 pt-2 border-t border-hearth-border text-xs">
                     <div>
                       <label className="block font-semibold text-hearth-ink mb-1">
-                        Reassign to Another Partner (Optional):
-                      </label>
-                      <select
-                        value={targetVenId}
-                        onChange={(e) =>
-                          setTargetVendorByInv({
-                            ...targetVendorByInv,
-                            [inv.id]: e.target.value,
-                          })
-                        }
-                        className="w-full px-3 py-2 rounded-xl bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] text-xs font-semibold text-[#166534] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#166534]/30 cursor-pointer transition-all"
-                      >
-                        {eligibleVendors.map((v) => (
-                          <option key={v.id} value={v.id} className="bg-white text-hearth-ink font-sans font-normal">
-                            {v.displayName} ({v.id}) — {v.serviceAreas.join(', ')}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block font-semibold text-hearth-ink mb-1">
                         Notes *
                       </label>
                       <input
@@ -306,22 +270,6 @@ export const AdminGovernanceView: React.FC = () => {
                         onClick={() =>
                           resolveStagedInventoryRequest({
                             inventoryId: inv.id,
-                            decision: 'REASSIGN_SOURCE',
-                            newSourceVendorId: targetVenId,
-                            adminReason: reasonVal,
-                          })
-                        }
-                        className="spring-btn px-3.5 py-2 rounded-pill bg-hearth-terracotta text-white text-xs font-semibold flex items-center gap-1"
-                      >
-                        <ArrowRightLeft className="w-3.5 h-3.5" />
-                        <span>Reassign Partner</span>
-                      </button>
-
-                      <button
-                        disabled={isSimulatingLatency}
-                        onClick={() =>
-                          resolveStagedInventoryRequest({
-                            inventoryId: inv.id,
                             decision: 'REJECT',
                             adminReason: reasonVal,
                           })
@@ -338,72 +286,6 @@ export const AdminGovernanceView: React.FC = () => {
             })}
           </div>
         )}
-
-        {/* Change Fulfilling Partner Tool */}
-        <div className="p-4 rounded-2xl bg-hearth-oat border border-hearth-border space-y-3">
-          <div className="text-xs font-bold text-hearth-ink flex items-center gap-2">
-            <ArrowRightLeft className="w-4 h-4 text-hearth-terracotta" />
-            <span>Change Fulfilling Partner</span>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs items-end">
-            <div>
-              <label className="block text-[11px] font-semibold mb-1">
-                Product
-              </label>
-              <select
-                value={directSwitchInvId}
-                onChange={(e) => setDirectSwitchInvId(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] text-xs font-semibold text-[#166534] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#166534]/30 cursor-pointer transition-all"
-              >
-                {virtualInventory.map((i) => (
-                  <option key={i.id} value={i.id} className="bg-white text-hearth-ink font-sans font-normal">
-                    {i.id} — {i.productTitle.slice(0, 22)} ({i.owningVendorName})
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-[11px] font-semibold mb-1">
-                New Partner
-              </label>
-              <select
-                value={directSwitchNewVendorId}
-                onChange={(e) => setDirectSwitchNewVendorId(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] text-xs font-semibold text-[#166534] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#166534]/30 cursor-pointer transition-all"
-              >
-                {eligibleVendors.map((v) => (
-                  <option key={v.id} value={v.id} className="bg-white text-hearth-ink font-sans font-normal">
-                    {v.displayName} ({v.id})
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-[11px] font-semibold mb-1">
-                Notes *
-              </label>
-              <input
-                type="text"
-                value={directSwitchReason}
-                onChange={(e) => setDirectSwitchReason(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-hearth-card border border-hearth-border"
-              />
-            </div>
-            <button
-              onClick={() =>
-                resolveStagedInventoryRequest({
-                  inventoryId: directSwitchInvId,
-                  decision: 'REASSIGN_SOURCE',
-                  newSourceVendorId: directSwitchNewVendorId,
-                  adminReason: directSwitchReason,
-                })
-              }
-              className="spring-btn py-2 px-4 rounded-pill bg-hearth-ink text-hearth-canvas font-semibold"
-            >
-              Update Partner
-            </button>
-          </div>
-        </div>
       </div>
 
       {/* SECTION 2: Product Pricing & Partner Vendors */}
@@ -465,6 +347,30 @@ export const AdminGovernanceView: React.FC = () => {
                   onChange={(e) => setEditDepositMult(Number(e.target.value))}
                   className="w-full px-3 py-2 rounded-xl bg-hearth-oat border border-hearth-border font-ledger"
                 />
+              </div>
+            </div>
+
+            {/* Read-only Agreed Platform-Vendor Rate */}
+            <div>
+              <label className="block font-semibold text-hearth-ink mb-1">
+                Agreed Platform–Vendor Price / month
+              </label>
+              <div className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-[#DCFCE7]/40 border border-[#86EFAC] text-hearth-ink">
+                <div>
+                  <span className="font-ledger font-bold text-sm text-[#166534]">
+                    ₹{(
+                      vendorProductRates.find((r) => r.productId === selectedPricingProductId)?.agreedMonthlyRate ??
+                      Math.round(selectedProd.baseMonthlyRent * 0.75)
+                    ).toLocaleString('en-IN')}
+                    /mo
+                  </span>
+                  <div className="text-[10px] text-hearth-taupe">
+                    Contracted vendor disbursement rate
+                  </div>
+                </div>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#166534] border border-[#86EFAC]">
+                  Read-Only
+                </span>
               </div>
             </div>
 

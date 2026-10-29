@@ -117,7 +117,7 @@ export const WorkspaceSidebar: React.FC = () => {
       icon: <CalendarClock className="w-4 h-4" />,
       badgeCount: bookings.filter((b) => b.status === 'Final Bill Sent' || b.status === 'Awaiting Customer Agreement').length || undefined,
       badgeVariant: 'terracotta',
-      allowedRoles: ['CUSTOMER_INDIVIDUAL', 'CUSTOMER_BUSINESS', 'PLATFORM_ADMIN'],
+      allowedRoles: ['CUSTOMER_INDIVIDUAL', 'CUSTOMER_BUSINESS'],
     },
     {
       id: 'AGREEMENTS_ESIGN',
@@ -166,7 +166,7 @@ export const WorkspaceSidebar: React.FC = () => {
       icon: <CalendarCheck className="w-4 h-4" />,
       badgeCount: unassignedDeliveriesCount || undefined,
       badgeVariant: 'terracotta',
-      allowedRoles: ['VENDOR_OWNER', 'PLATFORM_ADMIN'],
+      allowedRoles: ['VENDOR_OWNER'],
     },
     {
       id: 'FIELD_OPERATIONS',
@@ -241,13 +241,11 @@ export const WorkspaceSidebar: React.FC = () => {
     PLATFORM_ADMIN: [
       'ADMIN_GOVERNANCE',
       'VENDOR_PORTAL',
-      'ASSIGN_DELIVERIES',
       'FIELD_OPERATIONS',
       'THREE_WAY_INSPECTION',
       'VENDOR_STAFF',
       'SETTLEMENTS_FINANCE',
       'MARKETPLACE',
-      'MY_RENTALS',
       'AGREEMENTS_ESIGN',
       'INVOICES_DEPOSITS',
       'BLACKLIST_REGISTRY',

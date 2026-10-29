@@ -5,6 +5,7 @@ import {
   AuditLogEntry,
   BlacklistEntry,
   BookingOrder,
+  CustomPayoutAdjustment,
   CustomerAccount,
   DeliveryAssignment,
   DisputeCaseRecord,
@@ -86,6 +87,8 @@ interface KaroRentState {
   serviceTickets: ServiceMaintenanceTicket[];
   supportTickets: SupportComplaintTicket[];
   settlements: VendorSettlementStatement[];
+  customPayoutAdjustments: Record<string, CustomPayoutAdjustment[]>;
+  vendorPayoutVerificationStatus: Record<string, 'DRAFT' | 'AWAITING_VENDOR' | 'VENDOR_AGREED' | 'SETTLED'>;
   blacklist: BlacklistEntry[];
   notifications: PlatformNotification[];
   auditLogs: AuditLogEntry[];
@@ -233,6 +236,11 @@ interface KaroRentState {
   overrideBlacklistEntry: (blacklistId: string, overrideReason: string) => Promise<void>;
   overrideFlaggedBooking: (bookingId: string, overrideReason: string) => Promise<void>;
   approveAndReleaseVendorSettlement: (settlementId: string) => Promise<void>;
+  addCustomPayoutAdjustment: (payload: { vendorId: string; description: string; amount: number }) => Promise<void>;
+  removeCustomPayoutAdjustment: (payload: { vendorId: string; adjustmentId: string }) => Promise<void>;
+  sendPayoutForVendorVerification: (vendorId: string) => Promise<void>;
+  vendorAgreeToPayout: (vendorId: string) => Promise<void>;
+  settleAndReleaseVendorPayout: (payload: { vendorId: string; netAmount: number; periodLabel?: string }) => Promise<void>;
   createServiceTicket: (bookingId: string, issueDescription: string, requestAssetSwap: boolean) => Promise<void>;
   executeVendorAssetReplacement: (ticketId: string, replacementSerial: string) => Promise<void>;
   escalateSupportTicket: (ticketId: string, resolutionOrEscalationNote: string) => Promise<void>;
@@ -280,6 +288,8 @@ export const useKaroRentStore = create<KaroRentState>()(
       serviceTickets: INITIAL_SERVICE_TICKETS,
       supportTickets: INITIAL_SUPPORT_TICKETS,
       settlements: INITIAL_SETTLEMENTS,
+      customPayoutAdjustments: {},
+      vendorPayoutVerificationStatus: {},
       blacklist: INITIAL_BLACKLIST,
       notifications: INITIAL_NOTIFICATIONS,
       auditLogs: INITIAL_AUDIT_LOGS,
@@ -2260,6 +2270,223 @@ export const useKaroRentStore = create<KaroRentState>()(
         get().addToast({
           title: `Vendor Payout Executed: ₹${st.netVendorPayable.toLocaleString('en-IN')}`,
           description: `Dual-control approval verified (Preparer ≠ Approver). UTR: ${utr}`,
+          variant: 'success',
+        });
+      },
+
+      addCustomPayoutAdjustment: async ({ vendorId, description, amount }) => {
+        set({ isSimulatingLatency: true, latencyActionLabel: 'Recording Custom Adjustment...' });
+        await simulateLatency(250);
+        const adj: CustomPayoutAdjustment = {
+          id: `ADJ-${Date.now()}`,
+          description,
+          amount,
+          addedBy: get().activePersona.name,
+          createdAt: nowIST(),
+        };
+        set((s) => ({
+          isSimulatingLatency: false,
+          latencyActionLabel: null,
+          customPayoutAdjustments: {
+            ...s.customPayoutAdjustments,
+            [vendorId]: [...(s.customPayoutAdjustments[vendorId] || []), adj],
+          },
+          vendorPayoutVerificationStatus: {
+            ...s.vendorPayoutVerificationStatus,
+            [vendorId]: 'DRAFT',
+          },
+        }));
+        get().addToast({
+          title: 'Custom Adjustment Added',
+          description: `${description} (${amount >= 0 ? '+' : ''}₹${amount.toLocaleString('en-IN')}) added to possible payouts.`,
+          variant: 'success',
+        });
+      },
+
+      removeCustomPayoutAdjustment: async ({ vendorId, adjustmentId }) => {
+        set((s) => ({
+          customPayoutAdjustments: {
+            ...s.customPayoutAdjustments,
+            [vendorId]: (s.customPayoutAdjustments[vendorId] || []).filter((a) => a.id !== adjustmentId),
+          },
+        }));
+      },
+
+      sendPayoutForVendorVerification: async (vendorId) => {
+        set({ isSimulatingLatency: true, latencyActionLabel: 'Sending Payout Statement to Partner for Verification...' });
+        await simulateLatency(350);
+        const vendor = get().vendors.find((v) => v.id === vendorId);
+        const vName = vendor?.displayName || vendorId;
+        const ntf: PlatformNotification = {
+          id: `NTF-${Date.now()}`,
+          eventCode: 'Payout Verification Required',
+          title: 'Payout Statement Ready for Review',
+          message: `Platform has submitted the current monthly payout statement (including custom adjustments) for ${vName}. Please review and agree.`,
+          recipientRole: 'VENDOR_OWNER',
+          vendorScopeId: vendorId,
+          category: 'Deposit & Billing',
+          priority: 'high',
+          read: false,
+          timestamp: 'Just now',
+          linkedView: 'SETTLEMENTS_FINANCE',
+        };
+        set((s) => ({
+          isSimulatingLatency: false,
+          latencyActionLabel: null,
+          vendorPayoutVerificationStatus: {
+            ...s.vendorPayoutVerificationStatus,
+            [vendorId]: 'AWAITING_VENDOR',
+          },
+          notifications: [ntf, ...s.notifications],
+          auditLogs: [
+            {
+              id: `AUD-${Date.now()}`,
+              timestamp: nowIST(),
+              actorName: s.activePersona.name,
+              actorRole: s.activePersona.roleBadge,
+              moduleCode: 'Vendor Payouts',
+              actionSummary: `Dispatched payout verification statement to vendor ${vName} (${vendorId})`,
+              affectedRecordId: vendorId,
+              priorValue: 'Status: Draft',
+              newValue: 'Status: Awaiting Vendor Verification',
+              mandatoryReason: 'Dual-control payout reconciliation with partner agreement.',
+            },
+            ...s.auditLogs,
+          ],
+        }));
+        get().addToast({
+          title: 'Sent for Vendor Verification',
+          description: `Statement sent to ${vName}. Payout can be settled once vendor agrees.`,
+          variant: 'info',
+        });
+      },
+
+      vendorAgreeToPayout: async (vendorId) => {
+        set({ isSimulatingLatency: true, latencyActionLabel: 'Verifying & Agreeing to Payout Statement...' });
+        await simulateLatency(350);
+        const vendor = get().vendors.find((v) => v.id === vendorId);
+        const vName = vendor?.displayName || vendorId;
+        const ntf: PlatformNotification = {
+          id: `NTF-${Date.now()}`,
+          eventCode: 'Payout Agreed',
+          title: `Partner Agreed to Payout: ${vName}`,
+          message: `${vName} has verified and agreed to the payout statement. Ready for final settlement.`,
+          recipientRole: 'PLATFORM_ADMIN',
+          category: 'Deposit & Billing',
+          priority: 'high',
+          read: false,
+          timestamp: 'Just now',
+          linkedView: 'SETTLEMENTS_FINANCE',
+        };
+        set((s) => ({
+          isSimulatingLatency: false,
+          latencyActionLabel: null,
+          vendorPayoutVerificationStatus: {
+            ...s.vendorPayoutVerificationStatus,
+            [vendorId]: 'VENDOR_AGREED',
+          },
+          notifications: [ntf, ...s.notifications],
+          auditLogs: [
+            {
+              id: `AUD-${Date.now()}`,
+              timestamp: nowIST(),
+              actorName: s.activePersona.name,
+              actorRole: s.activePersona.roleBadge,
+              moduleCode: 'Vendor Payouts',
+              actionSummary: `Vendor ${vName} (${vendorId}) verified and agreed to payout statement.`,
+              affectedRecordId: vendorId,
+              priorValue: 'Status: Awaiting Vendor Verification',
+              newValue: 'Status: Vendor Agreed',
+              mandatoryReason: 'Partner confirmed aggregated rental units and adjustments.',
+            },
+            ...s.auditLogs,
+          ],
+        }));
+        get().addToast({
+          title: 'Payout Verified & Agreed',
+          description: 'You have agreed to this payout statement. Platform operator will now settle the payout.',
+          variant: 'success',
+        });
+      },
+
+      settleAndReleaseVendorPayout: async ({ vendorId, netAmount, periodLabel = 'October 2026 Billing Cycle' }) => {
+        set({ isSimulatingLatency: true, latencyActionLabel: 'Finalizing Payout Settlement & Disbursing Funds...' });
+        await simulateLatency(400);
+
+        const state = get();
+        const vendor = state.vendors.find((v) => v.id === vendorId);
+        const vName = vendor?.displayName || vendorId;
+        const utr = `NEFT_UTR_HDFC261028${Math.floor(10000 + Math.random() * 89999)}`;
+        const customAdjs = state.customPayoutAdjustments[vendorId] || [];
+
+        const newStatement: VendorSettlementStatement = {
+          id: `SET-2026-${Math.floor(200 + Math.random() * 800)}`,
+          vendorId,
+          vendorName: vName,
+          periodLabel,
+          grossEligibleCollections: netAmount,
+          platformCommissionPercent: 0,
+          platformCommissionFee: 0,
+          refundsAndChargebacks: 0,
+          damageRecoveryCredit: 0,
+          terminationHoldbackAmount: 0,
+          netVendorPayable: netAmount,
+          status: 'Paid',
+          preparedByActor: 'Platform Financial Engine',
+          approvedByActor: `${state.activePersona.name} (Platform Operator)`,
+          payoutReference: utr,
+          customAdjustments: customAdjs,
+          vendorAgreedAt: nowIST(),
+          createdAt: '2026-10-29',
+        };
+
+        const ntf: PlatformNotification = {
+          id: `NTF-${Date.now()}`,
+          eventCode: 'Payout Disbursed',
+          title: `Payout Disbursed: ₹${netAmount.toLocaleString('en-IN')}`,
+          message: `Payout for ${periodLabel} has been disbursed via ${utr}. Download receipt in Past Payouts.`,
+          recipientRole: 'VENDOR_OWNER',
+          vendorScopeId: vendorId,
+          category: 'Deposit & Billing',
+          priority: 'high',
+          read: false,
+          timestamp: 'Just now',
+          linkedView: 'SETTLEMENTS_FINANCE',
+        };
+
+        set((s) => ({
+          isSimulatingLatency: false,
+          latencyActionLabel: null,
+          settlements: [newStatement, ...s.settlements],
+          customPayoutAdjustments: {
+            ...s.customPayoutAdjustments,
+            [vendorId]: [],
+          },
+          vendorPayoutVerificationStatus: {
+            ...s.vendorPayoutVerificationStatus,
+            [vendorId]: 'SETTLED',
+          },
+          notifications: [ntf, ...s.notifications],
+          auditLogs: [
+            {
+              id: `AUD-${Date.now()}`,
+              timestamp: nowIST(),
+              actorName: s.activePersona.name,
+              actorRole: s.activePersona.roleBadge,
+              moduleCode: 'Vendor Payouts',
+              actionSummary: `Settled & disbursed payout ${newStatement.id} for ${vName}: ₹${netAmount.toLocaleString('en-IN')} (UTR: ${utr})`,
+              affectedRecordId: newStatement.id,
+              priorValue: 'Status: Vendor Agreed',
+              newValue: `Status: Paid (UTR: ${utr})`,
+              mandatoryReason: 'Vendor agreement verified and payout released by Platform Operator.',
+            },
+            ...s.auditLogs,
+          ],
+        }));
+
+        get().addToast({
+          title: `Vendor Payout Settled: ₹${netAmount.toLocaleString('en-IN')}`,
+          description: `Disbursed to ${vName}. Settlement statement generated with UTR: ${utr}`,
           variant: 'success',
         });
       },

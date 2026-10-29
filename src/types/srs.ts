@@ -536,12 +536,22 @@ export interface SupportComplaintTicket {
 export type SettlementPayoutStatus =
   | 'Draft'
   | 'Pending Approval'
+  | 'Awaiting Vendor Verification'
+  | 'Vendor Agreed'
   | 'Ready'
   | 'Processing'
   | 'Paid'
   | 'Failed'
   | 'On Hold — Vendor Termination' // FR-VEN-013
   | 'Disputed';
+
+export interface CustomPayoutAdjustment {
+  id: string;
+  description: string;
+  amount: number;
+  addedBy: string;
+  createdAt: string;
+}
 
 export interface VendorSettlementStatement {
   id: string;
@@ -559,6 +569,8 @@ export interface VendorSettlementStatement {
   preparedByActor: string; // Segregation of duties (FR-SET-008): preparer != approver
   approvedByActor?: string;
   payoutReference?: string;
+  customAdjustments?: CustomPayoutAdjustment[];
+  vendorAgreedAt?: string;
   createdAt: string;
 }
 

@@ -1,26 +1,21 @@
 import React, { useState } from 'react';
 import {
-  ArrowRightLeft,
   Lock,
   MessageSquare,
   MessageSquareWarning,
   Send,
-  Wrench,
   X,
 } from 'lucide-react';
 import { useKaroRentStore } from '../../store/useKaroRentStore';
 
 export const SupportDisputesView: React.FC = () => {
   const {
-    serviceTickets,
     supportTickets,
     activePersona,
-    executeVendorAssetReplacement,
     escalateSupportTicket,
     isSimulatingLatency,
   } = useKaroRentStore();
 
-  const [swapSerialInput, setSwapSerialInput] = useState('SN-AC15-2026-108');
   const [selectedInquiryId, setSelectedInquiryId] = useState<string | null>(
     null
   );
@@ -40,74 +35,12 @@ export const SupportDisputesView: React.FC = () => {
           Support
         </h1>
         <p className="text-xs text-hearth-umber">
-          Manage maintenance requests, item replacements, and customer inquiries.
+          Manage and resolve customer support inquiries and operational tickets.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Maintenance & Replacements */}
-        <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-4">
-          <h2 className="font-serif text-lg font-bold text-hearth-ink flex items-center gap-2">
-            <Wrench className="w-5 h-5 text-hearth-terracotta" />
-            <span>
-              Maintenance & Replacements ({serviceTickets.length})
-            </span>
-          </h2>
-
-          <div className="space-y-3">
-            {serviceTickets.map((t) => (
-              <div
-                key={t.id}
-                className="p-4 rounded-2xl bg-hearth-oat border border-hearth-border space-y-2.5 text-xs"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-mono font-bold text-hearth-ink">
-                    {t.id} ({t.bookingId})
-                  </span>
-                  <span className="px-2.5 py-0.5 rounded-pill bg-hearth-apricot text-hearth-terracotta font-semibold text-[10px]">
-                    {t.status}
-                  </span>
-                </div>
-                <div className="font-serif font-bold text-sm text-hearth-ink">
-                  {t.productTitle} — Serial: {t.currentAssetSerial}
-                </div>
-                <p className="text-hearth-umber">{t.issueDescription}</p>
-
-                {t.replacementAssetSerial && (
-                  <div className="p-2.5 rounded-xl bg-[#DCFCE7] text-[#166534] font-mono text-[11px]">
-                    ✓ Replaced with {t.replacementAssetSerial} • Credit: ₹
-                    {t.downtimeCreditAmount}
-                  </div>
-                )}
-
-                {t.status !== 'Resolved' &&
-                  (activePersona.role === 'VENDOR_OWNER' ||
-                    activePersona.role === 'PLATFORM_ADMIN') && (
-                    <div className="pt-2 border-t border-hearth-border flex flex-wrap items-center gap-2">
-                      <input
-                        type="text"
-                        value={swapSerialInput}
-                        onChange={(e) => setSwapSerialInput(e.target.value)}
-                        className="px-3 py-1.5 rounded-xl bg-hearth-card border border-hearth-border font-mono text-xs"
-                      />
-                      <button
-                        disabled={isSimulatingLatency}
-                        onClick={() =>
-                          executeVendorAssetReplacement(t.id, swapSerialInput)
-                        }
-                        className="spring-btn px-3.5 py-1.5 rounded-pill bg-hearth-terracotta text-white text-xs font-semibold flex items-center gap-1"
-                      >
-                        <ArrowRightLeft className="w-3.5 h-3.5" />
-                        <span>Replace Item</span>
-                      </button>
-                    </div>
-                  )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Customer Inquiries (Multi-inquiry list; click opens chat popup) */}
+      <div className="w-full">
+        {/* Customer Inquiries */}
         <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="font-serif text-lg font-bold text-hearth-ink flex items-center gap-2">

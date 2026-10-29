@@ -4,10 +4,14 @@ import {
   CheckCircle2,
   Clock,
   Download,
+  FileCheck,
   PackageCheck,
+  Plus,
   ReceiptIndianRupee,
   RotateCcw,
+  Send,
   ShieldCheck,
+  Trash2,
   WalletCards,
 } from 'lucide-react';
 import { useKaroRentStore } from '../../store/useKaroRentStore';
@@ -19,6 +23,13 @@ export const SettlementsFinanceView: React.FC = () => {
     virtualInventory,
     vendorProductRates,
     settlements,
+    customPayoutAdjustments,
+    vendorPayoutVerificationStatus,
+    addCustomPayoutAdjustment,
+    removeCustomPayoutAdjustment,
+    sendPayoutForVendorVerification,
+    vendorAgreeToPayout,
+    settleAndReleaseVendorPayout,
     activePersona,
     approveAndReleaseVendorSettlement,
     isSimulatingLatency,
@@ -28,6 +39,9 @@ export const SettlementsFinanceView: React.FC = () => {
   const [selectedAdminVendorId, setSelectedAdminVendorId] = useState<string>(
     activePersona.vendorId || 'VEN-201'
   );
+
+  const [adjDesc, setAdjDesc] = useState('');
+  const [adjAmount, setAdjAmount] = useState<string>('');
 
   const targetVendorId =
     activePersona.role === 'PLATFORM_ADMIN'
@@ -94,6 +108,43 @@ export const SettlementsFinanceView: React.FC = () => {
   );
   const totalPossiblePayout =
     totalRentedAmount + totalReturnedAmount + totalInProgressAmount;
+
+  const currentAdjustments = customPayoutAdjustments[targetVendorId] || [];
+  const totalAdjustmentsAmount = currentAdjustments.reduce(
+    (acc, a) => acc + a.amount,
+    0
+  );
+  const netPossiblePayout = Math.max(0, totalPossiblePayout + totalAdjustmentsAmount);
+  const verificationStatus =
+    vendorPayoutVerificationStatus[targetVendorId] || 'DRAFT';
+
+  const handleAddAdjustment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!adjDesc.trim()) {
+      addToast({
+        title: 'Description Required',
+        description: 'Please enter a description for the custom adjustment.',
+        variant: 'error',
+      });
+      return;
+    }
+    const parsedAmount = Number(adjAmount);
+    if (adjAmount.trim() === '' || isNaN(parsedAmount)) {
+      addToast({
+        title: 'Valid Amount Required',
+        description: 'Please enter a valid numeric amount in ₹.',
+        variant: 'error',
+      });
+      return;
+    }
+    await addCustomPayoutAdjustment({
+      vendorId: targetVendorId,
+      description: adjDesc.trim(),
+      amount: parsedAmount,
+    });
+    setAdjDesc('');
+    setAdjAmount('');
+  };
 
   const pendingSettlement = settlements.find(
     (s) => s.vendorId === targetVendorId && s.status === 'Pending Approval'
@@ -199,25 +250,136 @@ export const SettlementsFinanceView: React.FC = () => {
                 Current Possible Payouts
               </h2>
               <p className="text-xs text-hearth-taupe">
-                Aggregate product quantities and agreed platform–partner rates for{' '}
+                Aggregate product quantities, agreed rates, and custom adjustments for{' '}
                 <strong>{currentVendor.displayName}</strong>
               </p>
             </div>
           </div>
 
-          {activePersona.role === 'PLATFORM_ADMIN' && pendingSettlement && (
+          <div className="flex flex-wrap items-center gap-2.5">
+            {/* Verification Status Pill */}
+            <span
+              className={`px-3 py-1.5 rounded-pill text-xs font-semibold inline-flex items-center gap-1.5 border ${
+                verificationStatus === 'SETTLED'
+                  ? 'bg-[#DCFCE7] text-[#166534] border-[#86EFAC]'
+                  : verificationStatus === 'VENDOR_AGREED'
+                  ? 'bg-[#DCFCE7] text-[#166534] border-[#86EFAC]'
+                  : verificationStatus === 'AWAITING_VENDOR'
+                  ? 'bg-[#FEF3C7] text-[#92400E] border-[#FDE68A]'
+                  : 'bg-hearth-oat text-hearth-umber border-hearth-border'
+              }`}
+            >
+              {verificationStatus === 'SETTLED' && (
+                <>
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>Payout Settled</span>
+                </>
+              )}
+              {verificationStatus === 'VENDOR_AGREED' && (
+                <>
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>Vendor Agreed</span>
+                </>
+              )}
+              {verificationStatus === 'AWAITING_VENDOR' && (
+                <>
+                  <Clock className="w-3.5 h-3.5 text-[#D97706]" />
+                  <span>Awaiting Vendor Verification</span>
+                </>
+              )}
+              {verificationStatus === 'DRAFT' && (
+                <>
+                  <Clock className="w-3.5 h-3.5 text-hearth-taupe" />
+                  <span>Draft Calculation</span>
+                </>
+              )}
+            </span>
+
+            {/* Platform Admin Workflow Controls */}
+            {activePersona.role === 'PLATFORM_ADMIN' && (
+              <>
+                {(verificationStatus === 'DRAFT' || verificationStatus === 'AWAITING_VENDOR') && (
+                  <button
+                    disabled={isSimulatingLatency}
+                    onClick={() => sendPayoutForVendorVerification(targetVendorId)}
+                    className="spring-btn px-4 py-2 rounded-pill bg-hearth-terracotta hover:bg-hearth-kiln text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    <span>
+                      {verificationStatus === 'AWAITING_VENDOR'
+                        ? 'Re-send Verification'
+                        : 'Send for Vendor Verification'}
+                    </span>
+                  </button>
+                )}
+
+                {verificationStatus === 'VENDOR_AGREED' && (
+                  <button
+                    disabled={isSimulatingLatency}
+                    onClick={() =>
+                      settleAndReleaseVendorPayout({
+                        vendorId: targetVendorId,
+                        netAmount: netPossiblePayout,
+                      })
+                    }
+                    className="spring-btn px-5 py-2.5 rounded-pill bg-hearth-sage hover:bg-[#233E26] text-white text-xs font-semibold flex items-center gap-2 shadow-sm"
+                  >
+                    <ShieldCheck className="w-4 h-4" />
+                    <span>Settle & Release Payout (₹{netPossiblePayout.toLocaleString('en-IN')})</span>
+                  </button>
+                )}
+              </>
+            )}
+
+            {/* Vendor Review & Agree Action in Header */}
+            {activePersona.role === 'VENDOR_OWNER' && verificationStatus === 'AWAITING_VENDOR' && (
+              <button
+                disabled={isSimulatingLatency}
+                onClick={() => vendorAgreeToPayout(currentVendor.id)}
+                className="spring-btn px-4 py-2 rounded-pill bg-hearth-sage hover:bg-[#233E26] text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm"
+              >
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>Verify & Agree to Payout</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Vendor Notice Banner when awaiting verification */}
+        {activePersona.role === 'VENDOR_OWNER' && verificationStatus === 'AWAITING_VENDOR' && (
+          <div className="p-4 rounded-2xl bg-[#FEF3C7] border border-[#FDE68A] flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div className="space-y-0.5">
+              <div className="font-bold text-[#92400E] flex items-center gap-1.5">
+                <Clock className="w-4 h-4 text-[#D97706]" />
+                Platform Verification Request
+              </div>
+              <p className="text-[#B45309]">
+                KaroRent Platform has compiled the monthly payout including custom line items. Please review the details below and click "Verify & Agree" so the payout can be released.
+              </p>
+            </div>
             <button
               disabled={isSimulatingLatency}
-              onClick={() =>
-                approveAndReleaseVendorSettlement(pendingSettlement.id)
-              }
-              className="spring-btn px-5 py-2.5 rounded-pill bg-hearth-sage hover:bg-[#233E26] text-white text-xs font-semibold flex items-center gap-2 shadow-sm"
+              onClick={() => vendorAgreeToPayout(currentVendor.id)}
+              className="spring-btn px-4 py-2 rounded-pill bg-hearth-sage hover:bg-[#233E26] text-white font-semibold flex items-center gap-1.5 shadow-sm shrink-0"
             >
-              <ShieldCheck className="w-4 h-4" />
-              <span>Approve & Release Payout</span>
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>Verify & Agree to Payout</span>
             </button>
-          )}
-        </div>
+          </div>
+        )}
+
+        {/* Vendor Notice Banner when verified */}
+        {activePersona.role === 'VENDOR_OWNER' && verificationStatus === 'VENDOR_AGREED' && (
+          <div className="p-3.5 rounded-2xl bg-[#DCFCE7]/60 border border-[#86EFAC] flex items-center justify-between text-xs text-[#166534]">
+            <span className="flex items-center gap-1.5 font-semibold">
+              <CheckCircle2 className="w-4 h-4" />
+              You have verified and agreed to this payout statement. Settlement release is awaiting final platform disbursement.
+            </span>
+            <span className="font-mono text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-white border border-[#86EFAC]">
+              Agreed
+            </span>
+          </div>
+        )}
 
         {/* 1. Currently Rented Products */}
         <div className="space-y-3">
@@ -377,8 +539,136 @@ export const SettlementsFinanceView: React.FC = () => {
           )}
         </div>
 
+        {/* 4. Custom Adjustments & Line Items */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-hearth-ink flex items-center gap-1.5">
+              <FileCheck className="w-4 h-4 text-hearth-terracotta" />
+              <span>4. Custom Adjustments & Line Items</span>
+            </h3>
+            <span
+              className={`text-xs font-ledger font-semibold ${
+                totalAdjustmentsAmount >= 0 ? 'text-hearth-sage' : 'text-[#DC2626]'
+              }`}
+            >
+              Subtotal: {totalAdjustmentsAmount >= 0 ? '+' : ''}₹
+              {totalAdjustmentsAmount.toLocaleString('en-IN')}
+            </span>
+          </div>
+
+          {currentAdjustments.length === 0 ? (
+            <div className="p-4 rounded-2xl bg-hearth-oat text-xs text-hearth-taupe">
+              No custom adjustments added for this cycle.
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-hearth-border overflow-hidden">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="bg-hearth-oat border-b border-hearth-border text-[11px] font-mono uppercase text-hearth-taupe">
+                    <th className="py-3 px-4">Description</th>
+                    <th className="py-3 px-4 text-center">Added By</th>
+                    <th className="py-3 px-4 text-center">Date</th>
+                    <th className="py-3 px-4 text-right">Amount (₹)</th>
+                    {activePersona.role === 'PLATFORM_ADMIN' && verificationStatus !== 'SETTLED' && (
+                      <th className="py-3 px-4 text-center w-12">Action</th>
+                    )}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-hearth-border bg-hearth-parchment/40">
+                  {currentAdjustments.map((adj) => (
+                    <tr key={adj.id}>
+                      <td className="py-3 px-4 font-semibold text-hearth-ink">
+                        {adj.description}
+                      </td>
+                      <td className="py-3 px-4 text-center text-hearth-taupe text-[11px]">
+                        {adj.addedBy}
+                      </td>
+                      <td className="py-3 px-4 text-center text-hearth-taupe font-mono text-[11px]">
+                        {adj.createdAt}
+                      </td>
+                      <td
+                        className={`py-3 px-4 text-right font-ledger font-bold ${
+                          adj.amount >= 0 ? 'text-hearth-sage' : 'text-[#DC2626]'
+                        }`}
+                      >
+                        {adj.amount >= 0 ? '+' : ''}₹{adj.amount.toLocaleString('en-IN')}
+                      </td>
+                      {activePersona.role === 'PLATFORM_ADMIN' && verificationStatus !== 'SETTLED' && (
+                        <td className="py-3 px-4 text-center">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              removeCustomPayoutAdjustment({
+                                vendorId: targetVendorId,
+                                adjustmentId: adj.id,
+                              })
+                            }
+                            className="p-1 rounded-lg text-hearth-taupe hover:text-[#DC2626] hover:bg-[#FEE2E2] transition-colors"
+                            title="Remove adjustment"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* Admin Add Custom Adjustment Form */}
+          {activePersona.role === 'PLATFORM_ADMIN' && verificationStatus !== 'SETTLED' && (
+            <form
+              onSubmit={handleAddAdjustment}
+              className="p-4 rounded-2xl bg-hearth-oat border border-hearth-border space-y-3"
+            >
+              <div className="text-xs font-bold text-hearth-ink flex items-center gap-1.5">
+                <Plus className="w-3.5 h-3.5 text-hearth-terracotta" />
+                <span>Add Custom Description & Amount (Platform Operator)</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 text-xs items-end">
+                <div className="sm:col-span-7">
+                  <label className="block text-[11px] font-semibold text-hearth-ink mb-1">
+                    Custom Description *
+                  </label>
+                  <input
+                    type="text"
+                    value={adjDesc}
+                    onChange={(e) => setAdjDesc(e.target.value)}
+                    placeholder="e.g., On-time SLA bonus, Delivery subsidy, Packaging fee adjustment"
+                    className="w-full px-3 py-2 rounded-xl bg-hearth-card border border-hearth-border text-xs text-hearth-ink placeholder:text-hearth-taupe/70"
+                  />
+                </div>
+                <div className="sm:col-span-3">
+                  <label className="block text-[11px] font-semibold text-hearth-ink mb-1">
+                    Amount (₹) *
+                  </label>
+                  <input
+                    type="number"
+                    value={adjAmount}
+                    onChange={(e) => setAdjAmount(e.target.value)}
+                    placeholder="e.g. 1500 or -500"
+                    className="w-full px-3 py-2 rounded-xl bg-hearth-card border border-hearth-border text-xs font-ledger text-hearth-ink placeholder:text-hearth-taupe/70"
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <button
+                    type="submit"
+                    disabled={isSimulatingLatency}
+                    className="spring-btn w-full py-2 px-3 rounded-pill bg-hearth-terracotta hover:bg-hearth-kiln text-white text-xs font-semibold flex items-center justify-center gap-1 shadow-sm"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Add</span>
+                  </button>
+                </div>
+              </div>
+            </form>
+          )}
+        </div>
+
         {/* Summary Footer Strip */}
-        <div className="p-5 rounded-2xl bg-hearth-oat border border-hearth-border grid grid-cols-1 sm:grid-cols-4 gap-4 items-center">
+        <div className="p-5 rounded-2xl bg-hearth-oat border border-hearth-border grid grid-cols-1 sm:grid-cols-5 gap-4 items-center">
           <div>
             <div className="text-[11px] text-hearth-taupe">
               Currently Rented
@@ -403,12 +693,25 @@ export const SettlementsFinanceView: React.FC = () => {
               ₹{totalInProgressAmount.toLocaleString('en-IN')}
             </div>
           </div>
+          <div>
+            <div className="text-[11px] text-hearth-taupe">
+              Custom Adjustments
+            </div>
+            <div
+              className={`font-ledger font-bold text-sm ${
+                totalAdjustmentsAmount >= 0 ? 'text-hearth-sage' : 'text-[#DC2626]'
+              }`}
+            >
+              {totalAdjustmentsAmount >= 0 ? '+' : ''}₹
+              {totalAdjustmentsAmount.toLocaleString('en-IN')}
+            </div>
+          </div>
           <div className="sm:text-right pt-2 sm:pt-0 border-t sm:border-t-0 border-hearth-border">
             <div className="text-xs font-semibold text-hearth-sage">
-              Total Possible Payout
+              Net Possible Payout
             </div>
             <div className="font-serif font-bold text-2xl text-hearth-sage font-ledger">
-              ₹{totalPossiblePayout.toLocaleString('en-IN')}
+              ₹{netPossiblePayout.toLocaleString('en-IN')}
             </div>
           </div>
         </div>

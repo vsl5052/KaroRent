@@ -256,13 +256,15 @@ export const VendorStaffView: React.FC = () => {
             </div>
           )}
 
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="spring-btn px-4 py-2 rounded-pill bg-hearth-terracotta hover:bg-hearth-kiln text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm"
-          >
-            <UserPlus className="w-3.5 h-3.5" />
-            <span>Add Field Technician</span>
-          </button>
+          {activePersona.role !== 'PLATFORM_ADMIN' && (
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="spring-btn px-4 py-2 rounded-pill bg-hearth-terracotta hover:bg-hearth-kiln text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm"
+            >
+              <UserPlus className="w-3.5 h-3.5" />
+              <span>Add Field Technician</span>
+            </button>
+          )}
         </div>
       </div>
 
