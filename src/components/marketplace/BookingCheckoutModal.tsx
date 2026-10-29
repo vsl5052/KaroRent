@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   AlertTriangle,
   Ruler,
-  ShieldAlert,
   ShieldCheck,
   X,
 } from 'lucide-react';
@@ -116,18 +115,6 @@ export const BookingCheckoutModal: React.FC = () => {
 
         {/* Scrollable Body */}
         <form onSubmit={handleCheckoutSubmit} className="p-6 overflow-y-auto space-y-5">
-          {activePersona.isBlacklisted && (
-            <div className="p-4 rounded-2xl bg-[#FEE2E2] border-2 border-[#DC2626] text-[#991B1B] flex items-start gap-3">
-              <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
-              <div className="text-xs space-y-1">
-                <div className="font-bold">Account Under Review</div>
-                <p>
-                  Your account has an unresolved balance. New orders will be held for review by our support team before delivery.
-                </p>
-              </div>
-            </div>
-          )}
-
           {validationErrors.length > 0 && (
             <div className="p-4 rounded-2xl bg-[#FEE2E2] border border-[#FECACA] text-[#991B1B] text-xs space-y-1">
               <div className="font-bold flex items-center gap-1.5">

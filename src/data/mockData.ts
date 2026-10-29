@@ -45,7 +45,7 @@ export const DEMO_PERSONAS: ActivePersona[] = [
     id: 'persona-cus-blk',
     name: 'Vikram Mehta',
     role: 'CUSTOMER_INDIVIDUAL',
-    roleBadge: 'Restricted Customer',
+    roleBadge: 'Customer',
     subtitle: 'HSR Layout, Bengaluru',
     email: 'vikram.m88@mail.in',
     phone: '+91 99001 77889',

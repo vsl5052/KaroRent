@@ -168,7 +168,10 @@ export const FiveInvoiceLedgerView: React.FC = () => {
                       </span>
                       {booking && (
                         <span className="px-2.5 py-0.5 rounded-pill bg-hearth-parchment border border-hearth-border text-[11px] font-semibold text-hearth-umber">
-                          {booking.status}
+                          {booking.status === 'Flagged — Blacklist Review' &&
+                          activePersona.role !== 'PLATFORM_ADMIN'
+                            ? 'Order Processing'
+                            : booking.status}
                         </span>
                       )}
                     </div>

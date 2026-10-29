@@ -564,17 +564,19 @@ export const ThreeWayInspectionView: React.FC = () => {
               />
             </div>
 
-            <label className="flex items-center gap-2.5 p-3 rounded-xl bg-[#FEE2E2]/60 border border-[#FECACA] text-xs text-[#991B1B] cursor-pointer">
-              <input
-                type="checkbox"
-                checked={triggerBlacklistOnResolve}
-                onChange={(e) => setTriggerBlacklistOnResolve(e.target.checked)}
-                className="rounded text-[#991B1B]"
-              />
-              <span>
-                Block customer account due to severe damage or loss
-              </span>
-            </label>
+            {activePersona.role === 'PLATFORM_ADMIN' && (
+              <label className="flex items-center gap-2.5 p-3 rounded-xl bg-[#FEE2E2]/60 border border-[#FECACA] text-xs text-[#991B1B] cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={triggerBlacklistOnResolve}
+                  onChange={(e) => setTriggerBlacklistOnResolve(e.target.checked)}
+                  className="rounded text-[#991B1B]"
+                />
+                <span>
+                  Block customer account due to severe damage or loss
+                </span>
+              </label>
+            )}
 
             <button
               type="button"

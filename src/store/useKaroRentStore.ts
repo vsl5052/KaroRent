@@ -265,7 +265,7 @@ export const useKaroRentStore = create<KaroRentState>()(
         get().addToast({
           title: `Switched Account: ${found.name}`,
           description: `${found.roleBadge} (${found.subtitle})`,
-          variant: found.isBlacklisted || found.isTerminatedVendor ? 'warning' : 'info',
+          variant: found.isTerminatedVendor ? 'warning' : 'info',
         });
       },
 
@@ -441,9 +441,9 @@ export const useKaroRentStore = create<KaroRentState>()(
           }));
 
           get().addToast({
-            title: 'Booking Held for Trust & Safety Review',
-            description: `${bookingId} requires Administrator clearance due to prior account flags. Stock was not allocated.`,
-            variant: 'error',
+            title: `Order Received: ${bookingId}`,
+            description: `Your rental request for ${product.title} has been received and is being processed.`,
+            variant: 'success',
           });
 
           return { bookingId, interceptedByBlacklist: true };
@@ -2385,7 +2385,7 @@ export const useKaroRentStore = create<KaroRentState>()(
       },
     }),
     {
-      name: 'karorent-live-platform-v4',
+      name: 'karorent-live-platform-v5',
       partialize: (state) => ({
         darkMode: state.darkMode,
         customers: state.customers,

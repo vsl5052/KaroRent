@@ -166,7 +166,7 @@ export const TopEditorialHeader: React.FC = () => {
           <button
             onClick={() => setShowPersonaMenu(!showPersonaMenu)}
             className={`flex items-center gap-2 px-3.5 py-1.5 rounded-pill border text-xs font-medium transition-all ${
-              activePersona.isBlacklisted || activePersona.isTerminatedVendor
+              activePersona.isTerminatedVendor
                 ? 'bg-[#FEE2E2] text-[#991B1B] border-[#FECACA]'
                 : activePersona.role === 'PLATFORM_ADMIN'
                 ? 'bg-hearth-sage text-white border-hearth-sage shadow-sm'
@@ -174,7 +174,7 @@ export const TopEditorialHeader: React.FC = () => {
             }`}
             title="Switch Account"
           >
-            {activePersona.isBlacklisted || activePersona.isTerminatedVendor ? (
+            {activePersona.isTerminatedVendor ? (
               <ShieldAlert className="w-3.5 h-3.5 shrink-0" />
             ) : activePersona.role === 'PLATFORM_ADMIN' ? (
               <ShieldCheck className="w-3.5 h-3.5 shrink-0" />

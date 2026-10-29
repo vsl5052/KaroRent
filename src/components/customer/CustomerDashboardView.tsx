@@ -123,6 +123,12 @@ export const CustomerDashboardView: React.FC = () => {
             const product = masterProducts.find((p) => p.id === booking.productId);
             const isFlaggedBlacklist =
               booking.status === 'Flagged — Blacklist Review';
+            const showBlacklistToAdmin =
+              isFlaggedBlacklist && activePersona.role === 'PLATFORM_ADMIN';
+            const displayStatus =
+              isFlaggedBlacklist && activePersona.role !== 'PLATFORM_ADMIN'
+                ? 'Order Processing'
+                : booking.status;
             const isFinalBillSent = booking.status === 'Final Bill Sent';
             const isMultiStep = booking.workflowType === 'SITE_VISIT_MULTI_STEP';
 
@@ -130,7 +136,7 @@ export const CustomerDashboardView: React.FC = () => {
               <div
                 key={booking.id}
                 className={`rounded-3xl bg-hearth-card border p-6 shadow-hearth space-y-4 ${
-                  isFlaggedBlacklist
+                  showBlacklistToAdmin
                     ? 'border-2 border-[#DC2626] bg-[#FEE2E2]/20'
                     : 'border-hearth-border'
                 }`}
@@ -151,7 +157,7 @@ export const CustomerDashboardView: React.FC = () => {
                         </span>
                         <span
                           className={`text-xs font-semibold px-3 py-0.5 rounded-pill border ${
-                            isFlaggedBlacklist
+                            showBlacklistToAdmin
                               ? 'bg-[#FEE2E2] text-[#991B1B] border-[#FECACA]'
                               : booking.status === 'Active Rental' ||
                                 booking.status === 'Completed'
@@ -159,7 +165,7 @@ export const CustomerDashboardView: React.FC = () => {
                               : 'bg-[#FFEDD5] text-[#9A3412] border-[#FED7AA]'
                           }`}
                         >
-                          {booking.status}
+                          {displayStatus}
                         </span>
                       </div>
 
@@ -329,8 +335,8 @@ export const CustomerDashboardView: React.FC = () => {
                   </div>
                 )}
 
-                {/* Account Review Banner */}
-                {isFlaggedBlacklist && (
+                {/* Account Review Banner (Platform Operator Only) */}
+                {showBlacklistToAdmin && (
                   <div className="p-4 rounded-2xl bg-[#FEE2E2] border border-[#FECACA] text-[#991B1B] text-xs flex items-start gap-3">
                     <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
                     <div className="space-y-1">
