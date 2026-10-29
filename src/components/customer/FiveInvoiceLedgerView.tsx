@@ -48,6 +48,7 @@ export const FiveInvoiceLedgerView: React.FC = () => {
   const [selectedChargeFilter, setSelectedChargeFilter] = useState<
     InvoiceChargeType | 'ALL'
   >('ALL');
+  const [selectedProductFilter, setSelectedProductFilter] = useState<string>('ALL');
 
   const scopedInvoices = invoices.filter((inv) => {
     if (activePersona.role === 'PLATFORM_ADMIN') return true;
@@ -92,37 +93,73 @@ export const FiveInvoiceLedgerView: React.FC = () => {
           </p>
         </div>
 
-        {/* Filter Pills */}
-        <div className="flex flex-wrap items-center gap-2 pt-2">
-          <button
-            onClick={() => setSelectedChargeFilter('ALL')}
-            className={`px-3.5 py-1.5 rounded-pill text-xs font-medium border transition-all ${
-              selectedChargeFilter === 'ALL'
-                ? 'bg-hearth-terracotta text-white border-hearth-terracotta font-semibold'
-                : 'bg-hearth-oat text-hearth-umber border-hearth-border'
-            }`}
-          >
-            All ({scopedInvoices.length})
-          </button>
-          {(Object.keys(CHARGE_TYPE_BADGES) as InvoiceChargeType[]).map((type) => (
+        {/* Filter Controls Row */}
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+          {/* Filter Pills */}
+          <div className="flex flex-wrap items-center gap-2">
             <button
-              key={type}
-              onClick={() => setSelectedChargeFilter(type)}
-              className={`px-3 py-1.5 rounded-pill text-[11px] font-medium border transition-all ${
-                selectedChargeFilter === type
-                  ? 'bg-hearth-ink text-hearth-canvas border-hearth-ink font-semibold'
-                  : 'bg-hearth-card text-hearth-umber border-hearth-border hover:bg-hearth-oat'
+              onClick={() => setSelectedChargeFilter('ALL')}
+              className={`px-3.5 py-1.5 rounded-pill text-xs font-medium border transition-all ${
+                selectedChargeFilter === 'ALL'
+                  ? 'bg-hearth-terracotta text-white border-hearth-terracotta font-semibold'
+                  : 'bg-hearth-oat text-hearth-umber border-hearth-border'
               }`}
             >
-              {CHARGE_TYPE_BADGES[type].label}
+              All ({scopedInvoices.length})
             </button>
-          ))}
+            {(Object.keys(CHARGE_TYPE_BADGES) as InvoiceChargeType[]).map((type) => (
+              <button
+                key={type}
+                onClick={() => setSelectedChargeFilter(type)}
+                className={`px-3 py-1.5 rounded-pill text-[11px] font-medium border transition-all ${
+                  selectedChargeFilter === type
+                    ? 'bg-hearth-ink text-hearth-canvas border-hearth-ink font-semibold'
+                    : 'bg-hearth-card text-hearth-umber border-hearth-border hover:bg-hearth-oat'
+                }`}
+              >
+                {CHARGE_TYPE_BADGES[type].label}
+              </button>
+            ))}
+          </div>
+
+          {/* Select Product Dropdown */}
+          {allBookingIds.length > 0 && (
+            <div className="flex items-center gap-2">
+              <label className="text-xs font-semibold text-hearth-ink">
+                Select Product:
+              </label>
+              <select
+                value={selectedProductFilter}
+                onChange={(e) => setSelectedProductFilter(e.target.value)}
+                className="px-4 py-2 rounded-pill bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] text-xs font-mono font-bold text-[#166534] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#166534]/30 cursor-pointer transition-all"
+              >
+                <option value="ALL" className="bg-white text-hearth-ink font-sans font-normal">
+                  All Products ({allBookingIds.length})
+                </option>
+                {allBookingIds.map((bId) => {
+                  const b = bookings.find((bk) => bk.id === bId);
+                  const l = scopedDepositLedgers.find((d) => d.bookingId === bId);
+                  const title = b?.productTitle || l?.productTitle || bId;
+                  return (
+                    <option key={bId} value={bId} className="bg-white text-hearth-ink font-sans font-normal">
+                      {bId} — {title.slice(0, 26)}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Unified Product Cards combining Security Deposits + Invoices & Receipts */}
       <div className="space-y-6">
-        {allBookingIds.map((bookingId) => {
+        {allBookingIds
+          .filter(
+            (bookingId) =>
+              selectedProductFilter === 'ALL' || bookingId === selectedProductFilter
+          )
+          .map((bookingId) => {
           const booking = bookings.find((b) => b.id === bookingId);
           const ledger = scopedDepositLedgers.find((d) => d.bookingId === bookingId);
           const productInvoices = scopedInvoices.filter(

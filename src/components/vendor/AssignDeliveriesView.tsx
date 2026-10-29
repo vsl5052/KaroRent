@@ -254,10 +254,10 @@ export const AssignDeliveriesView: React.FC = () => {
             <select
               value={selectedAdminVendorId}
               onChange={(e) => setSelectedAdminVendorId(e.target.value)}
-              className="px-3.5 py-2 rounded-pill bg-hearth-oat border border-hearth-border text-xs font-mono font-semibold text-hearth-ink focus:outline-none"
+              className="px-3.5 py-2 rounded-pill bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] text-xs font-mono font-bold text-[#166534] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#166534]/30 cursor-pointer transition-all"
             >
               {vendors.map((v) => (
-                <option key={v.id} value={v.id}>
+                <option key={v.id} value={v.id} className="bg-white text-hearth-ink font-sans font-normal">
                   {v.id} — {v.displayName}
                 </option>
               ))}
@@ -804,10 +804,10 @@ export const AssignDeliveriesView: React.FC = () => {
                         setSelectedSlot(e.target.value);
                         setSelectedTechId('');
                       }}
-                      className="w-full px-3 py-2 rounded-xl bg-hearth-oat border border-hearth-border text-xs focus:outline-none focus:border-hearth-terracotta"
+                      className="w-full px-3 py-2 rounded-xl bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] text-xs font-semibold text-[#166534] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#166534]/30 cursor-pointer transition-all"
                     >
                       {TIME_SLOTS.map((slot) => (
-                        <option key={slot} value={slot}>
+                        <option key={slot} value={slot} className="bg-white text-hearth-ink font-sans font-normal">
                           {slot}
                         </option>
                       ))}

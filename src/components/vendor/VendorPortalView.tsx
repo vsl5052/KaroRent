@@ -162,10 +162,10 @@ export const VendorPortalView: React.FC = () => {
                 <select
                   value={selectedAdminVendorId}
                   onChange={(e) => setSelectedAdminVendorId(e.target.value)}
-                  className="px-3.5 py-2 rounded-pill bg-hearth-card border border-hearth-border text-xs font-mono font-semibold text-hearth-ink focus:outline-none"
+                  className="px-3.5 py-2 rounded-pill bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] text-xs font-mono font-bold text-[#166534] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#166534]/30 cursor-pointer transition-all"
                 >
                   {vendors.map((v) => (
-                    <option key={v.id} value={v.id}>
+                    <option key={v.id} value={v.id} className="bg-white text-hearth-ink font-sans font-normal">
                       {v.id} — {v.displayName}
                     </option>
                   ))}
@@ -368,10 +368,10 @@ export const VendorPortalView: React.FC = () => {
                                 onChange={(e) =>
                                   setReqEnabled(e.target.value === 'ENABLE')
                                 }
-                                className="w-full px-3 py-1.5 rounded-xl bg-hearth-card border border-hearth-border text-xs"
+                                className="w-full px-3 py-1.5 rounded-xl bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] text-xs font-semibold text-[#166534] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#166534]/30 cursor-pointer transition-all"
                               >
-                                <option value="ENABLE">Active</option>
-                                <option value="DISABLE">Paused</option>
+                                <option value="ENABLE" className="bg-white text-hearth-ink font-sans font-normal">Active</option>
+                                <option value="DISABLE" className="bg-white text-hearth-ink font-sans font-normal">Paused</option>
                               </select>
                             </div>
                             <div>
@@ -507,10 +507,10 @@ export const VendorPortalView: React.FC = () => {
                     onChange={(e) =>
                       setNewCategory(e.target.value as ProductCategory)
                     }
-                    className="w-full px-3.5 py-2 rounded-xl bg-hearth-card border border-hearth-border text-hearth-ink"
+                    className="w-full px-3.5 py-2 rounded-xl bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] text-xs font-semibold text-[#166534] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#166534]/30 cursor-pointer transition-all"
                   >
                     {PRODUCT_CATEGORIES.map((cat) => (
-                      <option key={cat} value={cat}>
+                      <option key={cat} value={cat} className="bg-white text-hearth-ink font-sans font-normal">
                         {cat}
                       </option>
                     ))}
@@ -553,11 +553,11 @@ export const VendorPortalView: React.FC = () => {
                   <select
                     value={newCondition}
                     onChange={(e) => setNewCondition(e.target.value as any)}
-                    className="w-full px-3.5 py-2 rounded-xl bg-hearth-card border border-hearth-border text-hearth-ink"
+                    className="w-full px-3.5 py-2 rounded-xl bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] text-xs font-semibold text-[#166534] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#166534]/30 cursor-pointer transition-all"
                   >
-                    <option value="Brand New">Brand New</option>
-                    <option value="Certified Mint">Certified Mint</option>
-                    <option value="Good — Refurbished">Good — Refurbished</option>
+                    <option value="Brand New" className="bg-white text-hearth-ink font-sans font-normal">Brand New</option>
+                    <option value="Certified Mint" className="bg-white text-hearth-ink font-sans font-normal">Certified Mint</option>
+                    <option value="Good — Refurbished" className="bg-white text-hearth-ink font-sans font-normal">Good — Refurbished</option>
                   </select>
                 </div>
 

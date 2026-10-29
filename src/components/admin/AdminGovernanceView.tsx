@@ -258,10 +258,10 @@ export const AdminGovernanceView: React.FC = () => {
                             [inv.id]: e.target.value,
                           })
                         }
-                        className="w-full px-3 py-2 rounded-xl bg-hearth-card border border-hearth-border text-xs font-medium"
+                        className="w-full px-3 py-2 rounded-xl bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] text-xs font-semibold text-[#166534] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#166534]/30 cursor-pointer transition-all"
                       >
                         {eligibleVendors.map((v) => (
-                          <option key={v.id} value={v.id}>
+                          <option key={v.id} value={v.id} className="bg-white text-hearth-ink font-sans font-normal">
                             {v.displayName} ({v.id}) — {v.serviceAreas.join(', ')}
                           </option>
                         ))}
@@ -353,10 +353,10 @@ export const AdminGovernanceView: React.FC = () => {
               <select
                 value={directSwitchInvId}
                 onChange={(e) => setDirectSwitchInvId(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-hearth-card border border-hearth-border"
+                className="w-full px-3 py-2 rounded-xl bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] text-xs font-semibold text-[#166534] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#166534]/30 cursor-pointer transition-all"
               >
                 {virtualInventory.map((i) => (
-                  <option key={i.id} value={i.id}>
+                  <option key={i.id} value={i.id} className="bg-white text-hearth-ink font-sans font-normal">
                     {i.id} — {i.productTitle.slice(0, 22)} ({i.owningVendorName})
                   </option>
                 ))}
@@ -369,10 +369,10 @@ export const AdminGovernanceView: React.FC = () => {
               <select
                 value={directSwitchNewVendorId}
                 onChange={(e) => setDirectSwitchNewVendorId(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-hearth-card border border-hearth-border"
+                className="w-full px-3 py-2 rounded-xl bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] text-xs font-semibold text-[#166534] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#166534]/30 cursor-pointer transition-all"
               >
                 {eligibleVendors.map((v) => (
-                  <option key={v.id} value={v.id}>
+                  <option key={v.id} value={v.id} className="bg-white text-hearth-ink font-sans font-normal">
                     {v.displayName} ({v.id})
                   </option>
                 ))}
@@ -430,10 +430,10 @@ export const AdminGovernanceView: React.FC = () => {
               <select
                 value={selectedPricingProductId}
                 onChange={(e) => handleSelectPricingProduct(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-hearth-oat border border-hearth-border font-medium"
+                className="w-full px-3 py-2 rounded-xl bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] text-xs font-semibold text-[#166534] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#166534]/30 cursor-pointer transition-all"
               >
                 {masterProducts.map((p) => (
-                  <option key={p.id} value={p.id}>
+                  <option key={p.id} value={p.id} className="bg-white text-hearth-ink font-sans font-normal">
                     {p.sku} — {p.title}
                   </option>
                 ))}

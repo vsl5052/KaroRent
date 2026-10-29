@@ -345,13 +345,13 @@ export const ForBusinessView: React.FC = () => {
                     <select
                       value={existingUser}
                       onChange={(e) => setExistingUser(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-hearth-card border border-hearth-border text-xs text-hearth-ink focus:border-hearth-terracotta focus:outline-none"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] text-xs font-semibold text-[#166534] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#166534]/30 cursor-pointer transition-all"
                     >
-                      <option value="">Select...</option>
-                      <option value="No — New to KaroRent">
+                      <option value="" className="bg-white text-hearth-ink font-sans font-normal">Select...</option>
+                      <option value="No — New to KaroRent" className="bg-white text-hearth-ink font-sans font-normal">
                         No — New to KaroRent
                       </option>
-                      <option value="Yes — Existing Customer">
+                      <option value="Yes — Existing Customer" className="bg-white text-hearth-ink font-sans font-normal">
                         Yes — Existing Customer
                       </option>
                     </select>
@@ -365,22 +365,22 @@ export const ForBusinessView: React.FC = () => {
                     <select
                       value={businessType}
                       onChange={(e) => setBusinessType(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-hearth-card border border-hearth-border text-xs text-hearth-ink focus:border-hearth-terracotta focus:outline-none"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] text-xs font-semibold text-[#166534] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#166534]/30 cursor-pointer transition-all"
                     >
-                      <option value="">Select business type...</option>
-                      <option value="Corporate Office / Startup">
+                      <option value="" className="bg-white text-hearth-ink font-sans font-normal">Select business type...</option>
+                      <option value="Corporate Office / Startup" className="bg-white text-hearth-ink font-sans font-normal">
                         Corporate Office / Startup
                       </option>
-                      <option value="Co-Living / Managed Residences">
+                      <option value="Co-Living / Managed Residences" className="bg-white text-hearth-ink font-sans font-normal">
                         Co-Living / Managed Residences
                       </option>
-                      <option value="Hotel / Boutique Stay / Serviced Apartments">
+                      <option value="Hotel / Boutique Stay / Serviced Apartments" className="bg-white text-hearth-ink font-sans font-normal">
                         Hotel / Boutique Stay / Serviced Apartments
                       </option>
-                      <option value="Real Estate / Show Flat Staging">
+                      <option value="Real Estate / Show Flat Staging" className="bg-white text-hearth-ink font-sans font-normal">
                         Real Estate / Show Flat Staging
                       </option>
-                      <option value="Employee Relocation / Guest House">
+                      <option value="Employee Relocation / Guest House" className="bg-white text-hearth-ink font-sans font-normal">
                         Employee Relocation / Guest House
                       </option>
                     </select>
@@ -396,16 +396,16 @@ export const ForBusinessView: React.FC = () => {
                   <select
                     value={isRegistered}
                     onChange={(e) => setIsRegistered(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-hearth-card border border-hearth-border text-xs text-hearth-ink focus:border-hearth-terracotta focus:outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] text-xs font-semibold text-[#166534] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#166534]/30 cursor-pointer transition-all"
                   >
-                    <option value="">Select...</option>
-                    <option value="Yes — Registered with GST & PAN">
+                    <option value="" className="bg-white text-hearth-ink font-sans font-normal">Select...</option>
+                    <option value="Yes — Registered with GST & PAN" className="bg-white text-hearth-ink font-sans font-normal">
                       Yes — Registered with GST & PAN
                     </option>
-                    <option value="Registration in Progress">
+                    <option value="Registration in Progress" className="bg-white text-hearth-ink font-sans font-normal">
                       Registration in progress
                     </option>
-                    <option value="No — Unregistered Entity">
+                    <option value="No — Unregistered Entity" className="bg-white text-hearth-ink font-sans font-normal">
                       No — Currently unregistered
                     </option>
                   </select>
@@ -420,19 +420,19 @@ export const ForBusinessView: React.FC = () => {
                   <select
                     value={interestArea}
                     onChange={(e) => setInterestArea(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-hearth-card border border-hearth-border text-xs text-hearth-ink focus:border-hearth-terracotta focus:outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] text-xs font-semibold text-[#166534] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#166534]/30 cursor-pointer transition-all"
                   >
-                    <option value="">Select interest...</option>
-                    <option value="Workstations, Desks & Office Seating">
+                    <option value="" className="bg-white text-hearth-ink font-sans font-normal">Select interest...</option>
+                    <option value="Workstations, Desks & Office Seating" className="bg-white text-hearth-ink font-sans font-normal">
                       Workstations, Desks & Office Seating
                     </option>
-                    <option value="Living, Lounge & Co-Living Furniture">
+                    <option value="Living, Lounge & Co-Living Furniture" className="bg-white text-hearth-ink font-sans font-normal">
                       Living, Lounge & Co-Living Furniture
                     </option>
-                    <option value="Air Conditioners, Purifiers & Appliances">
+                    <option value="Air Conditioners, Purifiers & Appliances" className="bg-white text-hearth-ink font-sans font-normal">
                       Air Conditioners, Purifiers & Appliances
                     </option>
-                    <option value="Complete Turnkey Package (Furniture + Appliances)">
+                    <option value="Complete Turnkey Package (Furniture + Appliances)" className="bg-white text-hearth-ink font-sans font-normal">
                       Complete Turnkey Package (Furniture + Appliances)
                     </option>
                   </select>

@@ -131,10 +131,10 @@ export const AuditObdReportsView: React.FC = () => {
                 value={obd.selectedOption}
                 onChange={(e) => updateObdDecision(obd.id, e.target.value)}
                 disabled={activePersona.role !== 'PLATFORM_ADMIN'}
-                className="w-full px-3 py-2 rounded-xl bg-hearth-card border border-hearth-border text-xs font-medium text-hearth-ink"
+                className="w-full px-3 py-2 rounded-xl bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] text-xs font-semibold text-[#166534] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#166534]/30 cursor-pointer transition-all disabled:opacity-60"
               >
                 {obd.options.map((opt) => (
-                  <option key={opt} value={opt}>
+                  <option key={opt} value={opt} className="bg-white text-hearth-ink font-sans font-normal">
                     {opt}
                   </option>
                 ))}

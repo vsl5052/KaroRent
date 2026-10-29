@@ -291,10 +291,10 @@ export const ThreeWayInspectionView: React.FC = () => {
           <select
             value={selectedBookingId}
             onChange={(e) => setSelectedBookingId(e.target.value)}
-            className="px-4 py-2 rounded-pill bg-hearth-oat border border-hearth-border text-xs font-mono font-semibold text-hearth-ink focus:outline-none"
+            className="px-4 py-2 rounded-pill bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] text-xs font-mono font-bold text-[#166534] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#166534]/30 cursor-pointer transition-all"
           >
             {returnBookings.map((b) => (
-              <option key={b.id} value={b.id}>
+              <option key={b.id} value={b.id} className="bg-white text-hearth-ink font-sans font-normal">
                 {b.id} — {b.productTitle.slice(0, 28)} ({b.returnRecord?.pickupStatus})
               </option>
             ))}
@@ -481,15 +481,15 @@ export const ThreeWayInspectionView: React.FC = () => {
                 <select
                   value={findingType}
                   onChange={(e) => setFindingType(e.target.value as any)}
-                  className="w-full px-3 py-2 rounded-xl bg-hearth-oat border border-hearth-border text-xs text-hearth-ink"
+                  className="w-full px-3 py-2 rounded-xl bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] text-xs font-semibold text-[#166534] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#166534]/30 cursor-pointer transition-all"
                 >
-                  <option value="Normal Wear">Normal Wear (₹0 Charge)</option>
-                  <option value="Customer Damage">Customer Damage</option>
-                  <option value="Transit Damage (Vendor Fault)">
+                  <option value="Normal Wear" className="bg-white text-hearth-ink font-sans font-normal">Normal Wear (₹0 Charge)</option>
+                  <option value="Customer Damage" className="bg-white text-hearth-ink font-sans font-normal">Customer Damage</option>
+                  <option value="Transit Damage (Vendor Fault)" className="bg-white text-hearth-ink font-sans font-normal">
                     Transit Damage (₹0 Customer Charge)
                   </option>
-                  <option value="Missing Accessory">Missing Accessory</option>
-                  <option value="Severe Damage / Loss">Severe Damage / Loss</option>
+                  <option value="Missing Accessory" className="bg-white text-hearth-ink font-sans font-normal">Missing Accessory</option>
+                  <option value="Severe Damage / Loss" className="bg-white text-hearth-ink font-sans font-normal">Severe Damage / Loss</option>
                 </select>
               </div>
 

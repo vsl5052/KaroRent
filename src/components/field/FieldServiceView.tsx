@@ -83,10 +83,10 @@ export const FieldServiceView: React.FC = () => {
           <select
             value={activeBooking.id}
             onChange={(e) => setSelectedBookingId(e.target.value)}
-            className="px-4 py-2 rounded-pill bg-hearth-oat border border-hearth-border text-xs font-mono font-semibold text-hearth-ink focus:outline-none"
+            className="px-4 py-2 rounded-pill bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] text-xs font-mono font-bold text-[#166534] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#166534]/30 cursor-pointer transition-all"
           >
             {operationalBookings.map((b) => (
-              <option key={b.id} value={b.id}>
+              <option key={b.id} value={b.id} className="bg-white text-hearth-ink font-sans font-normal">
                 {b.id} — {b.productTitle.slice(0, 28)} ({getTaskCategoryLabel(b)} •{' '}
                 {b.status})
               </option>
