@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import {
   Bell,
   ChevronDown,
+  LogIn,
   MapPin,
   Moon,
+  Phone,
   Search,
   ShieldCheck,
   Sun,
@@ -29,6 +31,7 @@ export const TopEditorialHeader: React.FC = () => {
     activePersona,
     personas,
     switchPersona,
+    loginWithMobile,
     selectedLocation,
     setSelectedLocation,
     searchQuery,
@@ -40,6 +43,25 @@ export const TopEditorialHeader: React.FC = () => {
   const [showLocationMenu, setShowLocationMenu] = useState(false);
   const [showPersonaMenu, setShowPersonaMenu] = useState(false);
   const [showNotifDrawer, setShowNotifDrawer] = useState(false);
+  const [accountMenuTab, setAccountMenuTab] = useState<'SWITCH' | 'MOBILE_LOGIN'>('SWITCH');
+  const [mobileLoginInput, setMobileLoginInput] = useState('');
+  const [mobileLoginError, setMobileLoginError] = useState<string | null>(null);
+
+  const handleMobileLoginSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setMobileLoginError(null);
+    if (!mobileLoginInput.trim()) {
+      setMobileLoginError('Please enter your registered mobile number.');
+      return;
+    }
+    const result = loginWithMobile(mobileLoginInput.trim());
+    if (result.success) {
+      setMobileLoginInput('');
+      setShowPersonaMenu(false);
+    } else {
+      setMobileLoginError(result.message);
+    }
+  };
 
   const scopedNotifications = notifications.filter((n) => {
     if (activePersona.role === 'PLATFORM_ADMIN') return true;
@@ -217,45 +239,156 @@ export const TopEditorialHeader: React.FC = () => {
           </button>
 
           {showPersonaMenu && (
-            <div className="absolute right-0 mt-2 w-72 sm:w-80 rounded-3xl bg-hearth-card border border-hearth-border shadow-hearth-lg p-3 z-50">
-              <div className="px-3 py-2 border-b border-hearth-border mb-2">
-                <div className="text-xs font-serif font-semibold text-hearth-ink flex items-center gap-1.5">
-                  <Users className="w-3.5 h-3.5 text-hearth-terracotta" />
-                  Switch Account
-                </div>
+            <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-3xl bg-hearth-card border border-hearth-border shadow-hearth-lg p-3 z-50">
+              {/* Top Tabs: Switch Account vs Mobile Login */}
+              <div className="flex items-center gap-1 p-1 rounded-2xl bg-hearth-oat border border-hearth-border mb-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAccountMenuTab('SWITCH');
+                    setMobileLoginError(null);
+                  }}
+                  className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors ${
+                    accountMenuTab === 'SWITCH'
+                      ? 'bg-hearth-card text-hearth-terracotta shadow-sm'
+                      : 'text-hearth-umber hover:text-hearth-ink'
+                  }`}
+                >
+                  <Users className="w-3.5 h-3.5" />
+                  <span>Website Accounts</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAccountMenuTab('MOBILE_LOGIN');
+                    setMobileLoginError(null);
+                  }}
+                  className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors ${
+                    accountMenuTab === 'MOBILE_LOGIN'
+                      ? 'bg-hearth-card text-hearth-terracotta shadow-sm'
+                      : 'text-hearth-umber hover:text-hearth-ink'
+                  }`}
+                >
+                  <Phone className="w-3.5 h-3.5" />
+                  <span>Mobile Login</span>
+                </button>
               </div>
-              <div className="space-y-1 max-h-80 overflow-y-auto pr-1">
-                {personas.map((p) => {
-                  const isSelected = p.id === activePersona.id;
-                  return (
-                    <button
-                      key={p.id}
-                      onClick={() => {
-                        switchPersona(p.id);
-                        setShowPersonaMenu(false);
-                      }}
-                      className={`w-full text-left p-2.5 rounded-2xl border transition-all flex items-start justify-between gap-2 ${
-                        isSelected
-                          ? 'bg-hearth-apricot border-hearth-terracotta'
-                          : 'bg-hearth-card hover:bg-hearth-oat border-transparent'
-                      }`}
-                    >
-                      <div>
-                        <div className="text-xs font-semibold text-hearth-ink">{p.name}</div>
-                        <div className="text-[11px] font-medium text-hearth-terracotta mt-0.5">
-                          {p.roleBadge}
+
+              {/* Tab 1: Account List */}
+              {accountMenuTab === 'SWITCH' && (
+                <div className="space-y-1 max-h-80 overflow-y-auto pr-1">
+                  {personas.map((p) => {
+                    const isSelected = p.id === activePersona.id;
+                    return (
+                      <button
+                        key={p.id}
+                        onClick={() => {
+                          switchPersona(p.id);
+                          setShowPersonaMenu(false);
+                        }}
+                        className={`w-full text-left p-2.5 rounded-2xl border transition-all flex items-start justify-between gap-2 ${
+                          isSelected
+                            ? 'bg-hearth-apricot border-hearth-terracotta'
+                            : 'bg-hearth-card hover:bg-hearth-oat border-transparent'
+                        }`}
+                      >
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="text-xs font-semibold text-hearth-ink truncate">
+                              {p.name}
+                            </span>
+                            <span className="px-2 py-0.5 rounded-pill bg-hearth-oat border border-hearth-border text-[9px] font-semibold text-hearth-umber">
+                              {p.roleBadge}
+                            </span>
+                          </div>
+                          <div className="text-[10px] text-hearth-taupe mt-0.5 truncate">
+                            {p.subtitle}
+                          </div>
+                          <div className="text-[10px] text-hearth-terracotta font-mono mt-0.5 flex items-center gap-1">
+                            <Phone className="w-2.5 h-2.5" />
+                            <span>{p.phone}</span>
+                          </div>
                         </div>
-                        <div className="text-[10px] text-hearth-taupe mt-0.5">{p.subtitle}</div>
-                      </div>
-                      {isSelected && (
-                        <span className="px-2 py-0.5 rounded-pill bg-hearth-terracotta text-white text-[10px]">
-                          Active
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
+                        {isSelected && (
+                          <span className="px-2 py-0.5 rounded-pill bg-hearth-terracotta text-white text-[10px] shrink-0">
+                            Active
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Tab 2: Mobile Number Login */}
+              {accountMenuTab === 'MOBILE_LOGIN' && (
+                <form
+                  onSubmit={handleMobileLoginSubmit}
+                  className="p-2 space-y-3 text-xs"
+                >
+                  <div>
+                    <label className="block text-[11px] font-semibold text-hearth-ink mb-1">
+                      Enter Registered Mobile Number
+                    </label>
+                    <div className="relative flex items-center">
+                      <Phone className="w-3.5 h-3.5 text-hearth-taupe absolute left-3 pointer-events-none" />
+                      <input
+                        type="tel"
+                        value={mobileLoginInput}
+                        onChange={(e) => {
+                          setMobileLoginInput(e.target.value);
+                          setMobileLoginError(null);
+                        }}
+                        placeholder="e.g. +91 97400 55667 or 9740055667"
+                        className="w-full pl-9 pr-3 py-2 rounded-xl bg-hearth-oat border border-hearth-border font-mono text-xs text-hearth-ink focus:outline-none focus:border-hearth-terracotta"
+                        autoFocus
+                      />
+                    </div>
+                    <span className="text-[10px] text-hearth-taupe mt-1 block">
+                      Field technicians and accounts registered by vendors can log in using their phone number.
+                    </span>
+                  </div>
+
+                  {mobileLoginError && (
+                    <div className="p-2.5 rounded-xl bg-[#FEE2E2] border border-[#FECACA] text-[#991B1B] text-[11px] font-medium leading-relaxed">
+                      {mobileLoginError}
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    className="w-full spring-btn py-2 px-4 rounded-xl bg-hearth-terracotta hover:bg-hearth-kiln text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm"
+                  >
+                    <LogIn className="w-3.5 h-3.5" />
+                    <span>Log In with Mobile</span>
+                  </button>
+
+                  {/* Quick-fill shortcut pills for registered technician mobile numbers */}
+                  <div className="pt-2 border-t border-hearth-border space-y-1.5">
+                    <div className="text-[10px] font-semibold uppercase text-hearth-taupe tracking-wider">
+                      Quick-Fill Registered Numbers:
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {personas
+                        .filter((p) => p.role === 'FIELD_PERSONNEL')
+                        .map((p) => (
+                          <button
+                            key={p.id}
+                            type="button"
+                            onClick={() => {
+                              setMobileLoginInput(p.phone);
+                              setMobileLoginError(null);
+                            }}
+                            className="px-2 py-1 rounded-lg bg-hearth-oat hover:bg-hearth-apricot text-[10px] font-mono text-hearth-umber transition-colors flex items-center gap-1 border border-hearth-border"
+                          >
+                            <span>{p.name.split(' ')[0]}:</span>
+                            <span className="font-semibold">{p.phone.slice(-5)}</span>
+                          </button>
+                        ))}
+                    </div>
+                  </div>
+                </form>
+              )}
             </div>
           )}
         </div>

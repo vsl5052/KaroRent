@@ -529,6 +529,11 @@ export const VendorStaffView: React.FC = () => {
                 </span>
               </div>
 
+              {/* Account & Role Auto-Creation Notice */}
+              <div className="p-3 rounded-2xl bg-hearth-oat border border-hearth-border text-[11px] text-hearth-umber leading-relaxed">
+                🔐 <strong>Automatic Website Account & Role:</strong> Registering this technician automatically creates their <strong>Field Technician</strong> account on the website. They can immediately log in using this mobile number to view and fulfill their assigned deliveries and visits.
+              </div>
+
               {/* Service Areas */}
               <div>
                 <label className="block text-xs font-semibold text-hearth-ink mb-1">

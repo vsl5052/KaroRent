@@ -107,6 +107,12 @@ interface KaroRentState {
   markAllNotificationsRead: () => void;
   resetDemoState: () => void;
 
+  loginWithMobile: (mobileNumber: string) => {
+    success: boolean;
+    message: string;
+    persona?: ActivePersona;
+  };
+
   addFieldTechnician: (payload: {
     fullName: string;
     phone: string;
@@ -2601,10 +2607,23 @@ export const useKaroRentStore = create<KaroRentState>()(
           createdAt: nowIST().split(' ')[0],
         };
 
+        const newPersonaId = `persona-${newTech.id}`;
+        const newPersona: ActivePersona = {
+          id: newPersonaId,
+          name: newTech.fullName,
+          role: 'FIELD_PERSONNEL',
+          roleBadge: 'Field Technician',
+          subtitle: `${vendor.displayName} • ${newTech.serviceAreas[0] || 'Bengaluru'}`,
+          email: `${newTech.fullName.toLowerCase().replace(/[^a-z0-9]/g, '.')}@karorent.in`,
+          phone: newTech.phone,
+          vendorId: vendor.id,
+        };
+
         set((s) => ({
           isSimulatingLatency: false,
           latencyActionLabel: null,
           fieldTechnicians: [newTech, ...s.fieldTechnicians],
+          personas: [...s.personas, newPersona],
           auditLogs: [
             {
               id: `AUD-${Date.now()}`,
@@ -2784,11 +2803,77 @@ export const useKaroRentStore = create<KaroRentState>()(
           variant: 'success',
         });
       },
+
+      loginWithMobile: (mobileNumber: string) => {
+        const cleanInput = mobileNumber.replace(/\D/g, '');
+        if (cleanInput.length < 5) {
+          get().addToast({
+            title: 'Invalid Mobile Number',
+            description: 'Please enter a valid mobile number (at least 5 digits).',
+            variant: 'error',
+          });
+          return { success: false, message: 'Please enter a valid mobile number.' };
+        }
+
+        const state = get();
+        // Look in personas
+        let matched = state.personas.find((p) => {
+          const cleanPhone = p.phone.replace(/\D/g, '');
+          return cleanPhone.endsWith(cleanInput) || cleanInput.endsWith(cleanPhone);
+        });
+
+        // If not in personas, also check fieldTechnicians
+        if (!matched) {
+          const tech = state.fieldTechnicians.find((t) => {
+            const cleanPhone = t.phone.replace(/\D/g, '');
+            return cleanPhone.endsWith(cleanInput) || cleanInput.endsWith(cleanPhone);
+          });
+          if (tech) {
+            matched = {
+              id: `persona-${tech.id}`,
+              name: tech.fullName,
+              role: 'FIELD_PERSONNEL',
+              roleBadge: 'Field Technician',
+              subtitle: `${tech.vendorName} • ${tech.serviceAreas[0] || 'Bengaluru'}`,
+              email: `${tech.fullName.toLowerCase().replace(/[^a-z0-9]/g, '.')}@karorent.in`,
+              phone: tech.phone,
+              vendorId: tech.vendorId,
+            };
+            set((s) => ({ personas: [...s.personas, matched!] }));
+          }
+        }
+
+        if (matched) {
+          let defaultTab: NavigationTab = 'MARKETPLACE';
+          if (matched.role === 'VENDOR_OWNER') defaultTab = 'VENDOR_PORTAL';
+          if (matched.role === 'FIELD_PERSONNEL') defaultTab = 'FIELD_OPERATIONS';
+          if (matched.role === 'PLATFORM_ADMIN') defaultTab = 'ADMIN_GOVERNANCE';
+
+          set({ activePersona: matched, activeTab: defaultTab });
+          get().addToast({
+            title: `Welcome, ${matched.name}!`,
+            description: `Logged in as ${matched.roleBadge} with mobile ${matched.phone}.`,
+            variant: 'success',
+          });
+          return { success: true, message: `Logged in as ${matched.name}`, persona: matched };
+        }
+
+        get().addToast({
+          title: 'Mobile Not Found',
+          description: `No account or field technician found with mobile ${mobileNumber}.`,
+          variant: 'error',
+        });
+        return {
+          success: false,
+          message: `No account or field technician found with mobile number ${mobileNumber}.`,
+        };
+      },
     }),
     {
-      name: 'karorent-live-platform-v9',
+      name: 'karorent-live-platform-v10',
       partialize: (state) => ({
         darkMode: state.darkMode,
+        personas: state.personas,
         customers: state.customers,
         vendors: state.vendors,
         masterProducts: state.masterProducts,
