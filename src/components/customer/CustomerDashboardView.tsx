@@ -5,6 +5,7 @@ import {
   CheckCircle2,
   FileSignature,
   MapPin,
+  Phone,
   ReceiptIndianRupee,
   Ruler,
   ShieldAlert,
@@ -330,6 +331,69 @@ export const CustomerDashboardView: React.FC = () => {
                           </div>
                         </div>
                       )}
+                  </div>
+                )}
+
+                {/* Assigned Field Technician Details (Received by Customer) */}
+                {(booking.deliveryAssignment ||
+                  (booking.siteVisit?.assignedTechnician &&
+                    booking.siteVisit.status === 'Scheduled') ||
+                  (booking.returnRecord?.assignedPickupStaff &&
+                    booking.returnRecord.pickupStatus === 'Scheduled')) && (
+                  <div className="p-4 rounded-2xl bg-hearth-oat/90 border border-hearth-border flex flex-wrap items-center justify-between gap-4 text-xs">
+                    <div className="flex items-center gap-3.5">
+                      <img
+                        src={
+                          booking.deliveryAssignment?.technicianPhoto ||
+                          booking.returnRecord?.assignedStaffPhoto ||
+                          'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80'
+                        }
+                        alt="Assigned Technician"
+                        className="w-12 h-12 rounded-2xl object-cover border-2 border-hearth-terracotta shrink-0 shadow-sm"
+                      />
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-[10px] uppercase font-mono tracking-wider px-2 py-0.5 rounded-pill bg-hearth-apricot text-hearth-terracotta font-semibold">
+                            {booking.deliveryAssignment?.reason ||
+                              (booking.returnRecord?.assignedPickupStaff
+                                ? 'Return Pickup'
+                                : 'Home Measurement Visit')}
+                          </span>
+                          <span className="text-[11px] text-hearth-taupe">
+                            Assigned Field Technician
+                          </span>
+                        </div>
+                        <div className="font-serif font-bold text-sm text-hearth-ink mt-0.5">
+                          {booking.deliveryAssignment?.technicianName ||
+                            booking.returnRecord?.assignedPickupStaff ||
+                            booking.siteVisit?.assignedTechnician}
+                        </div>
+                        <div className="text-[11px] text-hearth-umber flex items-center gap-1 font-mono mt-0.5">
+                          <Phone className="w-3.5 h-3.5 text-hearth-terracotta" />
+                          <span>
+                            {booking.deliveryAssignment?.technicianPhone ||
+                              booking.returnRecord?.assignedStaffPhone ||
+                              '+91 97400 55667'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="text-right space-y-1">
+                      <div className="text-[11px] text-hearth-taupe">Scheduled Visit Time</div>
+                      <div className="font-semibold text-hearth-ink">
+                        {booking.deliveryAssignment?.scheduledDate ||
+                          booking.returnRecord?.scheduledDate ||
+                          booking.siteVisit?.scheduledDate}
+                      </div>
+                      {(booking.deliveryAssignment?.scheduledTimeSlot ||
+                        booking.returnRecord?.scheduledTimeSlot) && (
+                        <div className="text-[11px] font-mono text-hearth-terracotta font-semibold">
+                          {booking.deliveryAssignment?.scheduledTimeSlot ||
+                            booking.returnRecord?.scheduledTimeSlot}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 

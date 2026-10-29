@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   Building2,
+  CalendarCheck,
   CalendarClock,
   Camera,
   FileSignature,
@@ -11,6 +12,7 @@ import {
   ReceiptIndianRupee,
   ShieldAlert,
   Truck,
+  Users,
   WalletCards,
 } from 'lucide-react';
 import { useKaroRentStore } from '../../store/useKaroRentStore';
@@ -48,6 +50,15 @@ export const WorkspaceSidebar: React.FC = () => {
   ).length;
   const pendingSettlementsCount = settlements.filter((s) => s.status === 'Pending Approval').length;
   const openDisputesCount = disputeCases.filter((d) => d.status !== 'Decided' && d.status !== 'Closed').length;
+  const unassignedDeliveriesCount = bookings.filter(
+    (b) =>
+      !b.deliveryCompletedAt &&
+      (b.status === 'Confirmed' ||
+        b.status === 'Site Visit Scheduled' ||
+        b.status === 'Return Requested') &&
+      !b.deliveryAssignment &&
+      (!b.siteVisit || !b.siteVisit.assignedTechnician)
+  ).length;
 
   const navItems: NavItemConfig[] = [
     {
@@ -96,6 +107,20 @@ export const WorkspaceSidebar: React.FC = () => {
       label: 'Vendor Inventory',
       icon: <Building2 className="w-4 h-4" />,
       badgeCount: stagedCount || undefined,
+      badgeVariant: 'terracotta',
+      allowedRoles: ['VENDOR_OWNER', 'PLATFORM_ADMIN'],
+    },
+    {
+      id: 'VENDOR_STAFF',
+      label: 'Staff',
+      icon: <Users className="w-4 h-4" />,
+      allowedRoles: ['VENDOR_OWNER', 'PLATFORM_ADMIN'],
+    },
+    {
+      id: 'ASSIGN_DELIVERIES',
+      label: 'Assign Deliveries',
+      icon: <CalendarCheck className="w-4 h-4" />,
+      badgeCount: unassignedDeliveriesCount || undefined,
       badgeVariant: 'terracotta',
       allowedRoles: ['VENDOR_OWNER', 'PLATFORM_ADMIN'],
     },

@@ -6,7 +6,9 @@ import {
   BlacklistEntry,
   BookingOrder,
   CustomerAccount,
+  DeliveryAssignment,
   DisputeCaseRecord,
+  FieldTechnician,
   FinancialInvoiceDocument,
   NavigationTab,
   OpenBusinessDecisionItem,
@@ -31,6 +33,7 @@ import {
   INITIAL_CUSTOMERS,
   INITIAL_DEPOSIT_LEDGERS,
   INITIAL_DISPUTE_CASES,
+  INITIAL_FIELD_TECHNICIANS,
   INITIAL_INVOICES,
   INITIAL_MASTER_PRODUCTS,
   INITIAL_NOTIFICATIONS,
@@ -74,6 +77,7 @@ interface KaroRentState {
   masterProducts: PlatformMasterProduct[];
   virtualInventory: VirtualInventoryItem[];
   vendorProductRates: VendorProductRateEntry[];
+  fieldTechnicians: FieldTechnician[];
   bookings: BookingOrder[];
   agreements: RentalAgreementRecord[];
   invoices: FinancialInvoiceDocument[];
@@ -102,6 +106,22 @@ interface KaroRentState {
   dismissToast: (id: string) => void;
   markAllNotificationsRead: () => void;
   resetDemoState: () => void;
+
+  addFieldTechnician: (payload: {
+    fullName: string;
+    phone: string;
+    photoUrl: string;
+    serviceAreas?: string[];
+  }) => Promise<void>;
+
+  assignTechnicianToTask: (payload: {
+    taskId: string;
+    taskType: 'DELIVERY' | 'SITE_VISIT' | 'PICKUP' | 'MAINTENANCE';
+    technicianId: string;
+    scheduledDate: string;
+    scheduledTimeSlot: string;
+    notes?: string;
+  }) => Promise<void>;
 
   createBookingOrder: (payload: {
     productId: string;
@@ -245,6 +265,7 @@ export const useKaroRentStore = create<KaroRentState>()(
       masterProducts: INITIAL_MASTER_PRODUCTS,
       virtualInventory: INITIAL_VIRTUAL_INVENTORY,
       vendorProductRates: INITIAL_VENDOR_PRODUCT_RATES,
+      fieldTechnicians: INITIAL_FIELD_TECHNICIANS,
       bookings: INITIAL_BOOKINGS,
       agreements: INITIAL_AGREEMENTS,
       invoices: INITIAL_INVOICES,
@@ -2555,9 +2576,217 @@ export const useKaroRentStore = create<KaroRentState>()(
           variant: 'success',
         });
       },
+
+      addFieldTechnician: async (payload) => {
+        set({ isSimulatingLatency: true, latencyActionLabel: 'Registering Field Technician...' });
+        await simulateLatency(300);
+
+        const state = get();
+        const activeVendorId = state.activePersona.vendorId || 'VEN-201';
+        const vendor = state.vendors.find((v) => v.id === activeVendorId) || state.vendors[0];
+        const newTechId = `TECH-${Math.floor(100 + Math.random() * 899)}`;
+
+        const newTech: FieldTechnician = {
+          id: newTechId,
+          vendorId: vendor.id,
+          vendorName: vendor.displayName,
+          fullName: payload.fullName.trim(),
+          phone: payload.phone.trim(),
+          photoUrl: payload.photoUrl.trim(),
+          status: 'Active',
+          serviceAreas:
+            payload.serviceAreas && payload.serviceAreas.length > 0
+              ? payload.serviceAreas
+              : vendor.serviceAreas,
+          createdAt: nowIST().split(' ')[0],
+        };
+
+        set((s) => ({
+          isSimulatingLatency: false,
+          latencyActionLabel: null,
+          fieldTechnicians: [newTech, ...s.fieldTechnicians],
+          auditLogs: [
+            {
+              id: `AUD-${Date.now()}`,
+              timestamp: nowIST(),
+              actorName: s.activePersona.name,
+              actorRole: s.activePersona.roleBadge,
+              moduleCode: 'Staff Management',
+              actionSummary: `Registered Field Technician ${newTech.fullName} (${newTech.id})`,
+              affectedRecordId: newTech.id,
+              priorValue: 'Unregistered',
+              newValue: `Active Staff: ${newTech.fullName} (${newTech.phone})`,
+              mandatoryReason: 'Vendor onboarding field personnel for deliveries and visits.',
+            },
+            ...s.auditLogs,
+          ],
+        }));
+
+        get().addToast({
+          title: `Technician ${newTech.fullName} Added`,
+          description: `Mobile ${newTech.phone} registered. Ready for delivery & visit assignments.`,
+          variant: 'success',
+        });
+      },
+
+      assignTechnicianToTask: async (payload) => {
+        set({
+          isSimulatingLatency: true,
+          latencyActionLabel: 'Assigning Field Technician & Notifying Customer...',
+        });
+        await simulateLatency(350);
+
+        const state = get();
+        const tech = state.fieldTechnicians.find((t) => t.id === payload.technicianId);
+        if (!tech) return;
+
+        let customerId = '';
+        let productTitle = '';
+        let taskReasonLabel = '';
+
+        if (payload.taskType === 'DELIVERY') {
+          taskReasonLabel = 'Delivery & Setup';
+          const b = state.bookings.find((item) => item.id === payload.taskId);
+          if (b) {
+            customerId = b.customerId;
+            productTitle = b.productTitle;
+          }
+        } else if (payload.taskType === 'SITE_VISIT') {
+          taskReasonLabel = 'Home Measurement Visit';
+          const b = state.bookings.find((item) => item.id === payload.taskId);
+          if (b) {
+            customerId = b.customerId;
+            productTitle = b.productTitle;
+          }
+        } else if (payload.taskType === 'PICKUP') {
+          taskReasonLabel = 'Return Pickup';
+          const b = state.bookings.find((item) => item.id === payload.taskId);
+          if (b) {
+            customerId = b.customerId;
+            productTitle = b.productTitle;
+          }
+        } else if (payload.taskType === 'MAINTENANCE') {
+          taskReasonLabel = 'Maintenance & Repair';
+          const t = state.serviceTickets.find((item) => item.id === payload.taskId);
+          if (t) {
+            customerId = t.customerId;
+            productTitle = t.productTitle;
+          }
+        }
+
+        const assignment: DeliveryAssignment = {
+          technicianId: tech.id,
+          technicianName: tech.fullName,
+          technicianPhone: tech.phone,
+          technicianPhoto: tech.photoUrl,
+          scheduledDate: payload.scheduledDate,
+          scheduledTimeSlot: payload.scheduledTimeSlot,
+          taskType: payload.taskType,
+          reason: taskReasonLabel,
+          assignedAt: nowIST(),
+          notes: payload.notes,
+        };
+
+        const newNotification: PlatformNotification = {
+          id: `NTF-${Date.now()}`,
+          eventCode: 'Staff Assigned',
+          title: `Technician Assigned: ${tech.fullName}`,
+          message: `${tech.fullName} (${tech.phone}) has been scheduled for your ${productTitle} ${taskReasonLabel.toLowerCase()} on ${payload.scheduledDate} at ${payload.scheduledTimeSlot}.`,
+          recipientRole: 'CUSTOMER_INDIVIDUAL',
+          customerScopeId: customerId || undefined,
+          category: 'Fulfilment & Pickup',
+          priority: 'high',
+          read: false,
+          timestamp: 'Just now',
+          linkedView: 'MY_RENTALS',
+        };
+
+        set((s) => ({
+          isSimulatingLatency: false,
+          latencyActionLabel: null,
+          bookings: s.bookings.map((b) => {
+            if (b.id !== payload.taskId) return b;
+            if (payload.taskType === 'DELIVERY') {
+              return {
+                ...b,
+                status: 'Confirmed',
+                deliveryAssignment: assignment,
+              };
+            }
+            if (payload.taskType === 'SITE_VISIT') {
+              return {
+                ...b,
+                deliveryAssignment: assignment,
+                siteVisit: b.siteVisit
+                  ? {
+                      ...b.siteVisit,
+                      assignedTechnician: tech.fullName,
+                      scheduledDate: `${payload.scheduledDate} (${payload.scheduledTimeSlot})`,
+                      status: 'Scheduled',
+                    }
+                  : undefined,
+              };
+            }
+            if (payload.taskType === 'PICKUP') {
+              return {
+                ...b,
+                returnRecord: b.returnRecord
+                  ? {
+                      ...b.returnRecord,
+                      assignedPickupStaff: tech.fullName,
+                      assignedStaffId: tech.id,
+                      assignedStaffPhone: tech.phone,
+                      assignedStaffPhoto: tech.photoUrl,
+                      scheduledDate: payload.scheduledDate,
+                      scheduledTimeSlot: payload.scheduledTimeSlot,
+                      preferredPickupSlot: `${payload.scheduledDate} (${payload.scheduledTimeSlot})`,
+                      pickupStatus: 'Scheduled',
+                    }
+                  : undefined,
+              };
+            }
+            return b;
+          }),
+          serviceTickets: s.serviceTickets.map((st) => {
+            if (st.id !== payload.taskId) return st;
+            return {
+              ...st,
+              status: 'Scheduled',
+              assignedTechnicianId: tech.id,
+              assignedTechnicianName: tech.fullName,
+              assignedTechnicianPhone: tech.phone,
+              assignedTechnicianPhoto: tech.photoUrl,
+              scheduledDate: payload.scheduledDate,
+              scheduledTimeSlot: payload.scheduledTimeSlot,
+            };
+          }),
+          notifications: customerId ? [newNotification, ...s.notifications] : s.notifications,
+          auditLogs: [
+            {
+              id: `AUD-${Date.now()}`,
+              timestamp: nowIST(),
+              actorName: s.activePersona.name,
+              actorRole: s.activePersona.roleBadge,
+              moduleCode: 'Task Assignment',
+              actionSummary: `Assigned ${tech.fullName} to ${taskReasonLabel} for order ${payload.taskId} (${payload.scheduledDate} ${payload.scheduledTimeSlot})`,
+              affectedRecordId: payload.taskId,
+              priorValue: 'Unassigned',
+              newValue: `Technician: ${tech.fullName} (${tech.phone}) • ${payload.scheduledDate} ${payload.scheduledTimeSlot}`,
+              mandatoryReason: 'Vendor assigned technician for customer fulfillment.',
+            },
+            ...s.auditLogs,
+          ],
+        }));
+
+        get().addToast({
+          title: `Technician Assigned: ${tech.fullName}`,
+          description: `Scheduled for ${taskReasonLabel} on ${payload.scheduledDate} (${payload.scheduledTimeSlot}). Customer has been notified.`,
+          variant: 'success',
+        });
+      },
     }),
     {
-      name: 'karorent-live-platform-v8',
+      name: 'karorent-live-platform-v9',
       partialize: (state) => ({
         darkMode: state.darkMode,
         customers: state.customers,
@@ -2565,6 +2794,7 @@ export const useKaroRentStore = create<KaroRentState>()(
         masterProducts: state.masterProducts,
         virtualInventory: state.virtualInventory,
         vendorProductRates: state.vendorProductRates,
+        fieldTechnicians: state.fieldTechnicians,
         bookings: state.bookings,
         agreements: state.agreements,
         invoices: state.invoices,

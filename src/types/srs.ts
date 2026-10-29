@@ -314,6 +314,31 @@ export interface RentalAgreementRecord {
   amendments: AgreementAmendment[];
 }
 
+export interface DeliveryAssignment {
+  technicianId: string;
+  technicianName: string;
+  technicianPhone: string;
+  technicianPhoto: string;
+  scheduledDate: string;
+  scheduledTimeSlot: string;
+  taskType: 'DELIVERY' | 'SITE_VISIT' | 'PICKUP' | 'MAINTENANCE';
+  reason: string;
+  assignedAt: string;
+  notes?: string;
+}
+
+export interface FieldTechnician {
+  id: string; // e.g. 'TECH-101'
+  vendorId: string;
+  vendorName: string;
+  fullName: string;
+  phone: string;
+  photoUrl: string;
+  status: 'Active' | 'On Duty' | 'On Leave';
+  serviceAreas: string[];
+  createdAt: string;
+}
+
 export interface ReturnInspectionRecord {
   returnRequestedAt: string;
   preferredPickupSlot: string;
@@ -327,6 +352,11 @@ export interface ReturnInspectionRecord {
   customerPremisePickupPhotos?: string[];
   pickupPhotoExifTimestamp?: string;
   pickupPhotoGeoTag?: string;
+  assignedStaffId?: string;
+  assignedStaffPhone?: string;
+  assignedStaffPhoto?: string;
+  scheduledDate?: string;
+  scheduledTimeSlot?: string;
   warehouseReturnPhoto?: string;
   warehouseReturnPhotos?: string[];
   warehouseInspectionFinding?: 'Normal Wear' | 'Customer Damage' | 'Transit Damage (Vendor Fault)' | 'Missing Accessory' | 'Severe Damage / Loss';
@@ -372,6 +402,7 @@ export interface BookingOrder {
   agreementId: string;
   deliveryCompletedAt?: string;
   deliveryEvidencePhoto?: string;
+  deliveryAssignment?: DeliveryAssignment;
   returnRecord?: ReturnInspectionRecord;
   createdAt: string;
 }
@@ -448,6 +479,12 @@ export interface ServiceMaintenanceTicket {
   status: 'New' | 'Scheduled' | 'In Progress' | 'Resolved' | 'Closed';
   replacementRequested: boolean;
   replacementAssetSerial?: string;
+  assignedTechnicianId?: string;
+  assignedTechnicianName?: string;
+  assignedTechnicianPhone?: string;
+  assignedTechnicianPhoto?: string;
+  scheduledDate?: string;
+  scheduledTimeSlot?: string;
   customerReplacementConsent: boolean;
   downtimeCreditAmount: number;
   createdAt: string;
@@ -603,6 +640,8 @@ export type NavigationTab =
   | 'INVOICES_DEPOSITS'
   | 'THREE_WAY_INSPECTION'
   | 'VENDOR_PORTAL'
+  | 'VENDOR_STAFF'
+  | 'ASSIGN_DELIVERIES'
   | 'FIELD_OPERATIONS'
   | 'ADMIN_GOVERNANCE'
   | 'BLACKLIST_REGISTRY'

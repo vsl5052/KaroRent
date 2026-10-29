@@ -11,6 +11,8 @@ const TAB_TITLES: Record<NavigationTab, string> = {
   INVOICES_DEPOSITS: 'Payments & Deposits',
   THREE_WAY_INSPECTION: 'Returns',
   VENDOR_PORTAL: 'Vendor Inventory',
+  VENDOR_STAFF: 'Staff',
+  ASSIGN_DELIVERIES: 'Assign Deliveries',
   FIELD_OPERATIONS: 'Deliveries & Visits',
   ADMIN_GOVERNANCE: 'Catalog & Vendors',
   BLACKLIST_REGISTRY: 'Blocked Accounts',

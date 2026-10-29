@@ -12,6 +12,8 @@ import { AgreementReaderModal } from './components/customer/AgreementReaderModal
 import { FiveInvoiceLedgerView } from './components/customer/FiveInvoiceLedgerView';
 import { ThreeWayInspectionView } from './components/inspection/ThreeWayInspectionView';
 import { VendorPortalView } from './components/vendor/VendorPortalView';
+import { VendorStaffView } from './components/vendor/VendorStaffView';
+import { AssignDeliveriesView } from './components/vendor/AssignDeliveriesView';
 import { FieldServiceView } from './components/field/FieldServiceView';
 import { AdminGovernanceView } from './components/admin/AdminGovernanceView';
 import { BlacklistRegistryView } from './components/admin/BlacklistRegistryView';
@@ -51,6 +53,10 @@ export const App: React.FC = () => {
         return <ThreeWayInspectionView />;
       case 'VENDOR_PORTAL':
         return <VendorPortalView />;
+      case 'VENDOR_STAFF':
+        return <VendorStaffView />;
+      case 'ASSIGN_DELIVERIES':
+        return <AssignDeliveriesView />;
       case 'FIELD_OPERATIONS':
         return <FieldServiceView />;
       case 'ADMIN_GOVERNANCE':
