@@ -280,7 +280,7 @@ export const useKaroRentStore = create<KaroRentState>()(
         get().addToast({
           title: `Switched Account: ${found.name}`,
           description: `${found.roleBadge} (${found.subtitle})`,
-          variant: found.isTerminatedVendor ? 'warning' : 'info',
+          variant: 'info',
         });
       },
 
@@ -2509,24 +2509,41 @@ export const useKaroRentStore = create<KaroRentState>()(
           effectiveDate: '2026-10-29',
         };
 
+        const isRestrictedVendor =
+          currentVendor.status.includes('Terminat') ||
+          Boolean(state.activePersona.isTerminatedVendor);
+
         set((s) => ({
           isSimulatingLatency: false,
           latencyActionLabel: null,
           masterProducts: [newMasterProduct, ...s.masterProducts],
           virtualInventory: [newInventoryItem, ...s.virtualInventory],
           vendorProductRates: [newRateEntry, ...s.vendorProductRates],
+          blacklist: isRestrictedVendor
+            ? s.blacklist.map((b) =>
+                b.entityId === currentVendor.id
+                  ? { ...b, blockedAttemptsCount: b.blockedAttemptsCount + 1 }
+                  : b
+              )
+            : s.blacklist,
           notifications: [
             {
               id: `NTF-${Date.now()}`,
-              eventCode: 'New Product',
-              title: `New Product Registered (${newInvId})`,
-              message: `${currentVendor.displayName} registered "${productTitle}" (${declaredQuantity} units) at an agreed vendor rate of ₹${agreedMonthlyRate}/mo.`,
+              eventCode: isRestrictedVendor ? 'Risk Alert' : 'New Product',
+              title: isRestrictedVendor
+                ? `Restricted Vendor Product Held (${newInvId})`
+                : `New Product Registered (${newInvId})`,
+              message: isRestrictedVendor
+                ? `Restricted vendor ${currentVendor.displayName} submitted "${productTitle}". Held for Operator review.`
+                : `${currentVendor.displayName} registered "${productTitle}" (${declaredQuantity} units) at an agreed vendor rate of ₹${agreedMonthlyRate}/mo.`,
               recipientRole: 'PLATFORM_ADMIN',
-              category: 'Inventory Approval',
-              priority: 'high',
+              category: isRestrictedVendor ? 'Blacklist Alert' : 'Inventory Approval',
+              priority: isRestrictedVendor ? 'critical' : 'high',
               read: false,
               timestamp: 'Just now',
-              linkedView: 'ADMIN_GOVERNANCE',
+              linkedView: isRestrictedVendor
+                ? 'BLACKLIST_REGISTRY'
+                : 'ADMIN_GOVERNANCE',
             },
             ...s.notifications,
           ],
@@ -2540,7 +2557,7 @@ export const useKaroRentStore = create<KaroRentState>()(
       },
     }),
     {
-      name: 'karorent-live-platform-v7',
+      name: 'karorent-live-platform-v8',
       partialize: (state) => ({
         darkMode: state.darkMode,
         customers: state.customers,

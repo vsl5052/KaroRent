@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+  AlertOctagon,
   CheckCircle2,
   Clock,
   Download,
@@ -164,6 +165,27 @@ export const SettlementsFinanceView: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Platform Operator Only: Restricted Vendor Hold Banner */}
+      {activePersona.role === 'PLATFORM_ADMIN' &&
+        (currentVendor.status.includes('Terminat') ||
+          currentVendor.settlementHoldAmount > 0) && (
+          <div className="p-5 rounded-3xl bg-[#FEE2E2] border-2 border-[#DC2626] text-[#991B1B] space-y-2 shadow-sm">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2 font-serif font-bold text-base">
+                <AlertOctagon className="w-5 h-5" />
+                <span>Restricted / Blacklisted Vendor Payout Hold (Operator View Only)</span>
+              </div>
+              <span className="px-3 py-1 rounded-pill bg-[#991B1B] text-white text-xs font-mono font-semibold">
+                Held Payout: ₹
+                {currentVendor.settlementHoldAmount.toLocaleString('en-IN')}
+              </span>
+            </div>
+            <p className="text-xs leading-relaxed">
+              {currentVendor.displayName} is restricted/blacklisted. The vendor sees normal payout calculations without any restriction alert, while disbursements remain held by the Platform Operator.
+            </p>
+          </div>
+        )}
 
       {/* CARD 1: Current Possible Payouts */}
       <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-6">

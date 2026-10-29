@@ -5,7 +5,6 @@ import {
   MapPin,
   Moon,
   Search,
-  ShieldAlert,
   ShieldCheck,
   Sun,
   UserCheck,
@@ -195,17 +194,13 @@ export const TopEditorialHeader: React.FC = () => {
           <button
             onClick={() => setShowPersonaMenu(!showPersonaMenu)}
             className={`flex items-center gap-2 px-3.5 py-1.5 rounded-pill border text-xs font-medium transition-all ${
-              activePersona.isTerminatedVendor
-                ? 'bg-[#FEE2E2] text-[#991B1B] border-[#FECACA]'
-                : activePersona.role === 'PLATFORM_ADMIN'
+              activePersona.role === 'PLATFORM_ADMIN'
                 ? 'bg-hearth-sage text-white border-hearth-sage shadow-sm'
                 : 'bg-hearth-oat text-hearth-ink border-hearth-border hover:border-hearth-terracotta'
             }`}
             title="Switch Account"
           >
-            {activePersona.isTerminatedVendor ? (
-              <ShieldAlert className="w-3.5 h-3.5 shrink-0" />
-            ) : activePersona.role === 'PLATFORM_ADMIN' ? (
+            {activePersona.role === 'PLATFORM_ADMIN' ? (
               <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
             ) : (
               <UserCheck className="w-3.5 h-3.5 text-hearth-terracotta shrink-0" />

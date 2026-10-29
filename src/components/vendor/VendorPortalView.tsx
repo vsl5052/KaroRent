@@ -29,13 +29,22 @@ export const VendorPortalView: React.FC = () => {
     isSimulatingLatency,
   } = useKaroRentStore();
 
-  const activeVendorId = activePersona.vendorId || 'VEN-201';
+  const [selectedAdminVendorId, setSelectedAdminVendorId] = useState<string>(
+    activePersona.vendorId || 'VEN-201'
+  );
+
+  const activeVendorId =
+    activePersona.role === 'PLATFORM_ADMIN'
+      ? selectedAdminVendorId
+      : activePersona.vendorId || 'VEN-201';
   const currentVendor =
     vendors.find((v) => v.id === activeVendorId) || vendors[0];
-  const isReadOnlyTerminated =
+  const isRestrictedVendor =
     currentVendor.status === 'Terminating — Continuity Active' ||
     currentVendor.status === 'Terminated' ||
     Boolean(activePersona.isTerminatedVendor);
+  const showRestrictionToAdmin =
+    isRestrictedVendor && activePersona.role === 'PLATFORM_ADMIN';
 
   const vendorInventory = virtualInventory.filter(
     (i) => i.owningVendorId === currentVendor.id
@@ -140,28 +149,40 @@ export const VendorPortalView: React.FC = () => {
             <p className="text-xs text-[#44403C]">
               Service Areas: {currentVendor.serviceAreas.join(', ')}
             </p>
-            {!isReadOnlyTerminated && (
-              <div className="flex flex-wrap items-center gap-2 pt-1">
-                <button
-                  onClick={() => setShowNewProductModal(true)}
-                  className="spring-btn px-4 py-2 rounded-pill bg-hearth-terracotta hover:bg-hearth-kiln text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm"
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              <button
+                onClick={() => setShowNewProductModal(true)}
+                className="spring-btn px-4 py-2 rounded-pill bg-hearth-terracotta hover:bg-hearth-kiln text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm"
+              >
+                <PackagePlus className="w-3.5 h-3.5" />
+                <span>Register New Product</span>
+              </button>
+
+              {activePersona.role === 'PLATFORM_ADMIN' && (
+                <select
+                  value={selectedAdminVendorId}
+                  onChange={(e) => setSelectedAdminVendorId(e.target.value)}
+                  className="px-3.5 py-2 rounded-pill bg-hearth-card border border-hearth-border text-xs font-mono font-semibold text-hearth-ink focus:outline-none"
                 >
-                  <PackagePlus className="w-3.5 h-3.5" />
-                  <span>Register New Product</span>
-                </button>
-              </div>
-            )}
+                  {vendors.map((v) => (
+                    <option key={v.id} value={v.id}>
+                      {v.id} — {v.displayName}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Restricted Banner */}
-      {isReadOnlyTerminated && (
+      {/* Restricted Banner (Platform Operator Only) */}
+      {showRestrictionToAdmin && (
         <div className="p-5 rounded-3xl bg-[#FEE2E2] border-2 border-[#DC2626] text-[#991B1B] space-y-2 shadow-sm">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2 font-serif font-bold text-base">
               <AlertOctagon className="w-5 h-5" />
-              <span>Account Restricted (Read-Only)</span>
+              <span>Restricted / Blacklisted Vendor (Operator View Only)</span>
             </div>
             <span className="px-3 py-1 rounded-pill bg-[#991B1B] text-white text-xs font-mono font-semibold">
               Held Payout: ₹
@@ -169,8 +190,7 @@ export const VendorPortalView: React.FC = () => {
             </span>
           </div>
           <p className="text-xs leading-relaxed">
-            Your partner agreement has ended. Inventory editing is disabled, and
-            you have read-only access to active returns and payout statements.
+            This vendor is restricted in the platform registry. The vendor sees a standard dashboard without restriction notices, while public catalog updates and payouts remain held pending operator review.
           </p>
         </div>
       )}
@@ -217,12 +237,18 @@ export const VendorPortalView: React.FC = () => {
                             </span>
                             <span
                               className={`px-2.5 py-0.5 rounded-pill text-[10px] font-semibold ${
-                                inv.livePublicEnabled
+                                inv.livePublicEnabled ||
+                                (isRestrictedVendor &&
+                                  activePersona.role !== 'PLATFORM_ADMIN')
                                   ? 'bg-[#DCFCE7] text-[#166534] border border-[#BBF7D0]'
                                   : 'bg-hearth-oat text-hearth-taupe border border-hearth-border'
                               }`}
                             >
-                              {inv.livePublicEnabled ? 'Active' : 'Paused'}
+                              {inv.livePublicEnabled ||
+                              (isRestrictedVendor &&
+                                activePersona.role !== 'PLATFORM_ADMIN')
+                                ? 'Active'
+                                : 'Paused'}
                             </span>
                           </div>
                           <h3 className="font-serif font-bold text-base text-hearth-ink mt-1">
@@ -308,27 +334,26 @@ export const VendorPortalView: React.FC = () => {
                   </div>
 
                   {/* Edit Trigger / Form */}
-                  {!isReadOnlyTerminated && (
-                    <div className="pt-3 border-t border-hearth-border">
-                      {!isEditing ? (
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <button
-                            onClick={() => {
-                              setEditingInvId(inv.id);
-                              setReqEnabled(!inv.livePublicEnabled);
-                              setReqStock(inv.declaredQuantity);
-                              setReqImageUrl('');
-                            }}
-                            className="spring-btn px-4 py-2 rounded-pill bg-hearth-terracotta hover:bg-hearth-kiln text-white text-xs font-semibold"
-                          >
-                            Update Stock or Status
-                          </button>
-                          <span className="text-[10px] font-mono text-hearth-taupe">
-                            Monthly Active Value: ₹
-                            {(inv.rentedQuantity * agreedRate).toLocaleString('en-IN')}
-                          </span>
-                        </div>
-                      ) : (
+                  <div className="pt-3 border-t border-hearth-border">
+                    {!isEditing ? (
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <button
+                          onClick={() => {
+                            setEditingInvId(inv.id);
+                            setReqEnabled(!inv.livePublicEnabled);
+                            setReqStock(inv.declaredQuantity);
+                            setReqImageUrl('');
+                          }}
+                          className="spring-btn px-4 py-2 rounded-pill bg-hearth-terracotta hover:bg-hearth-kiln text-white text-xs font-semibold"
+                        >
+                          Update Stock or Status
+                        </button>
+                        <span className="text-[10px] font-mono text-hearth-taupe">
+                          Monthly Active Value: ₹
+                          {(inv.rentedQuantity * agreedRate).toLocaleString('en-IN')}
+                        </span>
+                      </div>
+                    ) : (
                         <div className="p-4 rounded-2xl bg-hearth-oat border border-hearth-border space-y-3">
                           <div className="text-xs font-bold text-hearth-ink">
                             Update Stock or Availability
@@ -415,7 +440,6 @@ export const VendorPortalView: React.FC = () => {
                         </div>
                       )}
                     </div>
-                  )}
                 </div>
               );
             })}

@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  AlertOctagon,
   Building2,
   CalendarClock,
   Camera,
@@ -155,12 +154,6 @@ export const WorkspaceSidebar: React.FC = () => {
           <div className="text-xs text-hearth-terracotta font-medium mt-0.5">
             {activePersona.roleBadge}
           </div>
-          {activePersona.isTerminatedVendor && (
-            <div className="mt-2 p-2 rounded-xl bg-[#FEE2E2] border border-[#FECACA] text-[10px] text-[#991B1B] font-medium flex items-center gap-1.5">
-              <AlertOctagon className="w-3.5 h-3.5 shrink-0" />
-              <span>Read-Only Account</span>
-            </div>
-          )}
         </div>
 
         {/* Navigation Links */}
