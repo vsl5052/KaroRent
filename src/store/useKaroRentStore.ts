@@ -62,7 +62,7 @@ interface KaroRentState {
   searchQuery: string;
   selectedCategory: ProductCategory | 'All';
   selectedWorkflowFilter: 'ALL' | 'DIRECT_1_STEP' | 'SITE_VISIT_MULTI_STEP';
-  selectedTenureMonths: 3 | 6 | 12 | 24;
+  selectedTenureMonths: 1 | 3 | 6 | 12 | 24;
   comparisonProductIds: string[];
   activeAgreementModalBookingId: string | null;
   activeCheckoutProductId: string | null;
@@ -91,7 +91,7 @@ interface KaroRentState {
   setSearchQuery: (q: string) => void;
   setSelectedCategory: (cat: ProductCategory | 'All') => void;
   setSelectedWorkflowFilter: (wf: 'ALL' | 'DIRECT_1_STEP' | 'SITE_VISIT_MULTI_STEP') => void;
-  setSelectedTenureMonths: (months: 3 | 6 | 12 | 24) => void;
+  setSelectedTenureMonths: (months: 1 | 3 | 6 | 12 | 24) => void;
   toggleCompareProduct: (productId: string) => void;
   setActiveAgreementModalBookingId: (bookingId: string | null) => void;
   setActiveCheckoutProductId: (productId: string | null) => void;
@@ -103,7 +103,7 @@ interface KaroRentState {
   createBookingOrder: (payload: {
     productId: string;
     quantity: number;
-    tenureMonths: 3 | 6 | 12 | 24;
+    tenureMonths: 1 | 3 | 6 | 12 | 24;
     startDate: string;
     deliveryAddress: string;
   }) => Promise<{ bookingId: string; interceptedByBlacklist: boolean }>;
@@ -221,7 +221,7 @@ export const useKaroRentStore = create<KaroRentState>()(
       searchQuery: '',
       selectedCategory: 'All',
       selectedWorkflowFilter: 'ALL',
-      selectedTenureMonths: 6,
+      selectedTenureMonths: 1,
       comparisonProductIds: [],
       activeAgreementModalBookingId: null,
       activeCheckoutProductId: null,
@@ -1231,6 +1231,12 @@ export const useKaroRentStore = create<KaroRentState>()(
                     ...b.returnRecord,
                     pickupStatus: 'Picked Up',
                     customerPremisePickupPhoto: photoUrl,
+                    customerPremisePickupPhotos: Array.from(
+                      new Set([
+                        photoUrl,
+                        ...(b.returnRecord.customerPremisePickupPhotos || []),
+                      ])
+                    ),
                     pickupPhotoExifTimestamp: `${exifTimestamp} [GPS: ${geoTag} Verified]`,
                     pickupPhotoGeoTag: geoTag,
                   },
@@ -1290,6 +1296,12 @@ export const useKaroRentStore = create<KaroRentState>()(
                     ...b.returnRecord,
                     pickupStatus: effectiveProposedDeduction > 0 ? 'Under Inspection' : 'Finalised',
                     warehouseReturnPhoto: warehousePhotoUrl,
+                    warehouseReturnPhotos: Array.from(
+                      new Set([
+                        warehousePhotoUrl,
+                        ...(b.returnRecord.warehouseReturnPhotos || []),
+                      ])
+                    ),
                     warehouseInspectionFinding: blockedByDoorstepProtection
                       ? 'Transit Damage (Vendor Fault)'
                       : finding,
@@ -2373,7 +2385,7 @@ export const useKaroRentStore = create<KaroRentState>()(
       },
     }),
     {
-      name: 'karorent-live-platform-v3',
+      name: 'karorent-live-platform-v4',
       partialize: (state) => ({
         darkMode: state.darkMode,
         customers: state.customers,

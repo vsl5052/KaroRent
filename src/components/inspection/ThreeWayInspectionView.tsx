@@ -2,11 +2,131 @@ import React, { useState } from 'react';
 import {
   AlertTriangle,
   Camera,
+  ChevronLeft,
+  ChevronRight,
   Gavel,
   ShieldCheck,
 } from 'lucide-react';
 import { useKaroRentStore } from '../../store/useKaroRentStore';
 import { mandatoryReasonSchema } from '../../lib/validation';
+
+interface StagePhotoGalleryProps {
+  stageBadge: string;
+  title: string;
+  subtitle: React.ReactNode;
+  photos: string[];
+  verifiedBadgeText?: string;
+  highlightBorder?: boolean;
+  emptyText?: string;
+}
+
+const StagePhotoGallery: React.FC<StagePhotoGalleryProps> = ({
+  stageBadge,
+  title,
+  subtitle,
+  photos,
+  verifiedBadgeText,
+  highlightBorder = false,
+  emptyText = 'Awaiting Photos',
+}) => {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const safeIndex = photos.length > 0 ? activeIndex % photos.length : 0;
+
+  const handlePrev = () => {
+    setActiveIndex((prev) => (prev - 1 + photos.length) % photos.length);
+  };
+
+  const handleNext = () => {
+    setActiveIndex((prev) => (prev + 1) % photos.length);
+  };
+
+  return (
+    <div className="space-y-2.5 text-center">
+      <div
+        className={`relative h-52 rounded-2xl overflow-hidden bg-hearth-oat shadow-sm ${
+          highlightBorder
+            ? 'border-2 border-hearth-sage'
+            : 'border border-hearth-border'
+        }`}
+      >
+        {photos.length > 0 ? (
+          <>
+            <img
+              src={photos[safeIndex]}
+              alt={`${title} - Photo ${safeIndex + 1}`}
+              className="w-full h-full object-cover transition-all duration-200"
+            />
+            <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-pill bg-black/70 text-white text-[10px] font-medium">
+              {stageBadge}
+            </span>
+            <span className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-pill bg-black/70 text-white text-[10px] font-mono">
+              {safeIndex + 1} / {photos.length}
+            </span>
+
+            {photos.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={handlePrev}
+                  aria-label="Previous photo"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/65 hover:bg-black/85 text-white flex items-center justify-center shadow transition-colors"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  aria-label="Next photo"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/65 hover:bg-black/85 text-white flex items-center justify-center shadow transition-colors"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </>
+            )}
+
+            {verifiedBadgeText && (
+              <span className="absolute bottom-2.5 inset-x-2.5 px-2.5 py-0.5 rounded-pill bg-[#166534]/90 text-white text-[10px] font-medium truncate">
+                {verifiedBadgeText}
+              </span>
+            )}
+          </>
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center p-3 bg-[#FEE2E2] text-[#991B1B] text-xs font-semibold">
+            <AlertTriangle className="w-6 h-6 mb-1" />
+            <span>{emptyText}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Multi-Image Thumbnails */}
+      {photos.length > 1 && (
+        <div className="flex items-center justify-center gap-1.5 pt-0.5">
+          {photos.map((photoUrl, idx) => (
+            <button
+              key={`${photoUrl}-${idx}`}
+              type="button"
+              onClick={() => setActiveIndex(idx)}
+              className={`w-11 h-9 rounded-lg overflow-hidden border-2 transition-all ${
+                safeIndex === idx
+                  ? 'border-hearth-terracotta scale-105 shadow-sm'
+                  : 'border-hearth-border opacity-70 hover:opacity-100'
+              }`}
+            >
+              <img
+                src={photoUrl}
+                alt={`${title} thumbnail ${idx + 1}`}
+                className="w-full h-full object-cover"
+              />
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="text-xs font-bold text-hearth-ink">{title}</div>
+      <div className="text-[11px] text-hearth-taupe leading-snug">{subtitle}</div>
+    </div>
+  );
+};
 
 export const ThreeWayInspectionView: React.FC = () => {
   const {
@@ -42,13 +162,13 @@ export const ThreeWayInspectionView: React.FC = () => {
   // Customer Dispute Form State
   const [showDisputeInput, setShowDisputeInput] = useState(false);
   const [disputeReason, setDisputeReason] = useState(
-    'The pickup photo taken at my doorstep clearly shows the item was in good condition when handed over.'
+    'The pickup photos taken at my doorstep clearly show the item was in good condition when handed over.'
   );
 
   // Resolution Form State
   const [mediatorApprovedAmount, setMediatorApprovedAmount] = useState<number>(0);
   const [mediatorNotes, setMediatorNotes] = useState<string>(
-    'Pickup photo confirms item was in good condition at handover. Full deposit refund approved.'
+    'Pickup photos confirm item was in good condition at handover. Full deposit refund approved.'
   );
   const [triggerBlacklistOnResolve, setTriggerBlacklistOnResolve] =
     useState<boolean>(false);
@@ -65,6 +185,25 @@ export const ThreeWayInspectionView: React.FC = () => {
   const currentDeduction =
     returnRec.approvedDeductionAmount || returnRec.proposedDeductionAmount || 0;
   const netRefund = Math.max(0, originalDeposit - currentDeduction);
+
+  const beforeDeliveryPhotos =
+    returnRec.preDispatchPhotos && returnRec.preDispatchPhotos.length > 0
+      ? returnRec.preDispatchPhotos
+      : [returnRec.preDispatchPhoto];
+
+  const doorstepPickupPhotos =
+    returnRec.customerPremisePickupPhotos &&
+    returnRec.customerPremisePickupPhotos.length > 0
+      ? returnRec.customerPremisePickupPhotos
+      : returnRec.customerPremisePickupPhoto
+      ? [returnRec.customerPremisePickupPhoto]
+      : [];
+
+  const warehousePhotos =
+    returnRec.warehouseReturnPhotos &&
+    returnRec.warehouseReturnPhotos.length > 0
+      ? returnRec.warehouseReturnPhotos
+      : [returnRec.warehouseReturnPhoto || returnRec.preDispatchPhoto];
 
   const handleRunWarehouseInspection = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -166,7 +305,7 @@ export const ThreeWayInspectionView: React.FC = () => {
                 {activeBooking.productTitle}
               </h2>
               <p className="text-xs text-hearth-taupe">
-                Order {activeBooking.id} • Partner: {activeBooking.fulfillingVendorName}
+                Order {activeBooking.id}
               </p>
             </div>
             <span className="px-3 py-1 rounded-pill bg-hearth-oat border border-hearth-border text-xs font-semibold text-hearth-ink">
@@ -174,80 +313,47 @@ export const ThreeWayInspectionView: React.FC = () => {
             </span>
           </div>
 
-          {/* 3-Photo Condition Comparison */}
+          {/* 3-Stage Multi-Photo Condition Comparison */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-            {/* Photo 1: Before Delivery */}
-            <div className="space-y-2 text-center">
-              <div className="relative h-52 rounded-2xl overflow-hidden border border-hearth-border bg-hearth-oat shadow-sm">
-                <img
-                  src={returnRec.preDispatchPhoto}
-                  alt="Before Delivery"
-                  className="w-full h-full object-cover"
-                />
-                <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-pill bg-black/70 text-white text-[10px] font-medium">
-                  1. Before Delivery
-                </span>
-              </div>
-              <div className="text-xs font-bold text-hearth-ink">
-                Before Delivery
-              </div>
-              <div className="text-[11px] text-hearth-taupe leading-snug">
-                {returnRec.preDispatchNotes}
-              </div>
-            </div>
+            {/* Stage 1: Before Delivery */}
+            <StagePhotoGallery
+              key={`${activeBooking.id}-before`}
+              stageBadge="1. Before Delivery"
+              title="Before Delivery"
+              subtitle={returnRec.preDispatchNotes}
+              photos={beforeDeliveryPhotos}
+            />
 
-            {/* Photo 2: At Pickup */}
-            <div className="space-y-2 text-center">
-              <div className="relative h-52 rounded-2xl overflow-hidden border-2 border-hearth-sage bg-hearth-oat shadow-sm">
-                {returnRec.customerPremisePickupPhoto ? (
-                  <>
-                    <img
-                      src={returnRec.customerPremisePickupPhoto}
-                      alt="At Doorstep Pickup"
-                      className="w-full h-full object-cover"
-                    />
-                    <span className="absolute bottom-2.5 inset-x-2.5 px-2.5 py-0.5 rounded-pill bg-[#166534]/90 text-white text-[10px] font-medium truncate">
-                      ✓ Verified at Pickup
-                    </span>
-                  </>
-                ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center p-3 bg-[#FEE2E2] text-[#991B1B] text-xs font-semibold">
-                    <AlertTriangle className="w-6 h-6 mb-1" />
-                    <span>Awaiting Pickup Photo</span>
-                  </div>
-                )}
-              </div>
-              <div className="text-xs font-bold text-hearth-ink">
-                At Doorstep Pickup
-              </div>
-              <div className="text-[11px] text-hearth-taupe leading-snug">
-                {returnRec.pickupPhotoExifTimestamp ||
-                  'Photo taken at your doorstep during pickup'}
-              </div>
-            </div>
+            {/* Stage 2: At Doorstep Pickup */}
+            <StagePhotoGallery
+              key={`${activeBooking.id}-pickup`}
+              stageBadge="2. At Doorstep Pickup"
+              title="At Doorstep Pickup"
+              subtitle={
+                returnRec.pickupPhotoExifTimestamp ||
+                'Photos taken at your doorstep during pickup'
+              }
+              photos={doorstepPickupPhotos}
+              verifiedBadgeText="✓ Verified at Pickup"
+              highlightBorder
+              emptyText="Awaiting Pickup Photos"
+            />
 
-            {/* Photo 3: At Warehouse */}
-            <div className="space-y-2 text-center">
-              <div className="relative h-52 rounded-2xl overflow-hidden border border-hearth-border bg-hearth-oat shadow-sm">
-                <img
-                  src={
-                    returnRec.warehouseReturnPhoto ||
-                    returnRec.preDispatchPhoto
-                  }
-                  alt="At Warehouse"
-                  className="w-full h-full object-cover"
-                />
-                <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-pill bg-black/70 text-white text-[10px] font-medium">
-                  3. At Warehouse
+            {/* Stage 3: At Warehouse */}
+            <StagePhotoGallery
+              key={`${activeBooking.id}-warehouse`}
+              stageBadge="3. At Warehouse"
+              title="At Warehouse"
+              subtitle={
+                <span>
+                  Condition:{' '}
+                  <strong>
+                    {returnRec.warehouseInspectionFinding || 'Pending Check'}
+                  </strong>
                 </span>
-              </div>
-              <div className="text-xs font-bold text-hearth-ink">
-                At Warehouse
-              </div>
-              <div className="text-[11px] text-hearth-taupe leading-snug">
-                Condition: <strong>{returnRec.warehouseInspectionFinding || 'Pending Check'}</strong>
-              </div>
-            </div>
+              }
+              photos={warehousePhotos}
+            />
           </div>
 
           {returnRec.transitDamageBlockedByBR026 && (

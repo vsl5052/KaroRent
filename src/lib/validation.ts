@@ -29,7 +29,7 @@ export const bookingCheckoutSchema = z
       .positive('Quantity must be at least 1 unit.'),
     maxAvailable: z.number(),
     startDate: z.string().min(1, 'Start date is required.'),
-    tenureMonths: z.union([z.literal(3), z.literal(6), z.literal(12), z.literal(24)]),
+    tenureMonths: z.union([z.literal(1), z.literal(3), z.literal(6), z.literal(12), z.literal(24)]),
     deliveryAddress: nonWhitespaceText('Delivery address', 8),
     recipientPhone: indianMobileSchema,
   })

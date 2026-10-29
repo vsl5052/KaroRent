@@ -141,7 +141,7 @@ export const TopEditorialHeader: React.FC = () => {
         <nav className="hidden md:flex items-center gap-1 mr-1">
           <button
             onClick={() => setActiveTab('MARKETPLACE')}
-            className={`px-3 py-1.5 rounded-pill text-xs font-medium transition-colors ${
+            className={`px-3.5 py-1.5 rounded-pill text-xs font-medium transition-colors ${
               activeTab === 'MARKETPLACE'
                 ? 'bg-hearth-apricot text-hearth-terracotta font-semibold'
                 : 'text-hearth-umber hover:bg-hearth-oat'
@@ -150,24 +150,14 @@ export const TopEditorialHeader: React.FC = () => {
             Catalog
           </button>
           <button
-            onClick={() => setActiveTab('THREE_WAY_INSPECTION')}
-            className={`px-3 py-1.5 rounded-pill text-xs font-medium transition-colors ${
-              activeTab === 'THREE_WAY_INSPECTION'
+            onClick={() => setActiveTab('MY_RENTALS')}
+            className={`px-3.5 py-1.5 rounded-pill text-xs font-medium transition-colors ${
+              activeTab === 'MY_RENTALS'
                 ? 'bg-hearth-apricot text-hearth-terracotta font-semibold'
                 : 'text-hearth-umber hover:bg-hearth-oat'
             }`}
           >
-            Returns
-          </button>
-          <button
-            onClick={() => setActiveTab('INVOICES_DEPOSITS')}
-            className={`px-3 py-1.5 rounded-pill text-xs font-medium transition-colors ${
-              activeTab === 'INVOICES_DEPOSITS'
-                ? 'bg-hearth-apricot text-hearth-terracotta font-semibold'
-                : 'text-hearth-umber hover:bg-hearth-oat'
-            }`}
-          >
-            Payments
+            My Orders
           </button>
         </nav>
 

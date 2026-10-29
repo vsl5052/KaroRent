@@ -149,6 +149,7 @@ export interface PlatformMasterProduct {
   // Platform-controlled pricing (FR-PRC-001 / BR-027)
   baseMonthlyRent: number;
   tenureMultipliers: {
+    1: number;
     3: number; // 1.0x
     6: number; // 0.92x
     12: number; // 0.85x
@@ -306,11 +307,14 @@ export interface ReturnInspectionRecord {
   pickupStatus: 'Requested' | 'Scheduled' | 'Picked Up' | 'Under Inspection' | 'Disputed' | 'Finalised';
   // Three-Way Evidence Comparison (FR-RET-002, FR-RET-003, BR-026)
   preDispatchPhoto: string;
+  preDispatchPhotos?: string[];
   preDispatchNotes: string;
   customerPremisePickupPhoto?: string; // Mandatory before Picked Up! (FR-RET-002 / EX-029)
+  customerPremisePickupPhotos?: string[];
   pickupPhotoExifTimestamp?: string;
   pickupPhotoGeoTag?: string;
   warehouseReturnPhoto?: string;
+  warehouseReturnPhotos?: string[];
   warehouseInspectionFinding?: 'Normal Wear' | 'Customer Damage' | 'Transit Damage (Vendor Fault)' | 'Missing Accessory' | 'Severe Damage / Loss';
   findingDescription?: string;
   proposedDeductionAmount: number;
@@ -336,7 +340,7 @@ export interface BookingOrder {
   serviceLocation: string;
   allocatedSerial?: string;
   quantity: number;
-  tenureMonths: 3 | 6 | 12 | 24;
+  tenureMonths: 1 | 3 | 6 | 12 | 24;
   startDate: string;
   endDate: string;
   deliveryAddress: string;

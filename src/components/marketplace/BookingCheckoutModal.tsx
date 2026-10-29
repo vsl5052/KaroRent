@@ -30,7 +30,7 @@ export const BookingCheckoutModal: React.FC = () => {
     customers.find((c) => c.id === activePersona.customerId) || customers[0];
 
   const [quantity, setQuantity] = useState(1);
-  const [tenure, setTenure] = useState<3 | 6 | 12 | 24>(selectedTenureMonths);
+  const [tenure, setTenure] = useState<1 | 3 | 6 | 12 | 24>(selectedTenureMonths);
   const [startDate, setStartDate] = useState('2026-11-01');
   const [selectedAddress, setSelectedAddress] = useState(
     customer.addresses[0]
@@ -149,8 +149,8 @@ export const BookingCheckoutModal: React.FC = () => {
                 <label className="block text-xs font-semibold text-hearth-ink mb-1.5">
                   Rental Duration *
                 </label>
-                <div className="grid grid-cols-4 gap-2">
-                  {([3, 6, 12, 24] as const).map((m) => (
+                <div className="grid grid-cols-5 gap-2">
+                  {([1, 3, 6, 12, 24] as const).map((m) => (
                     <button
                       type="button"
                       key={m}
@@ -276,6 +276,27 @@ export const BookingCheckoutModal: React.FC = () => {
                       <p className="text-hearth-umber">
                         Pay only <strong>₹{product.siteVisitFee}</strong> now to book a technician visit. Monthly rent and deposit are paid after you approve the installation estimate.
                       </p>
+                    </div>
+                  )}
+
+                  {product.installationRateCard.length > 0 && (
+                    <div className="p-2.5 rounded-xl bg-hearth-card border border-hearth-border text-[11px] space-y-1.5">
+                      <div className="font-semibold text-hearth-ink">
+                        Standard Installation Rates
+                      </div>
+                      <div className="divide-y divide-hearth-border/60">
+                        {product.installationRateCard.map((rate) => (
+                          <div
+                            key={rate.code}
+                            className="py-1 flex items-center justify-between gap-2 text-hearth-umber"
+                          >
+                            <span>{rate.label}</span>
+                            <span className="font-ledger font-semibold text-hearth-ink shrink-0">
+                              ₹{rate.ratePerUnit} / {rate.unit}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>

@@ -20,6 +20,7 @@ export const CustomerDashboardView: React.FC = () => {
     customers,
     bookings,
     agreements,
+    masterProducts,
     respondToPostVisitQuote,
     setActiveAgreementModalBookingId,
     setActiveTab,
@@ -36,6 +37,7 @@ export const CustomerDashboardView: React.FC = () => {
   const [serviceModalBookingId, setServiceModalBookingId] = useState<string | null>(null);
   const [serviceIssueText, setServiceIssueText] = useState('');
   const [requestSwap, setRequestSwap] = useState(false);
+  const [expandedRateBookingId, setExpandedRateBookingId] = useState<string | null>(null);
 
   const scopedBookings =
     activePersona.role === 'PLATFORM_ADMIN'
@@ -46,111 +48,16 @@ export const CustomerDashboardView: React.FC = () => {
     customers.find((c) => c.id === (activePersona.customerId || 'CUS-1001')) ||
     customers[0];
 
-  const featuredMultiStepBooking =
-    scopedBookings.find((b) => b.workflowType === 'SITE_VISIT_MULTI_STEP') ||
-    bookings[0];
-
   return (
     <div className="space-y-7">
-      {/* Top Header & Installation Progress */}
-      <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-5">
-        <div>
-          <h1 className="font-serif text-2xl font-bold text-hearth-ink">
-            My Rentals
-          </h1>
-          <p className="text-xs text-hearth-umber mt-0.5">
-            Track your active rentals, deliveries, and home installation visits.
-          </p>
-        </div>
-
-        {/* 4-Stage Installation Progress */}
-        <div className="rounded-2xl bg-hearth-parchment border border-hearth-border p-5 shadow-sm">
-          <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-            <span className="text-xs font-semibold text-hearth-ink flex items-center gap-1.5">
-              <Ruler className="w-4 h-4 text-hearth-terracotta" />
-              <span>
-                Installation Progress — {featuredMultiStepBooking.productTitle}
-              </span>
-            </span>
-            <span className="text-[11px] text-hearth-terracotta font-semibold">
-              Status: {featuredMultiStepBooking.status}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 items-center">
-            {/* Step 1 */}
-            <div className="p-3.5 rounded-2xl bg-hearth-card border border-hearth-border flex items-start gap-3">
-              <div className="w-7 h-7 rounded-full bg-[#658361] text-white flex items-center justify-center shrink-0 mt-0.5">
-                <CheckCircle2 className="w-4 h-4" />
-              </div>
-              <div>
-                <div className="text-xs font-bold text-hearth-ink">Home Visit Booked</div>
-                <div className="text-[11px] text-hearth-umber">
-                  Paid (₹{featuredMultiStepBooking.siteVisitFee || 499})
-                </div>
-                <span className="inline-block mt-1.5 px-2.5 py-0.5 rounded-pill bg-[#658361] text-white text-[10px] font-semibold">
-                  Completed
-                </span>
-              </div>
-            </div>
-
-            {/* Step 2 */}
-            <div className="p-3.5 rounded-2xl bg-hearth-card border border-hearth-border flex items-start gap-3">
-              <div className="w-7 h-7 rounded-full bg-[#658361] text-white flex items-center justify-center shrink-0 mt-0.5">
-                <CheckCircle2 className="w-4 h-4" />
-              </div>
-              <div>
-                <div className="text-xs font-bold text-hearth-ink">
-                  Measurements Taken
-                </div>
-                <div className="text-[11px] text-hearth-umber">
-                  {featuredMultiStepBooking.siteVisit?.measuredCopperPipeMeters || 3.5}m Piping
-                </div>
-                <span className="inline-block mt-1.5 px-2.5 py-0.5 rounded-pill bg-[#B85D3B] text-white text-[10px] font-semibold">
-                  {featuredMultiStepBooking.siteVisit?.status.includes('Completed')
-                    ? 'Completed'
-                    : 'Scheduled'}
-                </span>
-              </div>
-            </div>
-
-            {/* Step 3 */}
-            <div className="p-3.5 rounded-2xl bg-hearth-card border border-hearth-border flex items-start gap-3">
-              <div className="w-7 h-7 rounded-full border-2 border-[#658361] text-[#2F5233] font-mono text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
-                3
-              </div>
-              <div>
-                <div className="text-xs font-bold text-hearth-ink">
-                  Estimate Approved
-                </div>
-                <div className="text-[11px] text-hearth-umber">Final Installation Quote</div>
-                <span className="inline-block mt-1.5 px-2.5 py-0.5 rounded-pill bg-[#B85D3B] text-white text-[10px] font-semibold">
-                  {featuredMultiStepBooking.siteVisit?.customerQuoteDecision === 'Accepted'
-                    ? 'Completed'
-                    : 'Action Needed'}
-                </span>
-              </div>
-            </div>
-
-            {/* Step 4 */}
-            <div className="p-3.5 rounded-2xl bg-hearth-card border border-hearth-border flex items-start gap-3">
-              <div className="w-7 h-7 rounded-full border-2 border-hearth-terracotta text-hearth-terracotta font-mono text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
-                4
-              </div>
-              <div>
-                <div className="text-xs font-bold text-hearth-ink">
-                  Agreement & Setup
-                </div>
-                <div className="text-[11px] text-hearth-umber">Delivery & Activation</div>
-                <span className="inline-block mt-1.5 px-2.5 py-0.5 rounded-pill bg-[#B85D3B] text-white text-[10px] font-semibold">
-                  {featuredMultiStepBooking.status === 'Active Rental'
-                    ? 'Active'
-                    : featuredMultiStepBooking.status}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* Top Header */}
+      <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth">
+        <h1 className="font-serif text-2xl font-bold text-hearth-ink">
+          My Rentals
+        </h1>
+        <p className="text-xs text-hearth-umber mt-0.5">
+          Track your active rentals, deliveries, and home installation progress.
+        </p>
       </div>
 
       {/* Customer Account Summary Strip */}
@@ -204,18 +111,20 @@ export const CustomerDashboardView: React.FC = () => {
         </div>
       </div>
 
-      {/* Bookings & Active Rentals */}
+      {/* My Orders Section */}
       <div className="space-y-4">
         <h2 className="font-serif text-xl font-bold text-hearth-ink">
-          Your Orders ({scopedBookings.length})
+          My Orders ({scopedBookings.length})
         </h2>
 
         <div className="space-y-4">
           {scopedBookings.map((booking) => {
             const agreement = agreements.find((a) => a.bookingId === booking.id);
+            const product = masterProducts.find((p) => p.id === booking.productId);
             const isFlaggedBlacklist =
               booking.status === 'Flagged — Blacklist Review';
             const isFinalBillSent = booking.status === 'Final Bill Sent';
+            const isMultiStep = booking.workflowType === 'SITE_VISIT_MULTI_STEP';
 
             return (
               <div
@@ -227,37 +136,43 @@ export const CustomerDashboardView: React.FC = () => {
                 }`}
               >
                 <div className="flex flex-wrap items-start justify-between gap-4">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-mono text-xs font-bold px-2.5 py-0.5 rounded-pill bg-hearth-oat border border-hearth-border text-hearth-ink">
-                        {booking.id}
-                      </span>
-                      <span
-                        className={`text-xs font-semibold px-3 py-0.5 rounded-pill border ${
-                          isFlaggedBlacklist
-                            ? 'bg-[#FEE2E2] text-[#991B1B] border-[#FECACA]'
-                            : booking.status === 'Active Rental' ||
-                              booking.status === 'Completed'
-                            ? 'bg-[#DCFCE7] text-[#166534] border-[#BBF7D0]'
-                            : 'bg-[#FFEDD5] text-[#9A3412] border-[#FED7AA]'
-                        }`}
-                      >
-                        {booking.status}
-                      </span>
-                      <span className="text-[11px] text-hearth-taupe">
-                        Partner: <strong>{booking.fulfillingVendorName}</strong>
-                      </span>
-                    </div>
+                  <div className="flex items-start gap-4">
+                    {product && (
+                      <img
+                        src={product.lifestyleImage}
+                        alt={booking.productTitle}
+                        className="w-20 h-20 rounded-2xl object-cover border border-hearth-border shrink-0 hidden sm:block"
+                      />
+                    )}
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-mono text-xs font-bold px-2.5 py-0.5 rounded-pill bg-hearth-oat border border-hearth-border text-hearth-ink">
+                          {booking.id}
+                        </span>
+                        <span
+                          className={`text-xs font-semibold px-3 py-0.5 rounded-pill border ${
+                            isFlaggedBlacklist
+                              ? 'bg-[#FEE2E2] text-[#991B1B] border-[#FECACA]'
+                              : booking.status === 'Active Rental' ||
+                                booking.status === 'Completed'
+                              ? 'bg-[#DCFCE7] text-[#166534] border-[#BBF7D0]'
+                              : 'bg-[#FFEDD5] text-[#9A3412] border-[#FED7AA]'
+                          }`}
+                        >
+                          {booking.status}
+                        </span>
+                      </div>
 
-                    <h3 className="font-serif text-lg font-bold text-hearth-ink">
-                      {booking.productTitle}
-                    </h3>
-                    <p className="text-xs text-hearth-umber">
-                      Plan: <strong>{booking.tenureMonths} Months</strong> ({booking.startDate} to {booking.endDate})
-                    </p>
-                    <p className="text-[11px] text-hearth-taupe">
-                      Address: {booking.deliveryAddress}
-                    </p>
+                      <h3 className="font-serif text-lg font-bold text-hearth-ink">
+                        {booking.productTitle}
+                      </h3>
+                      <p className="text-xs text-hearth-umber">
+                        Plan: <strong>{booking.tenureMonths} Months</strong> ({booking.startDate} to {booking.endDate})
+                      </p>
+                      <p className="text-[11px] text-hearth-taupe">
+                        Address: {booking.deliveryAddress}
+                      </p>
+                    </div>
                   </div>
 
                   {/* Right Financial Summary */}
@@ -281,6 +196,138 @@ export const CustomerDashboardView: React.FC = () => {
                     )}
                   </div>
                 </div>
+
+                {/* Installation Progress inside the Product Order Card */}
+                {isMultiStep && (
+                  <div className="rounded-2xl bg-hearth-parchment border border-hearth-border p-4 space-y-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <span className="text-xs font-semibold text-hearth-ink flex items-center gap-1.5">
+                        <Ruler className="w-4 h-4 text-hearth-terracotta" />
+                        <span>Installation Progress</span>
+                      </span>
+                      {product && product.installationRateCard.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setExpandedRateBookingId(
+                              expandedRateBookingId === booking.id ? null : booking.id
+                            )
+                          }
+                          className="text-[11px] font-semibold text-hearth-terracotta hover:underline"
+                        >
+                          {expandedRateBookingId === booking.id
+                            ? 'Hide Installation Rates'
+                            : 'View Standard Installation Rates'}
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 items-center">
+                      {/* Step 1 */}
+                      <div className="p-3 rounded-xl bg-hearth-card border border-hearth-border flex items-start gap-2.5">
+                        <div className="w-6 h-6 rounded-full bg-[#658361] text-white flex items-center justify-center shrink-0 mt-0.5">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-hearth-ink">
+                            Home Visit Booked
+                          </div>
+                          <div className="text-[11px] text-hearth-umber">
+                            Paid (₹{booking.siteVisitFee || 499})
+                          </div>
+                          <span className="inline-block mt-1 px-2 py-0.5 rounded-pill bg-[#658361] text-white text-[10px] font-semibold">
+                            Completed
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Step 2 */}
+                      <div className="p-3 rounded-xl bg-hearth-card border border-hearth-border flex items-start gap-2.5">
+                        <div className="w-6 h-6 rounded-full bg-[#658361] text-white flex items-center justify-center shrink-0 mt-0.5">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-hearth-ink">
+                            Measurements Taken
+                          </div>
+                          <div className="text-[11px] text-hearth-umber">
+                            {booking.siteVisit?.measuredCopperPipeMeters
+                              ? `${booking.siteVisit.measuredCopperPipeMeters}m Piping`
+                              : 'Technician Assessment'}
+                          </div>
+                          <span className="inline-block mt-1 px-2 py-0.5 rounded-pill bg-[#B85D3B] text-white text-[10px] font-semibold">
+                            {booking.siteVisit?.status.includes('Completed')
+                              ? 'Completed'
+                              : 'Scheduled'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Step 3 */}
+                      <div className="p-3 rounded-xl bg-hearth-card border border-hearth-border flex items-start gap-2.5">
+                        <div className="w-6 h-6 rounded-full border-2 border-[#658361] text-[#2F5233] font-mono text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                          3
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-hearth-ink">
+                            Estimate Approved
+                          </div>
+                          <div className="text-[11px] text-hearth-umber">
+                            Installation Quote
+                          </div>
+                          <span className="inline-block mt-1 px-2 py-0.5 rounded-pill bg-[#B85D3B] text-white text-[10px] font-semibold">
+                            {booking.siteVisit?.customerQuoteDecision === 'Accepted'
+                              ? 'Completed'
+                              : 'Action Needed'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Step 4 */}
+                      <div className="p-3 rounded-xl bg-hearth-card border border-hearth-border flex items-start gap-2.5">
+                        <div className="w-6 h-6 rounded-full border-2 border-hearth-terracotta text-hearth-terracotta font-mono text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                          4
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-hearth-ink">
+                            Agreement & Setup
+                          </div>
+                          <div className="text-[11px] text-hearth-umber">
+                            Delivery & Activation
+                          </div>
+                          <span className="inline-block mt-1 px-2 py-0.5 rounded-pill bg-[#B85D3B] text-white text-[10px] font-semibold">
+                            {booking.status === 'Active Rental'
+                              ? 'Active'
+                              : booking.status}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {expandedRateBookingId === booking.id &&
+                      product &&
+                      product.installationRateCard.length > 0 && (
+                        <div className="p-3 rounded-xl bg-hearth-card border border-hearth-border text-xs space-y-1.5">
+                          <div className="font-semibold text-hearth-ink">
+                            Standard Installation Rates
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">
+                            {product.installationRateCard.map((rate) => (
+                              <div
+                                key={rate.code}
+                                className="flex items-center justify-between py-1 border-b border-hearth-border/50 text-[11px]"
+                              >
+                                <span className="text-hearth-umber">{rate.label}</span>
+                                <span className="font-ledger font-semibold text-hearth-ink">
+                                  ₹{rate.ratePerUnit} / {rate.unit}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                  </div>
+                )}
 
                 {/* Account Review Banner */}
                 {isFlaggedBlacklist && (
