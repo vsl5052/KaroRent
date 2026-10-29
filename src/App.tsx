@@ -5,6 +5,7 @@ import { WorkspaceSidebar } from './components/layout/WorkspaceSidebar';
 import { BreadcrumbStrip } from './components/layout/BreadcrumbStrip';
 import { ToastContainer } from './components/layout/ToastContainer';
 import { MarketplaceView } from './components/marketplace/MarketplaceView';
+import { ForBusinessView } from './components/marketplace/ForBusinessView';
 import { BookingCheckoutModal } from './components/marketplace/BookingCheckoutModal';
 import { CustomerDashboardView } from './components/customer/CustomerDashboardView';
 import { AgreementReaderModal } from './components/customer/AgreementReaderModal';
@@ -29,6 +30,8 @@ export const App: React.FC = () => {
     switch (activeTab) {
       case 'MARKETPLACE':
         return <MarketplaceView />;
+      case 'FOR_BUSINESS':
+        return <ForBusinessView />;
       case 'MY_RENTALS':
         return <CustomerDashboardView />;
       case 'AGREEMENTS_ESIGN':

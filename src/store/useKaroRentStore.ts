@@ -2385,7 +2385,7 @@ export const useKaroRentStore = create<KaroRentState>()(
       },
     }),
     {
-      name: 'karorent-live-platform-v5',
+      name: 'karorent-live-platform-v6',
       partialize: (state) => ({
         darkMode: state.darkMode,
         customers: state.customers,

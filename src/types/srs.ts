@@ -583,6 +583,7 @@ export interface OpenBusinessDecisionItem {
 
 export type NavigationTab =
   | 'MARKETPLACE'
+  | 'FOR_BUSINESS'
   | 'MY_RENTALS'
   | 'AGREEMENTS_ESIGN'
   | 'INVOICES_DEPOSITS'

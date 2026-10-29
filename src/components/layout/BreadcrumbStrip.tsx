@@ -5,6 +5,7 @@ import { NavigationTab } from '../../types/srs';
 
 const TAB_TITLES: Record<NavigationTab, string> = {
   MARKETPLACE: 'Catalog',
+  FOR_BUSINESS: 'For Business',
   MY_RENTALS: 'My Rentals',
   AGREEMENTS_ESIGN: 'Agreements',
   INVOICES_DEPOSITS: 'Payments & Deposits',

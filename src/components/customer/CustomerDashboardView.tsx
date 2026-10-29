@@ -69,13 +69,11 @@ export const CustomerDashboardView: React.FC = () => {
               Account Details
             </div>
             <div className="text-hearth-umber">
-              <strong>{currentCustomer.fullName}</strong> ({currentCustomer.accountType})
+              <strong>{currentCustomer.fullName}</strong>
             </div>
-            {currentCustomer.companyName && (
-              <div className="text-[11px] text-hearth-terracotta font-medium">
-                {currentCustomer.companyName} • GSTIN: {currentCustomer.gstinOrTaxId}
-              </div>
-            )}
+            <div className="text-[11px] text-hearth-taupe">
+              {currentCustomer.verifiedMobile} • {currentCustomer.email}
+            </div>
           </div>
         </div>
 

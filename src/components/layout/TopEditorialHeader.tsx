@@ -159,6 +159,16 @@ export const TopEditorialHeader: React.FC = () => {
           >
             My Orders
           </button>
+          <button
+            onClick={() => setActiveTab('FOR_BUSINESS')}
+            className={`px-3.5 py-1.5 rounded-pill text-xs font-medium transition-colors ${
+              activeTab === 'FOR_BUSINESS'
+                ? 'bg-hearth-apricot text-hearth-terracotta font-semibold'
+                : 'text-hearth-umber hover:bg-hearth-oat'
+            }`}
+          >
+            For Business
+          </button>
         </nav>
 
         {/* Account Switcher */}
