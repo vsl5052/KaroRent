@@ -51,7 +51,6 @@ const RENT_MEGA_COLUMNS = [
     title: 'Bedroom',
     items: [
       'Beds',
-      'Kids Crib',
       'Queen Beds',
       'Storage Beds',
       'King Beds',
@@ -60,7 +59,6 @@ const RENT_MEGA_COLUMNS = [
       'Beds without Mattress',
       'Mattress',
       'Bedroom Combos',
-      'Kids Bed',
       'Compact Double Bed',
     ],
   },
@@ -72,8 +70,6 @@ const RENT_MEGA_COLUMNS = [
       'Living Room Combos',
       'Appliance Combos',
       'Storage Combos',
-      'Dining Combos',
-      'Study Combos',
     ],
   },
   {
@@ -81,7 +77,6 @@ const RENT_MEGA_COLUMNS = [
     title: 'Living Room',
     items: [
       'Sofas',
-      'Kids Seating',
       '3 Seater',
       'Sofa Sets',
       '2 Seater',
@@ -112,7 +107,6 @@ const RENT_MEGA_COLUMNS = [
     section: 'Storage',
     title: 'Storage',
     items: [
-      'Kids Storage',
       'Wardrobes',
       'Chest of Drawers',
       'Entertainment Units',
@@ -120,34 +114,6 @@ const RENT_MEGA_COLUMNS = [
       'Bookshelves',
       'Shoe Racks',
       'Storage Combos',
-    ],
-  },
-  {
-    section: 'Study',
-    title: 'Kids & Study',
-    items: [
-      'Kids Study',
-      'Kids Bed',
-      'Kids Crib',
-      'Kids Seating',
-      'Kids Storage',
-      'Workstations',
-      'Study Tables',
-      'Office Chairs',
-      'Study Combos',
-    ],
-  },
-  {
-    section: 'Dining',
-    title: 'Dining & Luxury',
-    items: [
-      'Dining Tables',
-      'Dining Combos',
-      'Luxury',
-      'Treadmills',
-      'Mattress',
-      'Compact Double Bed',
-      'Z Rated Combos',
     ],
   },
 ];
@@ -284,7 +250,7 @@ export const PublicNavbar: React.FC = () => {
                   onMouseEnter={handleRentMouseEnter}
                   onMouseLeave={handleRentMouseLeave}
                 >
-                  <div className="w-[980px] bg-white dark:bg-[#16181B] rounded-3xl border border-slate-200 dark:border-[#242B33] shadow-2xl p-6 grid grid-cols-7 gap-4 transition-colors">
+                  <div className="w-[820px] bg-white dark:bg-[#16181B] rounded-3xl border border-slate-200 dark:border-[#242B33] shadow-2xl p-6 grid grid-cols-5 gap-4 transition-colors">
                     {RENT_MEGA_COLUMNS.map((col, idx) => (
                       <div key={idx} className="space-y-2 border-r border-slate-100 dark:border-[#242B33]/60 last:border-0 pr-2">
                         {/* Column Header */}
@@ -413,7 +379,7 @@ export const PublicNavbar: React.FC = () => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search sofa, washing machine, split AC, study desk..."
+              placeholder="Search sofa, washing machine, split AC, double bed, wardrobe..."
               className="w-full pl-9 pr-9 py-2 rounded-full bg-slate-100/90 hover:bg-slate-100 focus:bg-white dark:bg-[#16181B] border border-slate-200 dark:border-[#242B33] focus:border-[#00C4DF] focus:ring-2 focus:ring-[#00C4DF]/20 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-sm transition-all"
             />
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -428,7 +394,7 @@ export const PublicNavbar: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Section: Theme Toggle, Become Partner & Sign In */}
+        {/* Right Section: Theme Toggle & Sign In */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           {/* Dark Mode Toggle */}
           <button
@@ -437,14 +403,6 @@ export const PublicNavbar: React.FC = () => {
             title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           >
             {darkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
-          </button>
-
-          {/* Become Partner Button */}
-          <button
-            onClick={() => setIsLoginModalOpen(true)}
-            className="hidden sm:flex items-center px-3.5 py-1.5 rounded-pill bg-slate-100 hover:bg-slate-200 dark:bg-[#16181B] dark:hover:bg-[#1E2328] border border-slate-200 dark:border-[#242B33] hover:border-[#00C4DF]/50 text-xs text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white font-medium transition-all"
-          >
-            Become Partner
           </button>
 
           {/* Quick Demo Persona Switcher */}

@@ -26,10 +26,6 @@ export const SECTION_TABS = [
   'Living Room',
   'Appliances',
   'Storage',
-  'Kids',
-  'Study',
-  'Dining',
-  'Luxury',
 ];
 
 interface SectionConfig {
@@ -52,7 +48,7 @@ const SECTION_CONFIGS: Record<string, SectionConfig> = {
     title: 'BHK Combos & Complete Home Packages',
     subtitle: 'Move into a fully furnished apartment tomorrow. Curated packages starting at ₹1,499/mo.',
     bannerImage: 'assets/hero_unlmtd_emerald_grid.jpg',
-    subCategories: ['All', 'Bedroom Combos', 'Living Room Combos', 'Appliance Combos', 'Storage Combos', 'Dining Combos', 'Study Combos'],
+    subCategories: ['All', 'Bedroom Combos', 'Living Room Combos', 'Appliance Combos', 'Storage Combos'],
   },
   'Living Room': {
     title: 'Luxe Living Room Sanctuaries',
@@ -73,31 +69,6 @@ const SECTION_CONFIGS: Record<string, SectionConfig> = {
     subtitle: 'Spacious wardrobes, chest of drawers, shoe racks, and entertainment media units.',
     bannerImage: 'assets/theme_warm_terracotta_living.jpg',
     subCategories: ['All', 'Wardrobes', 'Chest of Drawers', 'Entertainment Units', 'Bookshelves', 'Shoe Racks'],
-  },
-  'Kids': {
-    title: 'Kids Study & Bedroom Furnishings',
-    subtitle: 'Safe, rounded wooden cribs, adjustable study desks, and playful vibrant storage.',
-    bannerImage: 'assets/theme_zen_japandi_bedroom.jpg',
-    subCategories: ['All', 'Kids Study', 'Kids Bed', 'Kids Crib', 'Kids Storage', 'Study Desks'],
-  },
-  'Study': {
-    title: 'WFH & Executive Study Suites',
-    subtitle: 'Dual-motor motorized standing desks, breathable mesh chairs, and monitor arms.',
-    bannerImage: 'assets/client_workspace_setup.jpg',
-    subCategories: ['All', 'Workstations', 'Study Tables', 'Office Chairs', 'Bookshelves', 'Study Combos'],
-    categoryFilter: 'Study & WFH',
-  },
-  'Dining': {
-    title: 'Dining Tables & Entertaining Sets',
-    subtitle: 'Artisanal Sheesham dining tables, cushioned banquet chairs, and breakfast counter stools.',
-    bannerImage: 'assets/theme_botanical_verandah_dining.jpg',
-    subCategories: ['All', '4-Seater Dining', '6-Seater Dining', 'Dining Combos', 'Bar Stools'],
-  },
-  'Luxury': {
-    title: 'The Luxe Boutique Collection',
-    subtitle: 'Solid brass inlays, velvet chesterfields, and imported marble finishes.',
-    bannerImage: 'assets/hero_emerald_living_luxe.jpg',
-    subCategories: ['All', 'Velvet Chesterfields', 'Marble Coffee Tables', 'King Suites', 'Smart Recliners'],
   },
 };
 

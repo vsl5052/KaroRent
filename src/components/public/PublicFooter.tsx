@@ -146,11 +146,11 @@ export const PublicFooter: React.FC = () => {
               <button
                 onClick={() => {
                   setActiveTab('MARKETPLACE');
-                  setSelectedCategory('Study & WFH');
+                  setSelectedCategory('Living Room');
                 }}
                 className="hover:text-[#00C4DF] transition-colors"
               >
-                Ergonomic Desks & Chairs
+                Wardrobes & Storage Units
               </button>
             </li>
             <li>
