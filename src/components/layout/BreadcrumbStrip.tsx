@@ -4,7 +4,8 @@ import { useKaroRentStore } from '../../store/useKaroRentStore';
 import { NavigationTab } from '../../types/srs';
 
 const TAB_TITLES: Record<NavigationTab, string> = {
-  MARKETPLACE: 'Catalog',
+  MARKETPLACE: 'Public Catalog',
+  YOUR_ACCOUNT: 'Your Account',
   FOR_BUSINESS: 'For Business',
   MY_RENTALS: 'My Rentals',
   AGREEMENTS_ESIGN: 'Agreements',
@@ -37,23 +38,22 @@ export const BreadcrumbStrip: React.FC = () => {
 
   return (
     <div className="w-full bg-hearth-card/70 border-b border-hearth-border px-4 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
-      {/* Simple Breadcrumb */}
-      <div className="flex items-center gap-1.5 text-hearth-taupe flex-wrap">
+      {/* Breadcrumb & Quick Return */}
+      <div className="flex items-center gap-2 text-hearth-taupe flex-wrap">
         <button
-          onClick={() =>
-            setActiveTab(
-              activePersona.role === 'VENDOR_OWNER'
-                ? 'VENDOR_PORTAL'
-                : activePersona.role === 'FIELD_PERSONNEL'
-                ? 'FIELD_OPERATIONS'
-                : 'MARKETPLACE'
-            )
-          }
+          onClick={() => setActiveTab('YOUR_ACCOUNT')}
+          className="hover:text-hearth-terracotta transition-colors font-bold text-hearth-terracotta flex items-center gap-1"
+        >
+          <span>← Your Account</span>
+        </button>
+        <span className="text-hearth-border">•</span>
+        <button
+          onClick={() => setActiveTab('MARKETPLACE')}
           className="hover:text-hearth-terracotta transition-colors font-medium"
         >
-          Home
+          Catalog
         </button>
-        <ChevronRight className="w-3.5 h-3.5" />
+        <ChevronRight className="w-3.5 h-3.5 text-hearth-taupe" />
         <span className="text-hearth-ink font-semibold">{currentTitle}</span>
       </div>
 

@@ -15,11 +15,11 @@ import {
 import { useKaroRentStore } from '../../store/useKaroRentStore';
 
 const LOCATIONS = [
-  'Indiranagar, Bengaluru (560038)',
-  'Koramangala, Bengaluru (560034)',
-  'Ulsoor Lakefront, Bengaluru (560042)',
-  'Whitefield, Bengaluru (560066)',
-  'HSR Layout, Bengaluru (560102)',
+  'Zone 560038',
+  'Zone 560034',
+  'Zone 560042',
+  'Zone 560066',
+  'Zone 560102',
 ];
 
 export const TopEditorialHeader: React.FC = () => {

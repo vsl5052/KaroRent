@@ -1,10 +1,15 @@
 import React, { useEffect } from 'react';
 import { useKaroRentStore } from './store/useKaroRentStore';
-import { TopEditorialHeader } from './components/layout/TopEditorialHeader';
+import { PublicNavbar } from './components/public/PublicNavbar';
+import { PublicStorefrontView } from './components/public/PublicStorefrontView';
+import { SectionCatalogView } from './components/public/SectionCatalogView';
+import { ProductDetailModal } from './components/public/ProductDetailModal';
+import { PublicFooter } from './components/public/PublicFooter';
+import { LoginModal } from './components/public/LoginModal';
+import { AmazonStyleAccountHub } from './components/account/AmazonStyleAccountHub';
 import { WorkspaceSidebar } from './components/layout/WorkspaceSidebar';
 import { BreadcrumbStrip } from './components/layout/BreadcrumbStrip';
 import { ToastContainer } from './components/layout/ToastContainer';
-import { MarketplaceView } from './components/marketplace/MarketplaceView';
 import { ForBusinessView } from './components/marketplace/ForBusinessView';
 import { BookingCheckoutModal } from './components/marketplace/BookingCheckoutModal';
 import { CustomerDashboardView } from './components/customer/CustomerDashboardView';
@@ -22,25 +27,51 @@ import { SupportDisputesView } from './components/admin/SupportDisputesView';
 import { AuditObdReportsView } from './components/admin/AuditObdReportsView';
 
 export const App: React.FC = () => {
-  const { activeTab, darkMode, activePersona } = useKaroRentStore();
+  const { activeTab, darkMode, publicPageMode } = useKaroRentStore();
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode);
   }, [darkMode]);
 
-  const renderActiveView = () => {
-    if (
-      activePersona.role === 'VENDOR_OWNER' &&
-      (activeTab === 'MARKETPLACE' ||
-        activeTab === 'FOR_BUSINESS' ||
-        activeTab === 'AUDIT_OBD_REPORTS')
-    ) {
-      return <VendorPortalView />;
-    }
+  // 1. PUBLIC STOREFRONT (Catalog without any login - Furlenco / RentoMojo Style)
+  if (activeTab === 'MARKETPLACE') {
+    return (
+      <div className="min-h-screen flex flex-col bg-hearth-canvas text-hearth-ink">
+        <PublicNavbar />
+        <main className="flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+          {publicPageMode === 'SECTION' ? <SectionCatalogView /> : <PublicStorefrontView />}
+        </main>
+        <PublicFooter />
+        <LoginModal />
+        <ProductDetailModal />
+        <BookingCheckoutModal />
+        <AgreementReaderModal inlineMode={false} />
+        <ToastContainer />
+      </div>
+    );
+  }
 
+  // 2. YOUR ACCOUNT HUB (Amazon "Your Account" Layout matching user image)
+  if (activeTab === 'YOUR_ACCOUNT') {
+    return (
+      <div className="min-h-screen flex flex-col bg-hearth-canvas text-hearth-ink">
+        <PublicNavbar />
+        <main className="flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+          <AmazonStyleAccountHub />
+        </main>
+        <PublicFooter />
+        <LoginModal />
+        <ProductDetailModal />
+        <BookingCheckoutModal />
+        <AgreementReaderModal inlineMode={false} />
+        <ToastContainer />
+      </div>
+    );
+  }
+
+  // 3. SPECIFIC SUBMODULES (My Rentals, Invoices, Vendor Portal, Staff, Field Service, Governance, etc.)
+  const renderActiveModuleView = () => {
     switch (activeTab) {
-      case 'MARKETPLACE':
-        return <MarketplaceView />;
       case 'FOR_BUSINESS':
         return <ForBusinessView />;
       case 'MY_RENTALS':
@@ -70,27 +101,29 @@ export const App: React.FC = () => {
       case 'AUDIT_OBD_REPORTS':
         return <AuditObdReportsView />;
       default:
-        return <MarketplaceView />;
+        return <PublicStorefrontView />;
     }
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-hearth-canvas text-hearth-ink">
-      {/* Sticky 72px Top Editorial Header */}
-      <TopEditorialHeader />
+      {/* Top E-Commerce Header */}
+      <PublicNavbar />
 
-      {/* Sub-Header Breadcrumb & SRS Traceability Strip */}
+      {/* Sub-Header Breadcrumb & Return Strip */}
       <BreadcrumbStrip />
 
-      {/* Main Asymmetric Workspace Layout (272px Woven Oat Sidebar + Main Editorial Canvas) */}
+      {/* Asymmetric Workspace Layout with Sidebar & Submodule Canvas */}
       <div className="flex-1 flex flex-col lg:flex-row">
         <WorkspaceSidebar />
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1440px] w-full mx-auto">
-          {renderActiveView()}
+          {renderActiveModuleView()}
         </main>
       </div>
 
-      {/* Global Contextual Modals */}
+      {/* Global Modals & Notifications */}
+      <LoginModal />
+      <ProductDetailModal />
       <BookingCheckoutModal />
       <AgreementReaderModal inlineMode={false} />
       <ToastContainer />

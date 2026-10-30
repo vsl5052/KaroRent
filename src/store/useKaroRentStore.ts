@@ -114,6 +114,22 @@ interface KaroRentState {
   markAllNotificationsRead: () => void;
   resetDemoState: () => void;
 
+  isAuthenticated: boolean;
+  isLoginModalOpen: boolean;
+  setIsLoginModalOpen: (open: boolean) => void;
+  loginUser: (personaId: string) => void;
+  logoutUser: () => void;
+
+  publicPageMode: 'HOME' | 'SECTION';
+  setPublicPageMode: (mode: 'HOME' | 'SECTION') => void;
+  catalogSection: string;
+  setCatalogSection: (section: string) => void;
+  catalogSubCategory: string;
+  setCatalogSubCategory: (subCategory: string) => void;
+  openSectionCatalog: (section: string, subCategory?: string) => void;
+  activeDetailProductId: string | null;
+  setActiveDetailProductId: (id: string | null) => void;
+
   loginWithMobile: (mobileNumber: string) => {
     success: boolean;
     message: string;
@@ -304,15 +320,17 @@ const nowIST = () => {
 export const useKaroRentStore = create<KaroRentState>()(
   persist(
     (set, get) => ({
-      darkMode: false,
+      darkMode: true,
       activeTab: 'MARKETPLACE',
       activePersona: DEMO_PERSONAS[0],
       personas: DEMO_PERSONAS,
+      isAuthenticated: false,
+      isLoginModalOpen: false,
       isSimulatingLatency: false,
       latencyActionLabel: null,
       toasts: [],
 
-      selectedLocation: 'Indiranagar, Bengaluru (560038)',
+      selectedLocation: '560038',
       searchQuery: '',
       selectedCategory: 'All',
       selectedWorkflowFilter: 'ALL',
@@ -320,6 +338,10 @@ export const useKaroRentStore = create<KaroRentState>()(
       comparisonProductIds: [],
       activeAgreementModalBookingId: null,
       activeCheckoutProductId: null,
+      publicPageMode: 'HOME',
+      catalogSection: 'Living Room',
+      catalogSubCategory: 'All',
+      activeDetailProductId: null,
 
       customers: INITIAL_CUSTOMERS,
       vendors: INITIAL_VENDORS,
@@ -352,15 +374,55 @@ export const useKaroRentStore = create<KaroRentState>()(
 
       setActiveTab: (tab) => set({ activeTab: tab }),
 
+      setIsLoginModalOpen: (open) => set({ isLoginModalOpen: open }),
+
+      loginUser: (personaId) => {
+        const found = get().personas.find((p) => p.id === personaId);
+        if (!found) return;
+        set({
+          activePersona: found,
+          isAuthenticated: true,
+          isLoginModalOpen: false,
+          activeTab: 'YOUR_ACCOUNT',
+        });
+        get().addToast({
+          title: `Welcome, ${found.name}!`,
+          description: `Signed in as ${found.roleBadge} (${found.subtitle}).`,
+          variant: 'success',
+        });
+      },
+
+      setPublicPageMode: (mode) => set({ publicPageMode: mode }),
+      setCatalogSection: (section) => set({ catalogSection: section }),
+      setCatalogSubCategory: (sub) => set({ catalogSubCategory: sub }),
+      openSectionCatalog: (section, subCategory = 'All') => {
+        set({
+          catalogSection: section,
+          catalogSubCategory: subCategory,
+          publicPageMode: 'SECTION',
+          activeTab: 'MARKETPLACE',
+        });
+      },
+      setActiveDetailProductId: (id) => set({ activeDetailProductId: id }),
+
+      logoutUser: () => {
+        set({
+          isAuthenticated: false,
+          activeTab: 'MARKETPLACE',
+        });
+        get().addToast({
+          title: 'Signed Out',
+          description: 'You are now browsing as a guest.',
+          variant: 'info',
+        });
+      },
+
       switchPersona: (personaId) => {
         const found = get().personas.find((p) => p.id === personaId);
         if (!found) return;
-        let defaultTab: NavigationTab = 'MARKETPLACE';
-        if (found.role === 'VENDOR_OWNER') defaultTab = 'VENDOR_PORTAL';
-        if (found.role === 'FIELD_PERSONNEL') defaultTab = 'FIELD_OPERATIONS';
-        if (found.role === 'PLATFORM_ADMIN') defaultTab = 'ADMIN_GOVERNANCE';
+        let defaultTab: NavigationTab = 'YOUR_ACCOUNT';
 
-        set({ activePersona: found, activeTab: defaultTab });
+        set({ activePersona: found, isAuthenticated: true, activeTab: defaultTab });
         get().addToast({
           title: `Switched Account: ${found.name}`,
           description: `${found.roleBadge} (${found.subtitle})`,
@@ -4142,7 +4204,7 @@ export const useKaroRentStore = create<KaroRentState>()(
               name: tech.fullName,
               role: 'FIELD_PERSONNEL',
               roleBadge: 'Field Technician',
-              subtitle: `${tech.vendorName} • ${tech.serviceAreas[0] || 'Bengaluru'}`,
+              subtitle: `${tech.vendorName} • Field Hub`,
               email: `${tech.fullName.toLowerCase().replace(/[^a-z0-9]/g, '.')}@karorent.in`,
               phone: tech.phone,
               vendorId: tech.vendorId,
@@ -4151,16 +4213,54 @@ export const useKaroRentStore = create<KaroRentState>()(
           }
         }
 
-        if (matched) {
-          let defaultTab: NavigationTab = 'MARKETPLACE';
-          if (matched.role === 'VENDOR_OWNER') defaultTab = 'VENDOR_PORTAL';
-          if (matched.role === 'FIELD_PERSONNEL') defaultTab = 'FIELD_OPERATIONS';
-          if (matched.role === 'PLATFORM_ADMIN') defaultTab = 'ADMIN_GOVERNANCE';
+        // If not in technicians, check vendors
+        if (!matched) {
+          const vendor = state.vendors.find((v) => {
+            const cleanPhone = v.registeredPhone.replace(/\D/g, '');
+            return cleanPhone.endsWith(cleanInput) || cleanInput.endsWith(cleanPhone);
+          });
+          if (vendor) {
+            matched = {
+              id: `persona-vendor-${vendor.id}`,
+              name: vendor.displayName || vendor.legalBusinessName,
+              role: 'VENDOR_OWNER',
+              roleBadge: 'Partner Vendor',
+              subtitle: 'Tier-1 Partner',
+              email: vendor.email,
+              phone: vendor.registeredPhone,
+              vendorId: vendor.id,
+            };
+            set((s) => ({ personas: [...s.personas, matched!] }));
+          }
+        }
 
-          set({ activePersona: matched, activeTab: defaultTab });
+        // Universal sign-in: if unrecognized mobile, register new customer automatically
+        if (!matched) {
+          const formattedPhone = mobileNumber.startsWith('+91') ? mobileNumber : `+91 ${cleanInput}`;
+          matched = {
+            id: `persona-cus-${Date.now()}`,
+            name: `Customer (${cleanInput.slice(-4)})`,
+            role: 'CUSTOMER_INDIVIDUAL',
+            roleBadge: 'Customer',
+            subtitle: 'Verified Customer',
+            email: `customer.${cleanInput.slice(-4)}@karorent.in`,
+            phone: formattedPhone,
+            customerId: `CUS-${cleanInput.slice(-4)}`,
+            isBlacklisted: false,
+          };
+          set((s) => ({ personas: [...s.personas, matched!] }));
+        }
+
+        if (matched) {
+          set({
+            activePersona: matched,
+            isAuthenticated: true,
+            isLoginModalOpen: false,
+            activeTab: 'YOUR_ACCOUNT',
+          });
           get().addToast({
             title: `Welcome, ${matched.name}!`,
-            description: `Logged in as ${matched.roleBadge} with mobile ${matched.phone}.`,
+            description: `Signed in as ${matched.roleBadge} (${matched.phone}).`,
             variant: 'success',
           });
           return { success: true, message: `Logged in as ${matched.name}`, persona: matched };
@@ -4181,6 +4281,7 @@ export const useKaroRentStore = create<KaroRentState>()(
       name: 'karorent-live-platform-v14',
       partialize: (state) => ({
         darkMode: state.darkMode,
+        isAuthenticated: state.isAuthenticated,
         personas: state.personas,
         customers: state.customers,
         vendors: state.vendors,

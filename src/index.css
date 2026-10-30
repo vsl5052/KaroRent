@@ -3,31 +3,31 @@
 @tailwind utilities;
 
 :root {
-  /* Theme 3: Terracotta Hearth — Light Mode ("Warm Alabaster Linen") */
-  --bg-surface-0: #FAF8F5;
-  --bg-surface-1: #FFFFFF;
-  --bg-surface-2: #F5F2EB;
-  --bg-surface-3: #FFFCF7;
-  --border-sandstone: #E7E5E4;
-  --text-ink: #1C1917;
-  --text-umber: #44403C;
-  --text-taupe: #78716C;
-  --bg-apricot: #FFF7ED;
-  --bg-sage-tint: #EFF6F0;
+  /* Charcoal & Cyan / Slate Minimalist — Light Mode ("Cool Slate Minimalist") */
+  --bg-surface-0: #F8FAFC; /* Crisp cool slate canvas */
+  --bg-surface-1: #FFFFFF; /* Pure brilliant white card fill */
+  --bg-surface-2: #F1F5F9; /* Slate mist elevation */
+  --bg-surface-3: #E2E8F0; /* Soft slate accent surface */
+  --border-sandstone: #E2E8F0; /* Crisp slate border */
+  --text-ink: #0F172A; /* Deep slate charcoal headlines */
+  --text-umber: #334155; /* Refined slate supporting copy */
+  --text-taupe: #64748B; /* Balanced muted slate metadata */
+  --bg-apricot: #E0F2FE; /* Pale ice-cyan tint */
+  --bg-sage-tint: #ECFEFF; /* Soft cyan ambient glow */
 }
 
 .dark {
-  /* Theme 3: Terracotta Hearth — Dark Mode ("Espresso Hearth") */
-  --bg-surface-0: #141210;
-  --bg-surface-1: #1C1917;
-  --bg-surface-2: #262320;
-  --bg-surface-3: #221F1D;
-  --border-sandstone: #38332E;
-  --text-ink: #FAF8F5;
-  --text-umber: #D6D3D1;
-  --text-taupe: #A8A29E;
-  --bg-apricot: #2E1A12;
-  --bg-sage-tint: #18281B;
+  /* Charcoal & Cyan / Slate Minimalist — Dark Mode ("Dark Slate Minimalist") */
+  --bg-surface-0: #111315; /* Deep charcoal / matte off-black */
+  --bg-surface-1: #16181B; /* Matte dark card fill */
+  --bg-surface-2: #1E2328; /* Slate blue-gray elevation */
+  --bg-surface-3: #14171A; /* Surface dark backing */
+  --border-sandstone: #242B33; /* Muted steel slate border */
+  --text-ink: #FFFFFF; /* Crisp white headlines */
+  --text-umber: #CBD5E1; /* Soft slate-gray supporting copy */
+  --text-taupe: #94A3B8; /* Muted slate-gray */
+  --bg-apricot: #1A242D; /* Slate blue accent fill */
+  --bg-sage-tint: #0B2228; /* Electric cyan glow tint */
 }
 
 @layer base {
@@ -37,6 +37,13 @@
     color: var(--text-ink);
     transition: background-color 280ms cubic-bezier(0.22, 1, 0.36, 1),
                 color 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Universal smooth transition for theme switching */
+  header, main, footer, nav, button, div, a, span, input, select, textarea {
+    transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    transition-duration: 250ms;
   }
 
   h1, h2, h3, .font-editorial {

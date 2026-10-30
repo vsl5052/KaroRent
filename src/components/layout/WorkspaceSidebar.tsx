@@ -8,6 +8,7 @@ import {
   FileSpreadsheet,
   Home,
   Layers,
+  LayoutGrid,
   MessageSquareWarning,
   ReceiptIndianRupee,
   ShieldAlert,
@@ -106,10 +107,28 @@ export const WorkspaceSidebar: React.FC = () => {
 
   const navItems: NavItemConfig[] = [
     {
+      id: 'YOUR_ACCOUNT',
+      label: 'Your Account',
+      icon: <LayoutGrid className="w-4 h-4 text-hearth-terracotta" />,
+      allowedRoles: [
+        'CUSTOMER_INDIVIDUAL',
+        'CUSTOMER_BUSINESS',
+        'VENDOR_OWNER',
+        'FIELD_PERSONNEL',
+        'PLATFORM_ADMIN',
+      ],
+    },
+    {
       id: 'MARKETPLACE',
-      label: 'Catalog',
+      label: 'Public Catalog',
       icon: <Home className="w-4 h-4" />,
-      allowedRoles: ['CUSTOMER_INDIVIDUAL', 'CUSTOMER_BUSINESS', 'PLATFORM_ADMIN'],
+      allowedRoles: [
+        'CUSTOMER_INDIVIDUAL',
+        'CUSTOMER_BUSINESS',
+        'VENDOR_OWNER',
+        'FIELD_PERSONNEL',
+        'PLATFORM_ADMIN',
+      ],
     },
     {
       id: 'MY_RENTALS',

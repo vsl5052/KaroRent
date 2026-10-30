@@ -14,12 +14,20 @@ export default {
           ink: 'var(--text-ink)',
           umber: 'var(--text-umber)',
           taupe: 'var(--text-taupe)',
-          terracotta: '#C2410C',
-          kiln: '#9A3412',
-          clay: '#7C2D12',
+          terracotta: '#00C4DF', // Bright Electric Cyan Primary Accent
+          kiln: '#00B2D6',       // Electric Cyan Hover
+          clay: '#008B9E',       // Cyan Dark Accent
           apricot: 'var(--bg-apricot)',
-          sage: '#2F5233',
+          sage: '#F59E0B',       // Warm Golden-Yellow Secondary Accent
           sageLight: 'var(--bg-sage-tint)',
+          gold: '#F59E0B',       // Warm Golden-Yellow for Pricing
+          goldWarm: '#FBBF24',
+          cyan: '#00C4DF',
+          cyanHover: '#00B2D6',
+          cyanDark: '#008B9E',
+          slateCard: '#16181B',
+          slateBg: '#111315',
+          slateBorder: '#242B33',
         },
       },
       fontFamily: {
