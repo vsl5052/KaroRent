@@ -3,9 +3,12 @@ import {
   AlertOctagon,
   ArrowRightLeft,
   CheckCircle2,
+  Clock,
+  FileText,
   ShieldAlert,
   Sliders,
   XCircle,
+  Zap,
 } from 'lucide-react';
 import { useKaroRentStore } from '../../store/useKaroRentStore';
 import { mandatoryReasonSchema } from '../../lib/validation';
@@ -19,13 +22,19 @@ export const AdminGovernanceView: React.FC = () => {
     bookings,
     depositLedgers,
     blacklist,
+    invoices,
     resolveStagedInventoryRequest,
     updateMasterProductPricing,
     reviewVendorApplication,
     terminateVendorAndAssignContinuity,
+    triggerDefaultNotice,
+    curePaymentDefault,
+    reportRepossessionObstruction,
     isSimulatingLatency,
     addToast,
   } = useKaroRentStore();
+
+  const [simBookingId, setSimBookingId] = useState<string>('BKG-2026-8892');
 
   // Inventory Decision State
   const [adminReasonByInv, setAdminReasonByInv] = useState<Record<string, string>>({
@@ -140,6 +149,190 @@ export const AdminGovernanceView: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* SECTION: Statutory Default, Legal Notices & Repossession Simulator */}
+      {(() => {
+        const simBooking = bookings.find((b) => b.id === simBookingId) || bookings[0];
+        const bookingInvoices = invoices.filter((i) => i.bookingId === simBooking?.id);
+        const targetInvoice =
+          bookingInvoices.find((i) => i.chargeType === 'PERIODIC_RENTAL_INVOICE' && i.paymentState !== 'Successful') ||
+          bookingInvoices.find((i) => i.chargeType === 'PERIODIC_RENTAL_INVOICE') ||
+          bookingInvoices[0];
+        const latestNotice = simBooking?.defaultNotices?.slice(-1)[0];
+
+        return (
+          <div className="rounded-3xl bg-gradient-to-r from-rose-950/20 via-amber-950/20 to-orange-950/20 border-2 border-rose-400 p-6 shadow-hearth space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-hearth-border pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-rose-600/20 text-rose-700 flex items-center justify-center">
+                  <Zap className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="font-serif text-lg font-bold text-hearth-ink flex items-center gap-2">
+                    <span>Default Escalation & Repossession Simulator</span>
+                    <span className="px-2 py-0.5 rounded-pill bg-rose-100 text-rose-800 border border-rose-200 text-[10px] font-mono font-bold">
+                      Appendix C & Section 4
+                    </span>
+                  </h2>
+                  <p className="text-xs text-hearth-umber">
+                    Simulate real-time progression: Notice 1 (T+1 Reminder) → Notice 2 (T+5 Default & ₹500 Late Fee) → Notice 3 (T+11 Termination & Repossession).
+                  </p>
+                </div>
+              </div>
+
+              {/* Booking Selector Dropdown */}
+              <div className="flex items-center gap-2">
+                <label className="text-xs font-semibold text-hearth-ink">
+                  Target Booking:
+                </label>
+                <select
+                  value={simBookingId}
+                  onChange={(e) => setSimBookingId(e.target.value)}
+                  className="px-3.5 py-1.5 rounded-pill bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] text-xs font-mono font-bold text-[#166534] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#166534]/30 cursor-pointer transition-all"
+                >
+                  {bookings.map((b) => (
+                    <option key={b.id} value={b.id} className="bg-white text-hearth-ink font-sans font-normal">
+                      {b.id} — {b.customerName} ({b.productTitle.slice(0, 20)}) • {b.status}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {simBooking && (
+              <div className="space-y-3 text-xs">
+                {/* Active Booking Telemetry Bar */}
+                <div className="p-3.5 rounded-2xl bg-hearth-card border border-hearth-border flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono font-bold text-hearth-ink">{simBooking.id}</span>
+                    <span className="font-semibold text-hearth-ink">{simBooking.customerName}</span>
+                    <span className="text-hearth-taupe font-mono">Invoice: {targetInvoice?.id || 'N/A'}</span>
+                  </div>
+
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="px-2.5 py-0.5 rounded-pill bg-hearth-oat border border-hearth-border text-[11px] font-semibold text-hearth-ink">
+                      Status: {simBooking.status}
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-pill bg-rose-100 text-rose-800 text-[11px] font-bold">
+                      Notices Dispatched: {simBooking.defaultNotices?.length || 0}
+                    </span>
+                    {latestNotice?.agentAuthCode && (
+                      <span className="px-2.5 py-0.5 rounded-pill bg-red-700 text-white font-mono text-[11px] font-bold">
+                        {latestNotice.agentAuthCode}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Simulator Action Triggers */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 pt-1">
+                  <button
+                    disabled={isSimulatingLatency || !targetInvoice}
+                    onClick={() => {
+                      if (!targetInvoice) return;
+                      triggerDefaultNotice({
+                        bookingId: simBooking.id,
+                        invoiceId: targetInvoice.id,
+                        targetStage: 1,
+                      });
+                    }}
+                    className="p-3 rounded-2xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-semibold text-left transition-all space-y-0.5 shadow-sm"
+                  >
+                    <div className="flex items-center gap-1.5 font-bold text-xs">
+                      <Clock className="w-3.5 h-3.5 text-amber-700" />
+                      <span>Stage 1: T+1 Reminder</span>
+                    </div>
+                    <div className="text-[10px] text-amber-800">
+                      Courtesy notice • 3 days cure
+                    </div>
+                  </button>
+
+                  <button
+                    disabled={isSimulatingLatency || !targetInvoice}
+                    onClick={() => {
+                      if (!targetInvoice) return;
+                      triggerDefaultNotice({
+                        bookingId: simBooking.id,
+                        invoiceId: targetInvoice.id,
+                        targetStage: 2,
+                      });
+                    }}
+                    className="p-3 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-900 border border-rose-300 font-semibold text-left transition-all space-y-0.5 shadow-sm"
+                  >
+                    <div className="flex items-center gap-1.5 font-bold text-xs">
+                      <ShieldAlert className="w-3.5 h-3.5 text-rose-700" />
+                      <span>Stage 2: T+5 Formal</span>
+                    </div>
+                    <div className="text-[10px] text-rose-800">
+                      ₹500 Late Fee & Restrict Account
+                    </div>
+                  </button>
+
+                  <button
+                    disabled={isSimulatingLatency || !targetInvoice}
+                    onClick={() => {
+                      if (!targetInvoice) return;
+                      triggerDefaultNotice({
+                        bookingId: simBooking.id,
+                        invoiceId: targetInvoice.id,
+                        targetStage: 3,
+                      });
+                    }}
+                    className="p-3 rounded-2xl bg-red-900 hover:bg-red-950 text-white border border-red-950 font-semibold text-left transition-all space-y-0.5 shadow-sm"
+                  >
+                    <div className="flex items-center gap-1.5 font-bold text-xs">
+                      <AlertOctagon className="w-3.5 h-3.5 text-red-200" />
+                      <span>Stage 3: T+11 Terminate</span>
+                    </div>
+                    <div className="text-[10px] text-red-200">
+                      Revoke License & Demand Repossession
+                    </div>
+                  </button>
+
+                  <button
+                    disabled={isSimulatingLatency}
+                    onClick={() => {
+                      reportRepossessionObstruction({
+                        bookingId: simBooking.id,
+                        refusalReason: 'Customer barred gate, refused surrender of asset, and disputed return policy.',
+                      });
+                    }}
+                    className="p-3 rounded-2xl bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-300 font-semibold text-left transition-all space-y-0.5 shadow-sm"
+                  >
+                    <div className="flex items-center gap-1.5 font-bold text-xs">
+                      <XCircle className="w-3.5 h-3.5 text-purple-700" />
+                      <span>Report Refusal (EX-035)</span>
+                    </div>
+                    <div className="text-[10px] text-purple-800">
+                      Enforce Hostile Retention Blacklist
+                    </div>
+                  </button>
+
+                  <button
+                    disabled={isSimulatingLatency || !targetInvoice}
+                    onClick={() => {
+                      if (!targetInvoice) return;
+                      curePaymentDefault({
+                        bookingId: simBooking.id,
+                        invoiceId: targetInvoice.id,
+                      });
+                    }}
+                    className="p-3 rounded-2xl bg-[#DCFCE7] hover:bg-[#BBF7D0] text-[#166534] border border-[#86EFAC] font-semibold text-left transition-all space-y-0.5 shadow-sm"
+                  >
+                    <div className="flex items-center gap-1.5 font-bold text-xs">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#166534]" />
+                      <span>Cure Default Payment</span>
+                    </div>
+                    <div className="text-[10px] text-[#166534]">
+                      Reconcile Invoice & Lift Restrictions
+                    </div>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* SECTION 1: Pending Inventory Updates */}
       <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-5">

@@ -252,6 +252,11 @@ export type BookingLifecycleStatus =
   | 'Confirmed'
   | 'Fulfilment In Progress'
   | 'Active Rental'
+  | 'Delivered & Active'
+  | 'Payment Overdue' // FR-PAY-012 (Notice 1 & 2)
+  | 'Terminated — Payment Default' // FR-PAY-012 (Notice 3)
+  | 'Asset Recovery — Repossession Scheduled' // WF-17
+  | 'Asset Recovery — Hostile Retention' // EX-035
   | 'Renewal Requested'
   | 'Expiring Soon'
   | 'Overdue'
@@ -261,9 +266,46 @@ export type BookingLifecycleStatus =
   | 'Disputed'
   | 'Settlement Pending'
   | 'Completed'
+  | 'Returned & Closed'
   | 'Cancellation Requested'
   | 'Cancelled'
   | 'Rejected';
+
+export type DefaultNoticeStage = 'NOTICE_1' | 'NOTICE_2' | 'NOTICE_3';
+
+export interface DefaultNoticeRecord {
+  id: string;
+  noticeType: DefaultNoticeStage;
+  noticeTitle: string;
+  bookingId: string;
+  invoiceId: string;
+  issuedAt: string;
+  dueOrCureDeadline: string;
+  principalAmount: number;
+  lateFeeAmount: number;
+  totalPayable: number;
+  agentAuthCode?: string;
+  scheduledRepossessionDate?: string;
+  scheduledRepossessionTimeWindow?: string;
+  subject: string;
+  fullNoticeText: string;
+}
+
+export interface DepositWaterfallSettlement {
+  bookingId: string;
+  settledAt: string;
+  originalDeposit: number;
+  unpaidBaseRent: number;
+  logisticsDeinstallationFee: number;
+  verifiedDamageFee: number;
+  contractualLateFees: number;
+  totalLiabilities: number;
+  netBalance: number; // positive = surplus, negative = deficit
+  outcome: 'SURPLUS_REFUND' | 'DEFICIT_FORFEIT_AND_INVOICE';
+  deficitInvoiceId?: string;
+  refundScheduledDate?: string;
+  mediatorNotes: string;
+}
 
 export interface SiteVisitRecord {
   scheduledDate: string;
@@ -321,9 +363,12 @@ export interface DeliveryAssignment {
   technicianPhoto: string;
   scheduledDate: string;
   scheduledTimeSlot: string;
-  taskType: 'DELIVERY' | 'SITE_VISIT' | 'PICKUP' | 'MAINTENANCE';
+  taskType: 'DELIVERY' | 'SITE_VISIT' | 'PICKUP' | 'MAINTENANCE' | 'REPOSSESSION';
   reason: string;
   assignedAt: string;
+  doorstepPhotoUrl?: string;
+  completedAt?: string;
+  status?: 'Scheduled' | 'Completed' | 'Refused / Obstructed';
   notes?: string;
 }
 
@@ -404,6 +449,10 @@ export interface BookingOrder {
   deliveryEvidencePhoto?: string;
   deliveryAssignment?: DeliveryAssignment;
   returnRecord?: ReturnInspectionRecord;
+  defaultNotices?: DefaultNoticeRecord[];
+  waterfallSettlement?: DepositWaterfallSettlement;
+  repossessionAssignment?: DeliveryAssignment;
+  repossessionObstructionNotes?: string;
   createdAt: string;
 }
 
@@ -418,6 +467,7 @@ export type InvoiceChargeType =
 export type PaymentState =
   | 'Initiated'
   | 'Pending'
+  | 'Pending Reconciliation'
   | 'Successful'
   | 'Failed'
   | 'Cancelled'
@@ -443,6 +493,8 @@ export interface FinancialInvoiceDocument {
   paidAt?: string;
   linkedCreditNoteId?: string;
   correctionReason?: string;
+  overdueStage?: 'NONE' | 'NOTICE_1' | 'NOTICE_2' | 'NOTICE_3';
+  lateFeeAssessed?: number;
 }
 
 export interface SegregatedDepositLedger {
@@ -580,7 +632,13 @@ export interface BlacklistEntry {
   ledgerType: 'VENDOR_BLACKLIST' | 'CUSTOMER_BLACKLIST';
   entityId: string;
   entityName: string;
-  categoryReason: 'Terminated Contract' | 'Severe Payment Default' | 'Heavy Asset Damage / Loss' | 'Extreme Policy Violation / Fraud';
+  categoryReason:
+    | 'Terminated Contract'
+    | 'Severe Payment Default'
+    | 'Heavy Asset Damage / Loss'
+    | 'Extreme Policy Violation / Fraud'
+    | 'Asset Retention & Unrecovered Balance Enforcement'
+    | 'Asset Recovery — Hostile Retention';
   triggeringCaseOrBookingId: string;
   matchedIdentifiers: {
     phone: string;

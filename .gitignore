@@ -7,4 +7,5 @@ dist-ssr
 .env.*
 Confidential/
 confidential/
+*.docx
 tsconfig.tsbuildinfo

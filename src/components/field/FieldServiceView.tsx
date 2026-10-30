@@ -13,7 +13,9 @@ import {
   UserCheck,
   Wrench,
   AlertCircle,
+  Camera,
   FileText,
+  ShieldAlert,
 } from 'lucide-react';
 import { useKaroRentStore } from '../../store/useKaroRentStore';
 import { BookingOrder, ServiceMaintenanceTicket, DeliveryAssignment } from '../../types/srs';
@@ -31,7 +33,7 @@ export interface TaskTechnician {
 export interface OperationalTask {
   id: string; // e.g. 'BKG-2026-8841' or 'SRV-2026-301'
   displayKey: string;
-  taskType: 'DELIVERY' | 'SITE_VISIT' | 'PICKUP' | 'MAINTENANCE';
+  taskType: 'DELIVERY' | 'SITE_VISIT' | 'PICKUP' | 'MAINTENANCE' | 'REPOSSESSION';
   categoryLabel: string;
   productTitle: string;
   productImage?: string;
@@ -71,7 +73,24 @@ export const FieldServiceView: React.FC = () => {
     masterProducts,
     fieldTechnicians,
     activePersona,
+    completeRepossessionHandover,
+    reportRepossessionObstruction,
+    isSimulatingLatency,
   } = useKaroRentStore();
+
+  const [handoverModalBookingId, setHandoverModalBookingId] = useState<string | null>(null);
+  const [handoverPhoto, setHandoverPhoto] = useState<string>(
+    'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=700&q=80'
+  );
+  const [handoverNotes, setHandoverNotes] = useState<string>('');
+
+  const [obstructionModalBookingId, setObstructionModalBookingId] = useState<string | null>(null);
+  const [obstructionReason, setObstructionReason] = useState<string>(
+    'Customer refused premises access and stated they will not return equipment until deposit dispute is settled.'
+  );
+  const [obstructionPhoto, setObstructionPhoto] = useState<string>(
+    'https://images.unsplash.com/photo-1541888946425-d0fbb186156a?auto=format&fit=crop&w=700&q=80'
+  );
 
   // Identify matching field technician for logged-in persona
   const loggedInTech = fieldTechnicians.find(
@@ -235,6 +254,66 @@ export const FieldServiceView: React.FC = () => {
           scheduledDate:
             b.returnRecord.scheduledDate || b.returnRecord.preferredPickupSlot,
           scheduledTimeSlot: b.returnRecord.scheduledTimeSlot,
+        });
+      }
+
+      // D) Asset Repossession Task (FR-REC-001)
+      if (
+        b.repossessionAssignment ||
+        b.status === 'Terminated — Payment Default' ||
+        b.status === 'Asset Recovery — Repossession Scheduled' ||
+        b.status === 'Asset Recovery — Hostile Retention'
+      ) {
+        const repoAssignment = b.repossessionAssignment;
+        const matchingRepoTech = fieldTechnicians.find(
+          (t) =>
+            (repoAssignment?.technicianId && t.id === repoAssignment.technicianId) ||
+            (repoAssignment?.technicianName &&
+              t.fullName.toLowerCase().includes(repoAssignment.technicianName.toLowerCase()))
+        );
+
+        allTasks.push({
+          id: b.id,
+          displayKey: `${b.id}-REPO`,
+          taskType: 'REPOSSESSION',
+          categoryLabel: 'Doorstep Asset Repossession',
+          productTitle: b.productTitle,
+          productImage: product?.lifestyleImage,
+          customerName: b.customerName,
+          deliveryAddress: b.deliveryAddress,
+          serviceLocation: b.serviceLocation,
+          status: b.status,
+          vendorId: b.fulfillingVendorId,
+          vendorName: b.fulfillingVendorName,
+          allocatedSerial: b.allocatedSerial,
+          booking: b,
+          assignedTechnician: repoAssignment
+            ? {
+                id: repoAssignment.technicianId || matchingRepoTech?.id,
+                name: repoAssignment.technicianName,
+                phone:
+                  repoAssignment.technicianPhone ||
+                  matchingRepoTech?.phone ||
+                  '+91 97400 55667',
+                photo:
+                  repoAssignment.technicianPhoto ||
+                  matchingRepoTech?.photoUrl ||
+                  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
+                scheduledDate: repoAssignment.scheduledDate || 'Scheduled Date',
+                scheduledTimeSlot: repoAssignment.scheduledTimeSlot || 'Scheduled Window',
+                reason: 'Asset Repossession (Legal Default)',
+              }
+            : undefined,
+          scheduledDate:
+            repoAssignment?.scheduledDate ||
+            b.defaultNotices?.slice(-1)[0]?.scheduledRepossessionDate ||
+            'Immediate Surrender',
+          scheduledTimeSlot:
+            repoAssignment?.scheduledTimeSlot ||
+            b.defaultNotices?.slice(-1)[0]?.scheduledRepossessionTimeWindow,
+          notes: b.defaultNotices?.slice(-1)[0]?.agentAuthCode
+            ? `Auth Code: ${b.defaultNotices.slice(-1)[0].agentAuthCode}`
+            : undefined,
         });
       }
     });
@@ -804,6 +883,284 @@ export const FieldServiceView: React.FC = () => {
                 </div>
               </div>
             )}
+
+            {/* 5. REPOSSESSION TASK */}
+            {activeTask.taskType === 'REPOSSESSION' && activeTask.booking && (
+              <div className="rounded-3xl bg-hearth-card border border-rose-200 p-6 shadow-hearth space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-hearth-border pb-3">
+                  <div className="flex items-center gap-2">
+                    <ShieldAlert className="w-5 h-5 text-[#991B1B]" />
+                    <h3 className="font-serif text-base font-bold text-hearth-ink">
+                      Asset Repossession Order (Section 4 Recovery Framework)
+                    </h3>
+                  </div>
+                  <span
+                    className={`px-3 py-0.5 rounded-pill text-[11px] font-bold ${
+                      activeTask.booking.status === 'Asset Recovery — Hostile Retention'
+                        ? 'bg-red-700 text-white'
+                        : activeTask.booking.status === 'Returned & Closed'
+                        ? 'bg-[#DCFCE7] text-[#166534]'
+                        : 'bg-rose-100 text-rose-900 border border-rose-300'
+                    }`}
+                  >
+                    {activeTask.booking.status}
+                  </span>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-rose-50/50 border border-rose-200 space-y-3 text-xs">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <span className="text-[10px] text-hearth-taupe block font-semibold">Agent Auth Code</span>
+                      <strong className="text-hearth-ink font-mono text-sm font-bold text-[#991B1B]">
+                        {activeTask.booking.defaultNotices?.slice(-1)[0]?.agentAuthCode || 'REPO-AUTH-VERIFIED'}
+                      </strong>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-hearth-taupe block font-semibold">Asset Serial to Recover</span>
+                      <strong className="text-hearth-ink font-mono">
+                        {activeTask.booking.allocatedSerial || 'SN-VERIFIED-ASSET'}
+                      </strong>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-hearth-taupe block font-semibold">Legal Notice Status</span>
+                      <strong className="text-rose-800">
+                        {activeTask.booking.defaultNotices?.slice(-1)[0]?.noticeTitle || 'Notice 3 Terminated'}
+                      </strong>
+                    </div>
+                  </div>
+
+                  {activeTask.booking.repossessionObstructionNotes && (
+                    <div className="p-3 rounded-xl bg-red-100 border border-red-300 text-red-900 text-xs space-y-1">
+                      <div className="font-bold flex items-center gap-1.5">
+                        <AlertCircle className="w-4 h-4 text-red-700" />
+                        <span>Obstruction Incident Logged (EX-035)</span>
+                      </div>
+                      <p>"{activeTask.booking.repossessionObstructionNotes}"</p>
+                      <p className="text-[10px] text-red-700">
+                        Customer enrolled in Blacklist Registry. Police assistance & Section 406 IPC recovery initiated.
+                      </p>
+                    </div>
+                  )}
+
+                  {activeTask.booking.repossessionAssignment?.doorstepPhotoUrl && (
+                    <div className="p-3 rounded-xl bg-green-50 border border-green-200 text-green-900 text-xs flex items-center justify-between gap-3">
+                      <div>
+                        <div className="font-bold flex items-center gap-1.5 text-[#166534]">
+                          <CheckCircle2 className="w-4 h-4 text-green-600" />
+                          <span>Doorstep Repossession Completed & Verified</span>
+                        </div>
+                        <p className="text-[11px] text-green-800 mt-0.5">
+                          Photo verified at {activeTask.booking.repossessionAssignment.completedAt} (FR-RET-002).
+                        </p>
+                      </div>
+                      <img
+                        src={activeTask.booking.repossessionAssignment.doorstepPhotoUrl}
+                        alt="Doorstep Handover"
+                        className="w-14 h-14 rounded-xl object-cover border border-green-300 shrink-0"
+                      />
+                    </div>
+                  )}
+
+                  {/* Technician Operational Actions */}
+                  {activeTask.booking.status !== 'Returned & Closed' && (
+                    <div className="pt-3 border-t border-rose-200 flex flex-wrap items-center justify-between gap-3">
+                      <span className="text-[11px] text-hearth-taupe">
+                        Field Execution: Capture handover photo or report refusal.
+                      </span>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setObstructionModalBookingId(activeTask.booking!.id)}
+                          className="px-3.5 py-1.5 rounded-pill bg-[#FEE2E2] hover:bg-rose-200 text-[#991B1B] border border-[#FECACA] text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                        >
+                          <AlertCircle className="w-3.5 h-3.5" />
+                          <span>Report Refusal / Obstruction (EX-035)</span>
+                        </button>
+
+                        <button
+                          onClick={() => setHandoverModalBookingId(activeTask.booking!.id)}
+                          className="spring-btn px-4 py-1.5 rounded-pill bg-[#166534] hover:bg-[#14532D] text-white text-xs font-semibold flex items-center gap-1.5"
+                        >
+                          <Camera className="w-3.5 h-3.5" />
+                          <span>Complete Recovery Handover</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Complete Repossession Handover Modal */}
+      {handoverModalBookingId && (
+        <div className="fixed inset-0 z-50 bg-[#1C1917]/55 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="w-full max-w-lg rounded-3xl bg-hearth-parchment border border-hearth-border shadow-hearth-lg p-6 space-y-4 text-xs">
+            <div className="flex items-center justify-between border-b border-hearth-border pb-3">
+              <div className="flex items-center gap-2">
+                <Camera className="w-5 h-5 text-[#166534]" />
+                <h3 className="font-serif text-base font-bold text-hearth-ink">
+                  Complete Doorstep Repossession Handover
+                </h3>
+              </div>
+              <button
+                onClick={() => setHandoverModalBookingId(null)}
+                className="w-7 h-7 rounded-full bg-hearth-oat hover:bg-hearth-card flex items-center justify-center text-hearth-taupe"
+              >
+                ✕
+              </button>
+            </div>
+
+            <p className="text-hearth-taupe text-[11px] leading-relaxed">
+              Pursuant to <strong>FR-RET-002</strong>, a verified doorstep handover photograph of the retrieved asset is mandatory before custody is confirmed.
+            </p>
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-[11px] font-semibold text-hearth-ink mb-1">
+                  Doorstep Photo Proof URL *
+                </label>
+                <input
+                  type="text"
+                  value={handoverPhoto}
+                  onChange={(e) => setHandoverPhoto(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-hearth-card border border-hearth-border text-xs focus:outline-none focus:border-[#166534]"
+                  placeholder="https://..."
+                  required
+                />
+              </div>
+
+              {handoverPhoto && (
+                <div className="p-2 rounded-xl bg-hearth-card border border-hearth-border flex items-center gap-3">
+                  <img
+                    src={handoverPhoto}
+                    alt="Doorstep Evidence Preview"
+                    className="w-16 h-16 rounded-lg object-cover border"
+                  />
+                  <div className="text-[11px] text-hearth-taupe">
+                    <span className="font-semibold text-hearth-ink block">Evidence Preview</span>
+                    Exif Timestamp: Verified • Geotag: Bengaluru Customer Premise
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-[11px] font-semibold text-hearth-ink mb-1">
+                  Handover Condition Notes (Optional)
+                </label>
+                <textarea
+                  value={handoverNotes}
+                  onChange={(e) => setHandoverNotes(e.target.value)}
+                  rows={2}
+                  className="w-full px-3 py-2 rounded-xl bg-hearth-card border border-hearth-border text-xs focus:outline-none focus:border-[#166534]"
+                  placeholder="Asset condition, power cord intact, remote handover, etc."
+                />
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-hearth-border flex items-center justify-end gap-2">
+              <button
+                onClick={() => setHandoverModalBookingId(null)}
+                className="px-4 py-2 rounded-pill bg-hearth-oat text-hearth-taupe hover:text-hearth-ink font-semibold"
+              >
+                Cancel
+              </button>
+              <button
+                disabled={isSimulatingLatency || !handoverPhoto.trim()}
+                onClick={async () => {
+                  await completeRepossessionHandover({
+                    bookingId: handoverModalBookingId,
+                    photoUrl: handoverPhoto.trim(),
+                    notes: handoverNotes.trim() || undefined,
+                  });
+                  setHandoverModalBookingId(null);
+                }}
+                className="spring-btn px-5 py-2 rounded-pill bg-[#166534] hover:bg-[#14532D] text-white font-semibold"
+              >
+                Confirm Repossession & Return
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Report Repossession Obstruction Modal (EX-035) */}
+      {obstructionModalBookingId && (
+        <div className="fixed inset-0 z-50 bg-[#1C1917]/55 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="w-full max-w-lg rounded-3xl bg-hearth-parchment border border-rose-300 shadow-hearth-lg p-6 space-y-4 text-xs">
+            <div className="flex items-center justify-between border-b border-hearth-border pb-3">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-red-600" />
+                <h3 className="font-serif text-base font-bold text-hearth-ink">
+                  Report Obstruction / Hostile Retention (EX-035)
+                </h3>
+              </div>
+              <button
+                onClick={() => setObstructionModalBookingId(null)}
+                className="w-7 h-7 rounded-full bg-hearth-oat hover:bg-hearth-card flex items-center justify-center text-hearth-taupe"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="p-3 rounded-2xl bg-red-100 border border-red-300 text-red-950 text-xs space-y-1">
+              <p className="font-bold">CRITICAL RISK INCIDENT</p>
+              <p className="text-[11px] leading-relaxed">
+                Reporting refusal will immediately categorize this order under <strong>EX-035: Asset Recovery — Hostile Retention</strong>, covertly enroll the customer in the platform Blacklist Registry, and prepare a Section 406 IPC recovery dossier.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-[11px] font-semibold text-hearth-ink mb-1">
+                  Specific Customer Refusal Statement / Notes *
+                </label>
+                <textarea
+                  value={obstructionReason}
+                  onChange={(e) => setObstructionReason(e.target.value)}
+                  rows={3}
+                  className="w-full px-3 py-2 rounded-xl bg-hearth-card border border-hearth-border text-xs focus:outline-none focus:border-red-600"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-hearth-ink mb-1">
+                  Premise / Doorstep Evidence Photo (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={obstructionPhoto}
+                  onChange={(e) => setObstructionPhoto(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-hearth-card border border-hearth-border text-xs focus:outline-none focus:border-red-600"
+                />
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-hearth-border flex items-center justify-end gap-2">
+              <button
+                onClick={() => setObstructionModalBookingId(null)}
+                className="px-4 py-2 rounded-pill bg-hearth-oat text-hearth-taupe hover:text-hearth-ink font-semibold"
+              >
+                Cancel
+              </button>
+              <button
+                disabled={isSimulatingLatency || !obstructionReason.trim()}
+                onClick={async () => {
+                  await reportRepossessionObstruction({
+                    bookingId: obstructionModalBookingId,
+                    refusalReason: obstructionReason.trim(),
+                    evidencePhotoUrl: obstructionPhoto.trim() || undefined,
+                  });
+                  setObstructionModalBookingId(null);
+                }}
+                className="spring-btn px-5 py-2 rounded-pill bg-red-700 hover:bg-red-800 text-white font-semibold"
+              >
+                Escalate & Enforce Blacklist
+              </button>
+            </div>
           </div>
         </div>
       )}

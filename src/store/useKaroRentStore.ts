@@ -7,7 +7,10 @@ import {
   BookingOrder,
   CustomPayoutAdjustment,
   CustomerAccount,
+  DefaultNoticeRecord,
+  DefaultNoticeStage,
   DeliveryAssignment,
+  DepositWaterfallSettlement,
   DisputeCaseRecord,
   FieldTechnician,
   FinancialInvoiceDocument,
@@ -46,6 +49,7 @@ import {
   INITIAL_VENDORS,
   INITIAL_VIRTUAL_INVENTORY,
 } from '../data/mockData';
+import { generateNotice1, generateNotice2, generateNotice3 } from '../lib/noticeTemplates';
 
 export interface ToastMessage {
   id: string;
@@ -125,7 +129,7 @@ interface KaroRentState {
 
   assignTechnicianToTask: (payload: {
     taskId: string;
-    taskType: 'DELIVERY' | 'SITE_VISIT' | 'PICKUP' | 'MAINTENANCE';
+    taskType: 'DELIVERY' | 'SITE_VISIT' | 'PICKUP' | 'MAINTENANCE' | 'REPOSSESSION';
     technicianId: string;
     scheduledDate: string;
     scheduledTimeSlot: string;
@@ -245,6 +249,42 @@ interface KaroRentState {
   executeVendorAssetReplacement: (ticketId: string, replacementSerial: string) => Promise<void>;
   escalateSupportTicket: (ticketId: string, resolutionOrEscalationNote: string) => Promise<void>;
   updateObdDecision: (obdId: string, selectedOption: string) => Promise<void>;
+  triggerDefaultNotice: (payload: {
+    bookingId: string;
+    invoiceId: string;
+    targetStage: 1 | 2 | 3;
+    scheduledRepossessionDate?: string;
+    scheduledRepossessionTimeWindow?: string;
+  }) => Promise<void>;
+  curePaymentDefault: (payload: {
+    bookingId: string;
+    invoiceId: string;
+  }) => Promise<void>;
+  assignRepossessionTask: (payload: {
+    bookingId: string;
+    technicianId: string;
+    scheduledDate: string;
+    scheduledTimeSlot: string;
+    notes?: string;
+  }) => Promise<void>;
+  completeRepossessionHandover: (payload: {
+    bookingId: string;
+    photoUrl: string;
+    notes?: string;
+  }) => Promise<void>;
+  reportRepossessionObstruction: (payload: {
+    bookingId: string;
+    refusalReason: string;
+    evidencePhotoUrl?: string;
+  }) => Promise<void>;
+  executeDepositWaterfallSettlement: (payload: {
+    bookingId: string;
+    unpaidBaseRent: number;
+    logisticsDeinstallationFee: number;
+    verifiedDamageFee: number;
+    contractualLateFees: number;
+    mediatorNotes: string;
+  }) => Promise<void>;
 }
 
 const simulateLatency = (ms = 320) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -1076,6 +1116,22 @@ export const useKaroRentStore = create<KaroRentState>()(
                       : d
                   )
                 : s.depositLedgers,
+            customers: s.customers.map((c) => {
+              if (c.id !== inv.customerId) return c;
+              if (c.status === 'Restricted') {
+                const hasOtherOverdue = updatedInvoices.some(
+                  (other) =>
+                    other.customerId === c.id &&
+                    other.id !== inv.id &&
+                    (other.overdueStage === 'NOTICE_2' || other.overdueStage === 'NOTICE_1') &&
+                    other.paymentState !== 'Successful'
+                );
+                if (!hasOtherOverdue) {
+                  return { ...c, status: 'Active' as const };
+                }
+              }
+              return c;
+            }),
             bookings: s.bookings.map((b) => {
               if (b.id !== inv.bookingId) return b;
               if (isSiteVisitOnlyPaid) {
@@ -1087,7 +1143,10 @@ export const useKaroRentStore = create<KaroRentState>()(
                     : undefined,
                 };
               }
-              if (allPaid) {
+              if (b.status === 'Payment Overdue') {
+                return { ...b, status: 'Delivered & Active' as const };
+              }
+              if (allPaid && b.status !== 'Delivered & Active' && b.status !== 'Return Requested' && b.status !== 'Returned & Closed') {
                 return { ...b, status: 'Confirmed' };
               }
               return b;
@@ -2918,6 +2977,13 @@ export const useKaroRentStore = create<KaroRentState>()(
             customerId = t.customerId;
             productTitle = t.productTitle;
           }
+        } else if (payload.taskType === 'REPOSSESSION') {
+          taskReasonLabel = 'Asset Repossession (Legal Default)';
+          const b = state.bookings.find((item) => item.id === payload.taskId);
+          if (b) {
+            customerId = b.customerId;
+            productTitle = b.productTitle;
+          }
         }
 
         const assignment: DeliveryAssignment = {
@@ -2991,6 +3057,13 @@ export const useKaroRentStore = create<KaroRentState>()(
                   : undefined,
               };
             }
+            if (payload.taskType === 'REPOSSESSION') {
+              return {
+                ...b,
+                status: 'Asset Recovery — Repossession Scheduled' as const,
+                repossessionAssignment: assignment,
+              };
+            }
             return b;
           }),
           serviceTickets: s.serviceTickets.map((st) => {
@@ -3028,6 +3101,696 @@ export const useKaroRentStore = create<KaroRentState>()(
           title: `Technician Assigned: ${tech.fullName}`,
           description: `Scheduled for ${taskReasonLabel} on ${payload.scheduledDate} (${payload.scheduledTimeSlot}). Customer has been notified.`,
           variant: 'success',
+        });
+      },
+
+      triggerDefaultNotice: async ({ bookingId, invoiceId, targetStage, scheduledRepossessionDate, scheduledRepossessionTimeWindow }) => {
+        set({ isSimulatingLatency: true, latencyActionLabel: `Issuing Legal Default Notice Stage ${targetStage}...` });
+        await simulateLatency(350);
+
+        const state = get();
+        const booking = state.bookings.find((b) => b.id === bookingId);
+        const invoice = state.invoices.find((i) => i.id === invoiceId);
+        if (!booking || !invoice) {
+          set({ isSimulatingLatency: false, latencyActionLabel: null });
+          return;
+        }
+
+        const customer = state.customers.find((c) => c.id === booking.customerId);
+        const customerMobile = customer?.verifiedMobile || '+91 98860 12345';
+        const customerEmail = customer?.email || 'customer@example.com';
+
+        let newRecord: DefaultNoticeRecord;
+        let noticeStage: DefaultNoticeStage;
+        let newBookingStatus = booking.status;
+        let lateFeeToAdd = 0;
+        let toastTitle = '';
+        let toastDesc = '';
+
+        if (targetStage === 1) {
+          noticeStage = 'NOTICE_1';
+          const content = generateNotice1({
+            booking,
+            invoice,
+            customerMobile,
+            customerEmail,
+          });
+          newRecord = {
+            id: `NOTC-1-${Date.now()}`,
+            noticeType: 'NOTICE_1',
+            noticeTitle: 'Notice 1: Payment Reminder (Day 1)',
+            bookingId: booking.id,
+            invoiceId: invoice.id,
+            issuedAt: nowIST(),
+            dueOrCureDeadline: 'Within 3 business days',
+            principalAmount: invoice.totalPayable,
+            lateFeeAmount: 0,
+            totalPayable: invoice.totalPayable,
+            subject: content.subject,
+            fullNoticeText: content.body,
+          };
+          newBookingStatus = 'Payment Overdue';
+          toastTitle = 'Notice 1 Issued: Day 1 Payment Reminder';
+          toastDesc = `Sent courteous payment reminder for invoice ${invoice.id} to ${booking.customerName}.`;
+        } else if (targetStage === 2) {
+          noticeStage = 'NOTICE_2';
+          lateFeeToAdd = 500;
+          const content = generateNotice2({
+            booking,
+            invoice,
+            customerMobile,
+            customerEmail,
+            lateFeeAmount: 500,
+            cureDeadlineDate: 'Within 5 business days',
+          });
+          newRecord = {
+            id: `NOTC-2-${Date.now()}`,
+            noticeType: 'NOTICE_2',
+            noticeTitle: 'Notice 2: Formal Notice of Default & Late Fee Assessment (Day 5)',
+            bookingId: booking.id,
+            invoiceId: invoice.id,
+            issuedAt: nowIST(),
+            dueOrCureDeadline: 'Within 5 business days',
+            principalAmount: invoice.totalPayable,
+            lateFeeAmount: 500,
+            totalPayable: invoice.totalPayable + 500,
+            subject: content.subject,
+            fullNoticeText: content.body,
+          };
+          newBookingStatus = 'Payment Overdue';
+          toastTitle = 'Notice 2 Issued: Formal Default & ₹500 Late Fee';
+          toastDesc = `Formal default declared. ₹500 late fee assessed and customer account restricted.`;
+        } else {
+          noticeStage = 'NOTICE_3';
+          const authCode = `REPO-AUTH-${booking.id.slice(-4)}-${Math.floor(1000 + Math.random() * 9000)}`;
+          const repoDate = scheduledRepossessionDate || '2026-10-31';
+          const repoWindow = scheduledRepossessionTimeWindow || '10:00 AM – 02:00 PM IST';
+          const content = generateNotice3({
+            booking,
+            invoice,
+            customerMobile,
+            customerEmail,
+            lateFeeAmount: invoice.lateFeeAssessed || 500,
+            cureDeadlineDate: 'IMMEDIATE SURRENDER',
+            repossessionDate: repoDate,
+            repossessionTimeWindow: repoWindow,
+            agentAuthCode: authCode,
+          });
+          newRecord = {
+            id: `NOTC-3-${Date.now()}`,
+            noticeType: 'NOTICE_3',
+            noticeTitle: 'Notice 3: Contract Termination & Repossession Demand (Day 11)',
+            bookingId: booking.id,
+            invoiceId: invoice.id,
+            issuedAt: nowIST(),
+            dueOrCureDeadline: 'Immediate Surrender',
+            principalAmount: invoice.totalPayable,
+            lateFeeAmount: invoice.lateFeeAssessed || 500,
+            totalPayable: invoice.totalPayable + (invoice.lateFeeAssessed ? 0 : 500),
+            agentAuthCode: authCode,
+            scheduledRepossessionDate: repoDate,
+            scheduledRepossessionTimeWindow: repoWindow,
+            subject: content.subject,
+            fullNoticeText: content.body,
+          };
+          newBookingStatus = 'Terminated — Payment Default';
+          toastTitle = 'Notice 3 Issued: Contract Terminated';
+          toastDesc = `Possessory license revoked. Equipment queued for immediate repossession dispatch.`;
+        }
+
+        set((s) => ({
+          isSimulatingLatency: false,
+          latencyActionLabel: null,
+          invoices: s.invoices.map((inv) => {
+            if (inv.id !== invoiceId) return inv;
+            return {
+              ...inv,
+              overdueStage: noticeStage,
+              lateFeeAssessed: lateFeeToAdd > 0 ? (inv.lateFeeAssessed || 0) + lateFeeToAdd : inv.lateFeeAssessed,
+              totalPayable: inv.totalPayable + lateFeeToAdd,
+              baseAmount: inv.baseAmount + lateFeeToAdd,
+            };
+          }),
+          bookings: s.bookings.map((b) => {
+            if (b.id !== bookingId) return b;
+            return {
+              ...b,
+              status: newBookingStatus,
+              defaultNotices: [...(b.defaultNotices || []), newRecord],
+            };
+          }),
+          customers: s.customers.map((c) => {
+            if (c.id !== booking.customerId) return c;
+            if (targetStage >= 2 && c.status === 'Active') {
+              return { ...c, status: 'Restricted' as const };
+            }
+            return c;
+          }),
+          notifications: [
+            {
+              id: `NTF-${Date.now()}`,
+              eventCode: targetStage === 3 ? 'Contract Termination' : 'Legal Default Notice',
+              title: newRecord.noticeTitle,
+              message: `${newRecord.subject}. Due: ${newRecord.dueOrCureDeadline}.`,
+              recipientRole: 'CUSTOMER_INDIVIDUAL',
+              customerScopeId: booking.customerId,
+              category: 'Deposit & Billing',
+              priority: targetStage >= 2 ? 'critical' : 'high',
+              read: false,
+              timestamp: 'Just now',
+              linkedView: 'INVOICES_DEPOSITS',
+            },
+            ...s.notifications,
+          ],
+          auditLogs: [
+            {
+              id: `AUD-${Date.now()}`,
+              timestamp: nowIST(),
+              actorName: s.activePersona.name,
+              actorRole: s.activePersona.roleBadge,
+              moduleCode: 'Legal Escalation',
+              actionSummary: `Dispatched ${newRecord.noticeTitle} for Booking ${booking.id} (Invoice ${invoice.id})`,
+              affectedRecordId: booking.id,
+              priorValue: `Booking Status: ${booking.status}`,
+              newValue: `Booking Status: ${newBookingStatus} • Stage: ${noticeStage}`,
+              mandatoryReason: `Statutory default progression pursuant to Appendix C framework.`,
+            },
+            ...s.auditLogs,
+          ],
+        }));
+
+        get().addToast({
+          title: toastTitle,
+          description: toastDesc,
+          variant: targetStage >= 2 ? 'warning' : 'info',
+        });
+      },
+
+      curePaymentDefault: async ({ bookingId, invoiceId }) => {
+        set({ isSimulatingLatency: true, latencyActionLabel: 'Reconciling Default Cure Payment...' });
+        await simulateLatency(350);
+
+        const state = get();
+        const invoice = state.invoices.find((i) => i.id === invoiceId);
+        const booking = state.bookings.find((b) => b.id === bookingId);
+        if (!invoice) {
+          set({ isSimulatingLatency: false, latencyActionLabel: null });
+          return;
+        }
+
+        const providerRef = `RZP_CURE_${Math.floor(100000 + Math.random() * 899999)}`;
+
+        set((s) => ({
+          isSimulatingLatency: false,
+          latencyActionLabel: null,
+          invoices: s.invoices.map((inv) =>
+            inv.id === invoiceId
+              ? {
+                  ...inv,
+                  paymentState: 'Successful',
+                  paidAt: nowIST(),
+                  providerReference: providerRef,
+                }
+              : inv
+          ),
+          bookings: s.bookings.map((b) => {
+            if (b.id !== bookingId) return b;
+            return {
+              ...b,
+              status: b.status === 'Payment Overdue' ? ('Delivered & Active' as const) : b.status,
+            };
+          }),
+          customers: s.customers.map((c) => {
+            if (c.id !== invoice.customerId) return c;
+            if (c.status === 'Restricted') {
+              const otherOverdue = s.invoices.some(
+                (inv) =>
+                  inv.customerId === c.id &&
+                  inv.id !== invoiceId &&
+                  (inv.overdueStage === 'NOTICE_2' || inv.overdueStage === 'NOTICE_1') &&
+                  inv.paymentState !== 'Successful'
+              );
+              if (!otherOverdue) {
+                return { ...c, status: 'Active' as const };
+              }
+            }
+            return c;
+          }),
+          auditLogs: [
+            {
+              id: `AUD-${Date.now()}`,
+              timestamp: nowIST(),
+              actorName: s.activePersona.name,
+              actorRole: s.activePersona.roleBadge,
+              moduleCode: 'Default Cured',
+              actionSummary: `Payment received for overdue invoice ${invoice.id}. Default cured and restrictions lifted.`,
+              affectedRecordId: invoice.id,
+              priorValue: `Overdue Stage: ${invoice.overdueStage || 'NOTICE_2'}`,
+              newValue: `Payment: Successful (Ref: ${providerRef})`,
+              mandatoryReason: 'Customer settled outstanding balance.',
+            },
+            ...s.auditLogs,
+          ],
+        }));
+
+        get().addToast({
+          title: `Default Cured: ₹${invoice.totalPayable.toLocaleString('en-IN')}`,
+          description: `Invoice ${invoice.id} settled. Account restrictions have been lifted.`,
+          variant: 'success',
+        });
+      },
+
+      assignRepossessionTask: async ({ bookingId, technicianId, scheduledDate, scheduledTimeSlot, notes }) => {
+        set({ isSimulatingLatency: true, latencyActionLabel: 'Dispatching Repossession Order to Technician...' });
+        await simulateLatency(350);
+
+        const state = get();
+        const tech = state.fieldTechnicians.find((t) => t.id === technicianId);
+        const booking = state.bookings.find((b) => b.id === bookingId);
+        if (!tech || !booking) {
+          set({ isSimulatingLatency: false, latencyActionLabel: null });
+          return;
+        }
+
+        const assignment: DeliveryAssignment = {
+          technicianId: tech.id,
+          technicianName: tech.fullName,
+          technicianPhone: tech.phone,
+          technicianPhoto: tech.photoUrl,
+          scheduledDate,
+          scheduledTimeSlot,
+          taskType: 'REPOSSESSION',
+          reason: 'Asset Repossession (Legal Default)',
+          assignedAt: nowIST(),
+          notes,
+        };
+
+        const authCode = booking.defaultNotices?.slice(-1)[0]?.agentAuthCode || `REPO-AUTH-${booking.id.slice(-4)}-7124`;
+
+        set((s) => ({
+          isSimulatingLatency: false,
+          latencyActionLabel: null,
+          bookings: s.bookings.map((b) => {
+            if (b.id !== bookingId) return b;
+            return {
+              ...b,
+              status: 'Asset Recovery — Repossession Scheduled' as const,
+              repossessionAssignment: assignment,
+            };
+          }),
+          notifications: [
+            {
+              id: `NTF-${Date.now()}`,
+              eventCode: 'Repossession Scheduled',
+              title: `Technician Scheduled for Equipment Repossession`,
+              message: `Field Technician ${tech.fullName} (${tech.phone}) is scheduled for doorstep asset recovery on ${scheduledDate} (${scheduledTimeSlot}). Authorization Code: ${authCode}.`,
+              recipientRole: 'CUSTOMER_INDIVIDUAL',
+              customerScopeId: booking.customerId,
+              category: 'Fulfilment & Pickup',
+              priority: 'critical',
+              read: false,
+              timestamp: 'Just now',
+              linkedView: 'MY_RENTALS',
+            },
+            ...s.notifications,
+          ],
+          auditLogs: [
+            {
+              id: `AUD-${Date.now()}`,
+              timestamp: nowIST(),
+              actorName: s.activePersona.name,
+              actorRole: s.activePersona.roleBadge,
+              moduleCode: 'Repossession Dispatch',
+              actionSummary: `Assigned Technician ${tech.fullName} to recover ${booking.productTitle} (${booking.allocatedSerial || 'Serial Pending'})`,
+              affectedRecordId: booking.id,
+              priorValue: `Booking Status: ${booking.status}`,
+              newValue: `Status: Asset Recovery — Repossession Scheduled • Tech: ${tech.fullName} • Slot: ${scheduledDate} ${scheduledTimeSlot}`,
+              mandatoryReason: 'Contract termination enforcement and asset retrieval.',
+            },
+            ...s.auditLogs,
+          ],
+        }));
+
+        get().addToast({
+          title: `Repossession Scheduled: ${tech.fullName}`,
+          description: `Technician dispatched for ${booking.productTitle} on ${scheduledDate} (${scheduledTimeSlot}).`,
+          variant: 'success',
+        });
+      },
+
+      completeRepossessionHandover: async ({ bookingId, photoUrl, notes }) => {
+        set({ isSimulatingLatency: true, latencyActionLabel: 'Recording Doorstep Repossession Evidence...' });
+        await simulateLatency(380);
+
+        const state = get();
+        const booking = state.bookings.find((b) => b.id === bookingId);
+        if (!booking) {
+          set({ isSimulatingLatency: false, latencyActionLabel: null });
+          return;
+        }
+
+        set((s) => ({
+          isSimulatingLatency: false,
+          latencyActionLabel: null,
+          bookings: s.bookings.map((b) => {
+            if (b.id !== bookingId) return b;
+            return {
+              ...b,
+              status: 'Returned & Closed' as const,
+              repossessionAssignment: b.repossessionAssignment
+                ? {
+                    ...b.repossessionAssignment,
+                    doorstepPhotoUrl: photoUrl,
+                    completedAt: nowIST(),
+                    status: 'Completed' as const,
+                    notes: notes || b.repossessionAssignment.notes,
+                  }
+                : undefined,
+              returnRecord: {
+                returnRequestedAt: nowIST(),
+                preferredPickupSlot: 'Doorstep Repossession Completed',
+                assignedPickupStaff: b.repossessionAssignment?.technicianName || 'Field Technician',
+                pickupStatus: 'Finalised',
+                preDispatchPhoto: b.deliveryEvidencePhoto || 'https://images.unsplash.com/photo-1585338107529-13afc5f02586?w=600',
+                preDispatchNotes: 'Original dispatch verification.',
+                customerPremisePickupPhoto: photoUrl,
+                assignedStaffId: b.repossessionAssignment?.technicianId,
+                assignedStaffPhone: b.repossessionAssignment?.technicianPhone,
+                assignedStaffPhoto: b.repossessionAssignment?.technicianPhoto,
+                pickupPhotoExifTimestamp: nowIST(),
+                pickupPhotoGeoTag: 'Lat 12.9716, Long 77.5946 (Customer Doorstep Verified)',
+                proposedDeductionAmount: 0,
+                approvedDeductionAmount: 0,
+                transitDamageBlockedByBR026: false,
+              },
+            };
+          }),
+          notifications: [
+            {
+              id: `NTF-${Date.now()}`,
+              eventCode: 'Repossession Completed',
+              title: `Asset Successfully Recovered: ${booking.productTitle}`,
+              message: `Field technician has completed doorstep repossession with photographic evidence (FR-RET-002). Equipment returned to partner warehouse.`,
+              recipientRole: 'VENDOR_OWNER',
+              category: 'Fulfilment & Pickup',
+              priority: 'high',
+              read: false,
+              timestamp: 'Just now',
+              linkedView: 'FIELD_OPERATIONS',
+            },
+            ...s.notifications,
+          ],
+          auditLogs: [
+            {
+              id: `AUD-${Date.now()}`,
+              timestamp: nowIST(),
+              actorName: s.activePersona.name,
+              actorRole: s.activePersona.roleBadge,
+              moduleCode: 'Asset Recovery',
+              actionSummary: `Completed doorstep repossession for ${booking.id} with photographic proof`,
+              affectedRecordId: booking.id,
+              priorValue: `Status: Asset Recovery — Repossession Scheduled`,
+              newValue: `Status: Returned & Closed (Handover Verified)`,
+              mandatoryReason: 'Doorstep recovery photo verified under FR-RET-002.',
+            },
+            ...s.auditLogs,
+          ],
+        }));
+
+        get().addToast({
+          title: 'Repossession Handover Verified',
+          description: `Asset ${booking.productTitle} recovered and returned to vendor custody.`,
+          variant: 'success',
+        });
+      },
+
+      reportRepossessionObstruction: async ({ bookingId, refusalReason, evidencePhotoUrl }) => {
+        set({ isSimulatingLatency: true, latencyActionLabel: 'Reporting Obstruction & Escalating to Risk Registry...' });
+        await simulateLatency(420);
+
+        const state = get();
+        const booking = state.bookings.find((b) => b.id === bookingId);
+        if (!booking) {
+          set({ isSimulatingLatency: false, latencyActionLabel: null });
+          return;
+        }
+
+        const customer = state.customers.find((c) => c.id === booking.customerId);
+
+        const newBlacklistEntry: BlacklistEntry = {
+          id: `BLK-${Date.now()}`,
+          ledgerType: 'CUSTOMER_BLACKLIST',
+          entityId: booking.customerId,
+          entityName: booking.customerName,
+          status: 'Active Blacklist',
+          categoryReason: 'Asset Recovery — Hostile Retention',
+          triggeringCaseOrBookingId: booking.id,
+          effectiveTimestamp: nowIST(),
+          enrolledByActor: 'System Automatic Enrollment (EX-035)',
+          outstandingDuesAmount: booking.monthlyRentRate,
+          evidenceSummary: `Doorstep repossession obstructed for booking ${booking.id}. Customer refused to surrender asset: "${refusalReason}". Mandatory police assistance and section 406 IPC recovery initiated.`,
+          matchedIdentifiers: {
+            phone: customer?.verifiedMobile || '+91 98860 12345',
+            email: customer?.email || 'customer@example.com',
+            bankOrPaymentFingerprint: customer?.paymentFingerprint || 'FP_HASH_9824',
+            addressSnippet: booking.deliveryAddress || 'Bengaluru',
+          },
+          blockedAttemptsCount: 0,
+        };
+
+        set((s) => ({
+          isSimulatingLatency: false,
+          latencyActionLabel: null,
+          bookings: s.bookings.map((b) => {
+            if (b.id !== bookingId) return b;
+            return {
+              ...b,
+              status: 'Asset Recovery — Hostile Retention' as const,
+              repossessionObstructionNotes: refusalReason,
+              repossessionAssignment: b.repossessionAssignment
+                ? {
+                    ...b.repossessionAssignment,
+                    status: 'Refused / Obstructed' as const,
+                    doorstepPhotoUrl: evidencePhotoUrl,
+                    notes: `Customer Refusal: ${refusalReason}`,
+                  }
+                : undefined,
+            };
+          }),
+          customers: s.customers.map((c) => {
+            if (c.id !== booking.customerId) return c;
+            return { ...c, status: 'Blacklisted / Watchlisted' as const };
+          }),
+          blacklist: [newBlacklistEntry, ...s.blacklist],
+          notifications: [
+            {
+              id: `NTF-${Date.now()}`,
+              eventCode: 'Hostile Retention Alert',
+              title: `CRITICAL: Repossession Obstructed (EX-035)`,
+              message: `Customer ${booking.customerName} refused to surrender equipment (${booking.productTitle}). Covertly blacklisted. Section 406 IPC recovery dossier prepared.`,
+              recipientRole: 'PLATFORM_ADMIN',
+              category: 'Blacklist Alert',
+              priority: 'critical',
+              read: false,
+              timestamp: 'Just now',
+              linkedView: 'BLACKLIST_REGISTRY',
+            },
+            ...s.notifications,
+          ],
+          auditLogs: [
+            {
+              id: `AUD-${Date.now()}`,
+              timestamp: nowIST(),
+              actorName: s.activePersona.name,
+              actorRole: s.activePersona.roleBadge,
+              moduleCode: 'Risk & Blacklist',
+              actionSummary: `Flagged Hostile Retention (EX-035) for booking ${booking.id}. Enrolled ${booking.customerName} in Blacklist Registry.`,
+              affectedRecordId: booking.id,
+              priorValue: `Status: Asset Recovery — Repossession Scheduled`,
+              newValue: `Status: Asset Recovery — Hostile Retention • Enrolled in Blacklist`,
+              mandatoryReason: `Customer refusal to surrender platform property post legal contract termination.`,
+            },
+            ...s.auditLogs,
+          ],
+        }));
+
+        get().addToast({
+          title: 'Obstruction Escalated: Hostile Retention',
+          description: `Order flagged under EX-035. Customer covertly enrolled in Blacklist Registry.`,
+          variant: 'error',
+        });
+      },
+
+      executeDepositWaterfallSettlement: async ({
+        bookingId,
+        unpaidBaseRent,
+        logisticsDeinstallationFee,
+        verifiedDamageFee,
+        contractualLateFees,
+        mediatorNotes,
+      }) => {
+        set({ isSimulatingLatency: true, latencyActionLabel: 'Executing Statutory 4-Tier Waterfall Drawdown...' });
+        await simulateLatency(420);
+
+        const state = get();
+        const booking = state.bookings.find((b) => b.id === bookingId);
+        if (!booking) {
+          set({ isSimulatingLatency: false, latencyActionLabel: null });
+          return;
+        }
+
+        const originalDeposit = booking.securityDepositAmount;
+        const totalLiabilities =
+          unpaidBaseRent + logisticsDeinstallationFee + verifiedDamageFee + contractualLateFees;
+        const netBalance = originalDeposit - totalLiabilities;
+        const customer = state.customers.find((c) => c.id === booking.customerId);
+
+        const outcome: 'SURPLUS_REFUND' | 'DEFICIT_FORFEIT_AND_INVOICE' =
+          netBalance >= 0 ? 'SURPLUS_REFUND' : 'DEFICIT_FORFEIT_AND_INVOICE';
+        let deficitInvoiceId: string | undefined;
+        let refundScheduledDate: string | undefined;
+
+        let createdAdjInvoice: FinancialInvoiceDocument | null = null;
+        let createdBlacklistEntry: BlacklistEntry | null = null;
+
+        if (outcome === 'SURPLUS_REFUND') {
+          refundScheduledDate = 'Within 14 business days (FR-DEP-006)';
+        } else {
+          const deficitAmount = Math.abs(netBalance);
+          deficitInvoiceId = `INV-ADJ-${booking.id.slice(4)}-${Math.floor(100 + Math.random() * 900)}`;
+          createdAdjInvoice = {
+            id: deficitInvoiceId,
+            bookingId: booking.id,
+            customerId: booking.customerId,
+            customerName: booking.customerName,
+            vendorId: booking.fulfillingVendorId,
+            chargeType: 'POST_RETURN_ADJUSTMENT_INVOICE',
+            title: `Deficit Settlement Adjustment: Unrecovered Liabilities for ${booking.id}`,
+            baseAmount: deficitAmount,
+            taxAmount: 0,
+            totalPayable: deficitAmount,
+            paymentState: 'Pending Reconciliation',
+            dueDate: 'Within 7 business days',
+            correctionReason: `4-Month deposit (₹${originalDeposit.toLocaleString('en-IN')}) exhausted. Remaining unrecovered liabilities demand.`,
+          };
+
+          createdBlacklistEntry = {
+            id: `BLK-${Date.now()}`,
+            ledgerType: 'CUSTOMER_BLACKLIST',
+            entityId: booking.customerId,
+            entityName: booking.customerName,
+            status: 'Active Blacklist',
+            categoryReason: 'Asset Retention & Unrecovered Balance Enforcement',
+            triggeringCaseOrBookingId: deficitInvoiceId,
+            effectiveTimestamp: nowIST(),
+            enrolledByActor: 'Platform Financial Governance',
+            outstandingDuesAmount: deficitAmount,
+            evidenceSummary: `4-Month Security deposit exhausted. Unrecovered balance of INR ${deficitAmount.toLocaleString('en-IN')} outstanding under adjustment invoice ${deficitInvoiceId}.`,
+            matchedIdentifiers: {
+              phone: customer?.verifiedMobile || '+91 98860 12345',
+              email: customer?.email || 'customer@example.com',
+              bankOrPaymentFingerprint: customer?.paymentFingerprint || 'FP_HASH_9824',
+              addressSnippet: booking.deliveryAddress || 'Bengaluru',
+            },
+            blockedAttemptsCount: 0,
+          };
+        }
+
+        const settlementRecord: DepositWaterfallSettlement = {
+          bookingId: booking.id,
+          settledAt: nowIST(),
+          originalDeposit,
+          unpaidBaseRent,
+          logisticsDeinstallationFee,
+          verifiedDamageFee,
+          contractualLateFees,
+          totalLiabilities,
+          netBalance,
+          outcome,
+          deficitInvoiceId,
+          refundScheduledDate,
+          mediatorNotes,
+        };
+
+        set((s) => ({
+          isSimulatingLatency: false,
+          latencyActionLabel: null,
+          bookings: s.bookings.map((b) => {
+            if (b.id !== bookingId) return b;
+            return {
+              ...b,
+              waterfallSettlement: settlementRecord,
+              status: 'Returned & Closed' as const,
+            };
+          }),
+          depositLedgers: s.depositLedgers.map((d) => {
+            if (d.bookingId !== bookingId) return d;
+            if (outcome === 'SURPLUS_REFUND') {
+              return {
+                ...d,
+                proposedDeduction: totalLiabilities,
+                approvedDeduction: totalLiabilities,
+                netRefundableAmount: netBalance,
+                refundStatus: 'Scheduled (14-Day Window)' as const,
+                settlementDueDate: 'Within 14 business days',
+              };
+            } else {
+              return {
+                ...d,
+                proposedDeduction: originalDeposit,
+                approvedDeduction: originalDeposit,
+                netRefundableAmount: 0,
+                refundStatus: 'Refund Processed' as const,
+                settlementDueDate: 'Deficit Invoice Generated',
+              };
+            }
+          }),
+          invoices: createdAdjInvoice ? [createdAdjInvoice, ...s.invoices] : s.invoices,
+          blacklist: createdBlacklistEntry ? [createdBlacklistEntry, ...s.blacklist] : s.blacklist,
+          customers: createdBlacklistEntry
+            ? s.customers.map((c) => (c.id === booking.customerId ? { ...c, status: 'Blacklisted / Watchlisted' as const } : c))
+            : s.customers,
+          notifications: [
+            {
+              id: `NTF-${Date.now()}`,
+              eventCode: 'Waterfall Settlement',
+              title: outcome === 'SURPLUS_REFUND' ? 'Deposit Surplus Refund Scheduled' : 'Security Deposit Forfeited (Deficit Adjustment)',
+              message: outcome === 'SURPLUS_REFUND'
+                ? `Net refundable balance of ₹${netBalance.toLocaleString('en-IN')} approved for release within 14 days.`
+                : `Total deposit exhausted. Ancillary adjustment invoice ${deficitInvoiceId} issued for unrecovered balance of ₹${Math.abs(netBalance).toLocaleString('en-IN')}.`,
+              recipientRole: 'CUSTOMER_INDIVIDUAL',
+              customerScopeId: booking.customerId,
+              category: 'Deposit & Billing',
+              priority: outcome === 'SURPLUS_REFUND' ? 'normal' : 'critical',
+              read: false,
+              timestamp: 'Just now',
+              linkedView: 'INVOICES_DEPOSITS',
+            },
+            ...s.notifications,
+          ],
+          auditLogs: [
+            {
+              id: `AUD-${Date.now()}`,
+              timestamp: nowIST(),
+              actorName: s.activePersona.name,
+              actorRole: s.activePersona.roleBadge,
+              moduleCode: 'Waterfall Settlement',
+              actionSummary: `Executed statutory 4-tier waterfall drawdown on deposit for ${booking.id}`,
+              affectedRecordId: booking.id,
+              priorValue: `Deposit: ₹${originalDeposit.toLocaleString('en-IN')}`,
+              newValue: `Outcome: ${outcome} • Net: ₹${netBalance.toLocaleString('en-IN')} • Liabilities: ₹${totalLiabilities.toLocaleString('en-IN')}`,
+              mandatoryReason: 'Final reconciliation of security deposit pursuant to Section 6.2 BR-033.',
+            },
+            ...s.auditLogs,
+          ],
+        }));
+
+        get().addToast({
+          title: outcome === 'SURPLUS_REFUND' ? 'Waterfall Settlement: Surplus Refund' : 'Waterfall Settlement: Deficit Forfeit',
+          description: outcome === 'SURPLUS_REFUND'
+            ? `Surplus ₹${netBalance.toLocaleString('en-IN')} scheduled for release within 14 days.`
+            : `Deficit ₹${Math.abs(netBalance).toLocaleString('en-IN')} billed via invoice ${deficitInvoiceId}.`,
+          variant: outcome === 'SURPLUS_REFUND' ? 'success' : 'warning',
         });
       },
 
@@ -3097,7 +3860,7 @@ export const useKaroRentStore = create<KaroRentState>()(
       },
     }),
     {
-      name: 'karorent-live-platform-v10',
+      name: 'karorent-live-platform-v11',
       partialize: (state) => ({
         darkMode: state.darkMode,
         personas: state.personas,

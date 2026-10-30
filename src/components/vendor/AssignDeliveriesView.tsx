@@ -9,6 +9,7 @@ import {
   Phone,
   Ruler,
   RotateCcw,
+  ShieldAlert,
   Truck,
   UserCheck,
   Wrench,
@@ -24,7 +25,7 @@ const TIME_SLOTS = [
   '04:00 PM – 06:00 PM',
 ];
 
-type PrimarySection = 'NEW_BOOKINGS' | 'MAINTENANCE' | 'PICKUP';
+type PrimarySection = 'NEW_BOOKINGS' | 'MAINTENANCE' | 'PICKUP' | 'REPOSSESSION';
 type BookingSubSection = 'ALL' | 'SITE_VISIT' | 'DELIVERY';
 
 export const AssignDeliveriesView: React.FC = () => {
@@ -114,10 +115,18 @@ export const AssignDeliveriesView: React.FC = () => {
         b.status === 'Return Requested')
   );
 
+  // 4. Asset Repossession Requests (FR-REC-001)
+  const pendingRepossessions = vendorBookings.filter(
+    (b) =>
+      b.status === 'Terminated — Payment Default' ||
+      b.status === 'Asset Recovery — Repossession Scheduled' ||
+      b.status === 'Asset Recovery — Hostile Retention'
+  );
+
   // Assignment Modal State
   const [assigningTask, setAssigningTask] = useState<{
     taskId: string;
-    taskType: 'DELIVERY' | 'SITE_VISIT' | 'PICKUP' | 'MAINTENANCE';
+    taskType: 'DELIVERY' | 'SITE_VISIT' | 'PICKUP' | 'MAINTENANCE' | 'REPOSSESSION';
     title: string;
     productTitle: string;
     customerName: string;
@@ -185,6 +194,17 @@ export const AssignDeliveriesView: React.FC = () => {
         t.scheduledTimeSlot === selectedSlot
     );
     if (hasConflictingMaintenance) return false;
+
+    // Check repossessions
+    const hasConflictingRepo = bookings.some(
+      (b) =>
+        b.repossessionAssignment &&
+        (b.repossessionAssignment.technicianId === techId ||
+          b.repossessionAssignment.technicianName.toLowerCase() === techName.toLowerCase()) &&
+        b.repossessionAssignment.scheduledDate === selectedDate &&
+        b.repossessionAssignment.scheduledTimeSlot === selectedSlot
+    );
+    if (hasConflictingRepo) return false;
 
     return true;
   };
@@ -266,8 +286,8 @@ export const AssignDeliveriesView: React.FC = () => {
         )}
       </div>
 
-      {/* 3 Main Sections Navigation Strip */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+      {/* 4 Main Sections Navigation Strip */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <button
           onClick={() => setActiveSection('NEW_BOOKINGS')}
           className={`p-4 rounded-2xl border text-left transition-all flex items-center justify-between ${
@@ -343,6 +363,32 @@ export const AssignDeliveriesView: React.FC = () => {
           </div>
           <span className="px-2.5 py-0.5 rounded-pill bg-[#9A3412] text-white font-mono text-xs font-bold">
             {pendingPickups.length}
+          </span>
+        </button>
+
+        <button
+          onClick={() => setActiveSection('REPOSSESSION')}
+          className={`p-4 rounded-2xl border text-left transition-all flex items-center justify-between ${
+            activeSection === 'REPOSSESSION'
+              ? 'bg-rose-50 border-rose-600 shadow-sm'
+              : 'bg-hearth-card border-hearth-border hover:bg-hearth-oat'
+          }`}
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-hearth-card border border-hearth-border flex items-center justify-center text-[#991B1B]">
+              <ShieldAlert className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="font-serif font-bold text-sm text-hearth-ink">
+                4. Asset Repossession
+              </div>
+              <div className="text-[11px] text-hearth-taupe">
+                Legal Default Recovery
+              </div>
+            </div>
+          </div>
+          <span className="px-2.5 py-0.5 rounded-pill bg-[#991B1B] text-white font-mono text-xs font-bold">
+            {pendingRepossessions.length}
           </span>
         </button>
       </div>
@@ -717,6 +763,145 @@ export const AssignDeliveriesView: React.FC = () => {
                       >
                         <UserCheck className="w-3.5 h-3.5" />
                         <span>{assignedStaff ? 'Reassign Staff' : 'Assign Staff'}</span>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 4. Asset Repossession Requests (Legal Default / Contract Terminated) */}
+      {activeSection === 'REPOSSESSION' && (
+        <div className="space-y-4">
+          <div className="border-b border-hearth-border pb-3 flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 className="font-serif text-lg font-bold text-hearth-ink flex items-center gap-2">
+                <span>Asset Repossession Queue ({pendingRepossessions.length})</span>
+                <span className="px-2 py-0.5 rounded-pill bg-[#FEE2E2] text-[#991B1B] text-[10px] font-bold">
+                  Statutory Default Enforcement
+                </span>
+              </h2>
+              <p className="text-xs text-hearth-taupe">
+                Dispatch field technicians to repossess equipment following Notice 3 Contract Termination (Section 4 Recovery Framework).
+              </p>
+            </div>
+          </div>
+
+          {pendingRepossessions.length === 0 ? (
+            <div className="p-8 rounded-3xl bg-hearth-card border border-hearth-border text-center text-xs text-hearth-taupe">
+              No terminated bookings requiring asset repossession for this partner.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {pendingRepossessions.map((b) => {
+                const assignedStaff = b.repossessionAssignment?.technicianName;
+                const latestNotice = b.defaultNotices?.slice(-1)[0];
+                const authCode = latestNotice?.agentAuthCode || 'REPO-AUTH-PENDING';
+                const isHostile = b.status === 'Asset Recovery — Hostile Retention';
+                const isScheduled = b.status === 'Asset Recovery — Repossession Scheduled';
+
+                return (
+                  <div
+                    key={b.id}
+                    className={`p-5 rounded-3xl bg-hearth-card border shadow-hearth space-y-3.5 text-xs flex flex-col justify-between ${
+                      isHostile
+                        ? 'border-2 border-red-500 bg-red-50/30'
+                        : isScheduled
+                        ? 'border-amber-300'
+                        : 'border-rose-300'
+                    }`}
+                  >
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="font-mono text-xs font-bold text-hearth-ink">
+                            {b.id}
+                          </span>
+                          <span className="px-2 py-0.5 rounded-pill bg-rose-100 text-rose-800 border border-rose-200 text-[10px] font-semibold">
+                            Notice 3 Terminated
+                          </span>
+                          {authCode && (
+                            <span className="px-2 py-0.5 rounded-pill bg-amber-100 text-amber-900 border border-amber-200 font-mono text-[10px] font-bold">
+                              {authCode}
+                            </span>
+                          )}
+                        </div>
+                        <span
+                          className={`px-2.5 py-0.5 rounded-pill text-[10px] font-bold ${
+                            isHostile
+                              ? 'bg-red-700 text-white'
+                              : isScheduled
+                              ? 'bg-amber-500 text-white'
+                              : 'bg-rose-600 text-white'
+                          }`}
+                        >
+                          {b.status}
+                        </span>
+                      </div>
+
+                      <div>
+                        <h3 className="font-serif font-bold text-sm text-hearth-ink">
+                          {b.productTitle}
+                        </h3>
+                        <div className="text-[11px] text-hearth-taupe mt-0.5">
+                          Customer: <strong>{b.customerName}</strong> • Serial: <strong>{b.allocatedSerial || 'SN-VERIFIED-ASSET'}</strong>
+                        </div>
+                      </div>
+
+                      <div className="p-3 rounded-2xl bg-hearth-oat/70 border border-hearth-border space-y-1 text-[11px]">
+                        <div className="flex items-start gap-1.5 text-hearth-umber">
+                          <MapPin className="w-3.5 h-3.5 text-hearth-terracotta shrink-0 mt-0.5" />
+                          <span>{b.deliveryAddress}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-hearth-taupe">
+                          <Clock className="w-3.5 h-3.5 text-rose-700 shrink-0" />
+                          <span>
+                            Target Slot: {latestNotice?.scheduledRepossessionDate || 'Immediate'} ({latestNotice?.scheduledRepossessionTimeWindow || '10 AM – 2 PM'})
+                          </span>
+                        </div>
+                        {b.repossessionObstructionNotes && (
+                          <div className="text-[11px] text-red-800 font-semibold bg-red-100 p-2 rounded-xl mt-1 border border-red-200">
+                            Obstruction Logged (EX-035): "{b.repossessionObstructionNotes}"
+                          </div>
+                        )}
+                      </div>
+
+                      {assignedStaff && (
+                        <div className="p-2.5 rounded-xl bg-[#DCFCE7]/60 border border-[#BBF7D0] text-[#166534] text-[11px] flex items-center justify-between">
+                          <span className="flex items-center gap-1.5 font-medium">
+                            <UserCheck className="w-3.5 h-3.5" />
+                            <span>Assigned Tech: {assignedStaff} ({b.repossessionAssignment?.technicianPhone})</span>
+                          </span>
+                          <span className="font-mono text-[10px]">
+                            {b.repossessionAssignment?.scheduledDate} ({b.repossessionAssignment?.scheduledTimeSlot})
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="pt-2 border-t border-hearth-border flex items-center justify-between">
+                      <span className="text-[10px] text-hearth-taupe">
+                        Mandatory Doorstep Photo (FR-RET-002)
+                      </span>
+                      <button
+                        onClick={() =>
+                          openAssignModal({
+                            taskId: b.id,
+                            taskType: 'REPOSSESSION',
+                            title: 'Assign Technician for Asset Repossession',
+                            productTitle: b.productTitle,
+                            customerName: b.customerName,
+                            address: b.deliveryAddress,
+                            currentAssignedName: assignedStaff,
+                          })
+                        }
+                        className="spring-btn px-4 py-1.5 rounded-pill bg-[#991B1B] hover:bg-[#7F1D1D] text-white text-xs font-semibold flex items-center gap-1"
+                      >
+                        <UserCheck className="w-3.5 h-3.5" />
+                        <span>{assignedStaff ? 'Reassign Tech' : 'Dispatch Technician'}</span>
                       </button>
                     </div>
                   </div>

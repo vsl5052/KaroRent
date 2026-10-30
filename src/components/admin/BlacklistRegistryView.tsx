@@ -169,6 +169,16 @@ export const BlacklistRegistryView: React.FC = () => {
                     >
                       {entry.status === 'Active Blacklist' ? 'Blocked' : 'Unblocked'}
                     </span>
+                    {entry.categoryReason === 'Asset Recovery — Hostile Retention' && (
+                      <span className="px-2.5 py-0.5 rounded-pill bg-red-800 text-white font-mono text-[10px] font-bold">
+                        EX-035 Hostile Retention
+                      </span>
+                    )}
+                    {entry.categoryReason === 'Asset Retention & Unrecovered Balance Enforcement' && (
+                      <span className="px-2.5 py-0.5 rounded-pill bg-amber-600 text-white font-mono text-[10px] font-bold">
+                        FR-BLK-009 Deficit Recovery
+                      </span>
+                    )}
                   </div>
                   <h3 className="font-serif text-lg font-bold text-hearth-ink mt-1">
                     {entry.entityName} ({entry.entityId})

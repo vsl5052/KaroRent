@@ -6,6 +6,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Gavel,
+  Layers,
+  ShieldAlert,
   ShieldCheck,
 } from 'lucide-react';
 import { useKaroRentStore } from '../../store/useKaroRentStore';
@@ -134,17 +136,28 @@ export const ThreeWayInspectionView: React.FC = () => {
     bookings,
     depositLedgers,
     disputeCases,
+    invoices,
     activePersona,
     submitWarehouseInspection,
     customerDisputeInspectionFinding,
     resolveDisputeAndSettleDeposit,
+    executeDepositWaterfallSettlement,
     isSimulatingLatency,
     addToast,
   } = useKaroRentStore();
 
-  const returnBookings = bookings.filter((b) => b.returnRecord);
+  const returnBookings = bookings.filter((b) => b.returnRecord || b.waterfallSettlement || b.status.includes('Terminated') || b.status.includes('Asset Recovery'));
   const [selectedBookingId, setSelectedBookingId] = useState<string>(
     returnBookings[0]?.id || 'BKG-2026-8790'
+  );
+
+  // Statutory 4-Tier Waterfall Settlement State (BR-033)
+  const [wfUnpaidRent, setWfUnpaidRent] = useState<number>(0);
+  const [wfLogisticsFee, setWfLogisticsFee] = useState<number>(1200);
+  const [wfVerifiedDamage, setWfVerifiedDamage] = useState<number>(0);
+  const [wfLateFees, setWfLateFees] = useState<number>(0);
+  const [wfMediatorNotes, setWfMediatorNotes] = useState<string>(
+    'Final statutory waterfall deposit drawdown executed pursuant to Section 6.2 BR-033.'
   );
 
   // Warehouse Inspection Form State
@@ -595,63 +608,226 @@ export const ThreeWayInspectionView: React.FC = () => {
 
           {/* Final Refund Approval (Platform Operator Only) */}
           {activePersona.role === 'PLATFORM_ADMIN' && (
-            <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-4">
-              <div className="flex items-center gap-2">
-                <Gavel className="w-4 h-4 text-hearth-sage" />
-                <h3 className="font-serif text-base font-bold text-hearth-ink">
-                  Finalize Deposit Refund
-                </h3>
-              </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Standard Refund Approval Form */}
+              <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-4">
+                <div className="flex items-center gap-2">
+                  <Gavel className="w-4 h-4 text-hearth-sage" />
+                  <h3 className="font-serif text-base font-bold text-hearth-ink">
+                    Standard Deposit Refund Decision
+                  </h3>
+                </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-hearth-ink mb-1">
-                  Approved Deduction (₹)
+                <div>
+                  <label className="block text-xs font-semibold text-hearth-ink mb-1">
+                    Approved Deduction (₹)
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={mediatorApprovedAmount}
+                    onChange={(e) =>
+                      setMediatorApprovedAmount(Number(e.target.value))
+                    }
+                    className="w-full px-3 py-2 rounded-xl bg-hearth-oat border border-hearth-border text-xs font-ledger text-hearth-ink"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-hearth-ink mb-1">
+                    Resolution Notes *
+                  </label>
+                  <input
+                    type="text"
+                    value={mediatorNotes}
+                    onChange={(e) => setMediatorNotes(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-hearth-oat border border-hearth-border text-xs text-hearth-ink"
+                  />
+                </div>
+
+                <label className="flex items-center gap-2.5 p-3 rounded-xl bg-[#FEE2E2]/60 border border-[#FECACA] text-xs text-[#991B1B] cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={triggerBlacklistOnResolve}
+                    onChange={(e) =>
+                      setTriggerBlacklistOnResolve(e.target.checked)
+                    }
+                    className="rounded text-[#991B1B]"
+                  />
+                  <span>
+                    Block customer account due to severe damage or loss
+                  </span>
                 </label>
-                <input
-                  type="number"
-                  min={0}
-                  value={mediatorApprovedAmount}
-                  onChange={(e) =>
-                    setMediatorApprovedAmount(Number(e.target.value))
-                  }
-                  className="w-full px-3 py-2 rounded-xl bg-hearth-oat border border-hearth-border text-xs font-ledger text-hearth-ink"
-                />
+
+                <button
+                  type="button"
+                  disabled={isSimulatingLatency}
+                  onClick={handleMediatorDecision}
+                  className="spring-btn w-full py-2.5 rounded-pill bg-hearth-sage hover:bg-[#233E26] text-white text-xs font-semibold shadow-sm"
+                >
+                  Confirm & Issue Refund
+                </button>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-hearth-ink mb-1">
-                  Resolution Notes *
-                </label>
-                <input
-                  type="text"
-                  value={mediatorNotes}
-                  onChange={(e) => setMediatorNotes(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-hearth-oat border border-hearth-border text-xs text-hearth-ink"
-                />
+              {/* Statutory 4-Tier Security Deposit Waterfall Settlement Panel (BR-033) */}
+              <div className="rounded-3xl bg-hearth-card border border-rose-300 p-6 shadow-hearth space-y-4">
+                <div className="flex items-center justify-between border-b border-hearth-border pb-3">
+                  <div className="flex items-center gap-2">
+                    <Layers className="w-5 h-5 text-hearth-terracotta" />
+                    <div>
+                      <h3 className="font-serif text-base font-bold text-hearth-ink">
+                        Statutory 4-Tier Deposit Drawdown (BR-033)
+                      </h3>
+                      <p className="text-[11px] text-hearth-taupe">
+                        Strict statutory priority drawdown from collected 4-month deposit.
+                      </p>
+                    </div>
+                  </div>
+                  <span className="font-mono text-xs font-bold text-[#166534] bg-[#DCFCE7] px-2.5 py-0.5 rounded-pill border border-[#BBF7D0]">
+                    4x Deposit: ₹{originalDeposit.toLocaleString('en-IN')}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-hearth-ink mb-1">
+                      1. Unpaid Base Rent (₹)
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={wfUnpaidRent}
+                      onChange={(e) => setWfUnpaidRent(Number(e.target.value))}
+                      className="w-full px-3 py-2 rounded-xl bg-hearth-oat border border-hearth-border text-xs font-ledger font-semibold text-[#991B1B]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-hearth-ink mb-1">
+                      2. Logistics / De-install (₹)
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={wfLogisticsFee}
+                      onChange={(e) => setWfLogisticsFee(Number(e.target.value))}
+                      className="w-full px-3 py-2 rounded-xl bg-hearth-oat border border-hearth-border text-xs font-ledger font-semibold text-[#991B1B]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-hearth-ink mb-1">
+                      3. Verified Damage (₹)
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={wfVerifiedDamage}
+                      onChange={(e) => setWfVerifiedDamage(Number(e.target.value))}
+                      className="w-full px-3 py-2 rounded-xl bg-hearth-oat border border-hearth-border text-xs font-ledger font-semibold text-[#991B1B]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-hearth-ink mb-1">
+                      4. Late Fees (BR-032) (₹)
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={wfLateFees}
+                      onChange={(e) => setWfLateFees(Number(e.target.value))}
+                      className="w-full px-3 py-2 rounded-xl bg-hearth-oat border border-hearth-border text-xs font-ledger font-semibold text-[#991B1B]"
+                    />
+                  </div>
+                </div>
+
+                {/* Live Drawdown Calculation Preview */}
+                {(() => {
+                  const totalDeductions = wfUnpaidRent + wfLogisticsFee + wfVerifiedDamage + wfLateFees;
+                  const netBalance = originalDeposit - totalDeductions;
+                  const isSurplus = netBalance >= 0;
+
+                  return (
+                    <div className="space-y-3 pt-1">
+                      <div className="p-3.5 rounded-2xl bg-hearth-oat border border-hearth-border flex items-center justify-between text-xs">
+                        <div>
+                          <div className="text-[10px] text-hearth-taupe">Total Deductions</div>
+                          <div className="font-ledger font-bold text-[#991B1B]">
+                            -₹{totalDeductions.toLocaleString('en-IN')}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-[10px] text-hearth-taupe font-semibold">
+                            {isSurplus ? 'Surplus Balance' : 'Deficit Shortfall'}
+                          </div>
+                          <div
+                            className={`font-ledger font-black text-sm ${
+                              isSurplus ? 'text-[#166534]' : 'text-[#991B1B]'
+                            }`}
+                          >
+                            {isSurplus ? '+' : '-'}₹{Math.abs(netBalance).toLocaleString('en-IN')}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div
+                        className={`p-3 rounded-2xl border text-xs space-y-1 ${
+                          isSurplus
+                            ? 'bg-[#DCFCE7]/70 border-[#BBF7D0] text-[#166534]'
+                            : 'bg-[#FEE2E2] border-[#FECACA] text-[#991B1B]'
+                        }`}
+                      >
+                        <div className="font-bold flex items-center gap-1.5">
+                          {isSurplus ? <CheckCircle2 className="w-4 h-4" /> : <ShieldAlert className="w-4 h-4" />}
+                          <span>
+                            {isSurplus
+                              ? 'Scenario A: Surplus Release within 14 Days'
+                              : 'Scenario B: Deficit Forfeit + Adjustment Invoice'}
+                          </span>
+                        </div>
+                        <p className="text-[11px] leading-relaxed">
+                          {isSurplus
+                            ? `Surplus ₹${netBalance.toLocaleString('en-IN')} will be scheduled for vault release to customer within 14 business days (FR-DEP-006).`
+                            : `Total deposit of ₹${originalDeposit.toLocaleString('en-IN')} forfeited. Ancillary adjustment invoice for ₹${Math.abs(netBalance).toLocaleString('en-IN')} will be generated with 7-day payment window, and customer enrolled in Blacklist Registry (FR-BLK-009).`}
+                        </p>
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-semibold text-hearth-ink mb-1">
+                          Settlement Order Notes
+                        </label>
+                        <input
+                          type="text"
+                          value={wfMediatorNotes}
+                          onChange={(e) => setWfMediatorNotes(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl bg-hearth-oat border border-hearth-border text-xs text-hearth-ink"
+                        />
+                      </div>
+
+                      <button
+                        type="button"
+                        disabled={isSimulatingLatency}
+                        onClick={async () => {
+                          await executeDepositWaterfallSettlement({
+                            bookingId: activeBooking.id,
+                            unpaidBaseRent: wfUnpaidRent,
+                            logisticsDeinstallationFee: wfLogisticsFee,
+                            verifiedDamageFee: wfVerifiedDamage,
+                            contractualLateFees: wfLateFees,
+                            mediatorNotes: wfMediatorNotes,
+                          });
+                        }}
+                        className={`spring-btn w-full py-2.5 rounded-pill text-white text-xs font-semibold shadow-sm ${
+                          isSurplus ? 'bg-[#166534] hover:bg-[#14532D]' : 'bg-[#991B1B] hover:bg-[#7F1D1D]'
+                        }`}
+                      >
+                        Execute Statutory Waterfall Settlement
+                      </button>
+                    </div>
+                  );
+                })()}
               </div>
-
-              <label className="flex items-center gap-2.5 p-3 rounded-xl bg-[#FEE2E2]/60 border border-[#FECACA] text-xs text-[#991B1B] cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={triggerBlacklistOnResolve}
-                  onChange={(e) =>
-                    setTriggerBlacklistOnResolve(e.target.checked)
-                  }
-                  className="rounded text-[#991B1B]"
-                />
-                <span>
-                  Block customer account due to severe damage or loss
-                </span>
-              </label>
-
-              <button
-                type="button"
-                disabled={isSimulatingLatency}
-                onClick={handleMediatorDecision}
-                className="spring-btn w-full py-2.5 rounded-pill bg-hearth-sage hover:bg-[#233E26] text-white text-xs font-semibold shadow-sm"
-              >
-                Confirm & Issue Refund
-              </button>
             </div>
           )}
         </div>

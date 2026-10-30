@@ -110,6 +110,93 @@ export const CustomerDashboardView: React.FC = () => {
         </div>
       </div>
 
+      {/* Delinquency / Legal Notice Alert Banner */}
+      {scopedBookings
+        .filter(
+          (b) =>
+            b.status === 'Payment Overdue' ||
+            b.status === 'Terminated — Payment Default' ||
+            b.status === 'Asset Recovery — Repossession Scheduled' ||
+            b.status === 'Asset Recovery — Hostile Retention'
+        )
+        .map((b) => {
+          const latestNotice = b.defaultNotices?.slice(-1)[0];
+          const isTerminated =
+            b.status === 'Terminated — Payment Default' ||
+            b.status === 'Asset Recovery — Repossession Scheduled' ||
+            b.status === 'Asset Recovery — Hostile Retention';
+
+          return (
+            <div
+              key={b.id}
+              className={`rounded-3xl p-6 border shadow-hearth space-y-3 ${
+                isTerminated
+                  ? 'bg-gradient-to-r from-red-950/90 to-rose-900 text-white border-red-700'
+                  : 'bg-gradient-to-r from-rose-50 via-amber-50 to-orange-50 border-rose-300 text-rose-950'
+              }`}
+            >
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="flex items-start gap-3">
+                  <div
+                    className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${
+                      isTerminated ? 'bg-red-500/20 text-red-200' : 'bg-rose-600/15 text-rose-700'
+                    }`}
+                  >
+                    <ShieldAlert className="w-5 h-5" />
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span
+                        className={`px-2.5 py-0.5 rounded-pill text-[10px] font-bold font-mono ${
+                          isTerminated ? 'bg-red-500 text-white' : 'bg-rose-200 text-rose-900'
+                        }`}
+                      >
+                        {latestNotice?.noticeTitle || 'Legal Default Notice'}
+                      </span>
+                      <span
+                        className={`px-2 py-0.5 rounded-pill text-[10px] font-semibold ${
+                          isTerminated ? 'bg-white/20 text-white' : 'bg-rose-100 text-rose-800'
+                        }`}
+                      >
+                        Order {b.id}
+                      </span>
+                      {b.status === 'Asset Recovery — Repossession Scheduled' && (
+                        <span className="px-2 py-0.5 rounded-pill bg-amber-400 text-amber-950 text-[10px] font-bold">
+                          Technician Dispatched
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="font-serif text-lg font-bold">
+                      {isTerminated
+                        ? 'Contract Terminated & Repossession Demand'
+                        : 'Formal Notice of Payment Default — Immediate Action Required'}
+                    </h3>
+                    <p className={`text-xs ${isTerminated ? 'text-rose-200' : 'text-rose-800'}`}>
+                      {isTerminated
+                        ? `Your rental agreement for ${b.productTitle} has been terminated. Your license to possess the equipment is revoked. Please surrender the asset to our authorized field technician.`
+                        : `Periodic rental invoice for ${b.productTitle} is in formal default. A ₹500 late fee has been assessed and your account is restricted. You have 5 business days to cure default.`}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setActiveTab('INVOICES_DEPOSITS')}
+                    className={`spring-btn px-4 py-2.5 rounded-pill text-xs font-bold shadow-md flex items-center gap-1.5 ${
+                      isTerminated
+                        ? 'bg-white text-red-950 hover:bg-rose-100'
+                        : 'bg-[#166534] hover:bg-[#14532D] text-white'
+                    }`}
+                  >
+                    <ReceiptIndianRupee className="w-4 h-4" />
+                    <span>{isTerminated ? 'View Invoices & Settlement' : 'Pay & Cure Default'}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+
       {/* My Orders Section */}
       <div className="space-y-4">
         <h2 className="font-serif text-xl font-bold text-hearth-ink">

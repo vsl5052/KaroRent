@@ -1,11 +1,19 @@
 import React, { useState } from 'react';
 import {
+  AlertTriangle,
+  CheckCircle2,
+  Copy,
   Download,
+  FileText,
+  Layers,
+  Printer,
   ReceiptIndianRupee,
+  ShieldAlert,
   ShieldCheck,
+  X,
 } from 'lucide-react';
 import { useKaroRentStore } from '../../store/useKaroRentStore';
-import { InvoiceChargeType } from '../../types/srs';
+import { DefaultNoticeRecord, InvoiceChargeType } from '../../types/srs';
 
 const CHARGE_TYPE_BADGES: Record<
   InvoiceChargeType,
@@ -41,10 +49,12 @@ export const FiveInvoiceLedgerView: React.FC = () => {
     depositLedgers,
     activePersona,
     payInvoiceDocument,
+    curePaymentDefault,
     isSimulatingLatency,
     addToast,
   } = useKaroRentStore();
 
+  const [selectedNoticeModal, setSelectedNoticeModal] = useState<DefaultNoticeRecord | null>(null);
   const [selectedChargeFilter, setSelectedChargeFilter] = useState<
     InvoiceChargeType | 'ALL'
   >('ALL');
@@ -284,6 +294,99 @@ export const FiveInvoiceLedgerView: React.FC = () => {
                 )}
               </div>
 
+              {/* 4-Tier Waterfall Security Deposit Drawdown Card (Section 6.2 BR-033) */}
+              {booking?.waterfallSettlement && (
+                <div className="p-6 bg-gradient-to-r from-amber-500/10 via-rose-500/10 to-orange-500/10 border-b border-hearth-border space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-xl bg-hearth-terracotta/15 flex items-center justify-center text-hearth-terracotta">
+                        <Layers className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h4 className="font-serif text-sm font-bold text-hearth-ink">
+                          Statutory 4-Tier Security Deposit Drawdown (BR-033)
+                        </h4>
+                        <p className="text-[11px] text-hearth-taupe">
+                          Settled on {booking.waterfallSettlement.settledAt} pursuant to Section 6.2 recovery priority.
+                        </p>
+                      </div>
+                    </div>
+
+                    <span
+                      className={`px-3 py-1 rounded-pill text-xs font-bold border ${
+                        booking.waterfallSettlement.outcome === 'SURPLUS_REFUND'
+                          ? 'bg-[#DCFCE7] text-[#166534] border-[#86EFAC]'
+                          : 'bg-[#FEE2E2] text-[#991B1B] border-[#FECACA]'
+                      }`}
+                    >
+                      {booking.waterfallSettlement.outcome === 'SURPLUS_REFUND'
+                        ? 'Scenario A: Surplus Refund Approved'
+                        : 'Scenario B: Deficit Forfeit & Adjustment Invoice Issued'}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-3 bg-hearth-card/80 p-4 rounded-2xl border border-hearth-border text-xs">
+                    <div>
+                      <div className="text-[10px] text-hearth-taupe uppercase font-semibold">1. Unpaid Base Rent</div>
+                      <div className="font-ledger font-bold text-[#991B1B] text-sm">
+                        -₹{booking.waterfallSettlement.unpaidBaseRent.toLocaleString('en-IN')}
+                      </div>
+                      <div className="text-[10px] text-hearth-taupe">Priority Tier 1</div>
+                    </div>
+
+                    <div>
+                      <div className="text-[10px] text-hearth-taupe uppercase font-semibold">2. Logistics / De-install</div>
+                      <div className="font-ledger font-bold text-[#991B1B] text-sm">
+                        -₹{booking.waterfallSettlement.logisticsDeinstallationFee.toLocaleString('en-IN')}
+                      </div>
+                      <div className="text-[10px] text-hearth-taupe">Priority Tier 2 (Standard)</div>
+                    </div>
+
+                    <div>
+                      <div className="text-[10px] text-hearth-taupe uppercase font-semibold">3. Verified Damage</div>
+                      <div className="font-ledger font-bold text-[#991B1B] text-sm">
+                        -₹{booking.waterfallSettlement.verifiedDamageFee.toLocaleString('en-IN')}
+                      </div>
+                      <div className="text-[10px] text-hearth-taupe">Priority Tier 3</div>
+                    </div>
+
+                    <div>
+                      <div className="text-[10px] text-hearth-taupe uppercase font-semibold">4. Contractual Late Fees</div>
+                      <div className="font-ledger font-bold text-[#991B1B] text-sm">
+                        -₹{booking.waterfallSettlement.contractualLateFees.toLocaleString('en-IN')}
+                      </div>
+                      <div className="text-[10px] text-hearth-taupe">Priority Tier 4 (BR-032)</div>
+                    </div>
+
+                    <div className="col-span-2 md:col-span-1 border-t md:border-t-0 md:border-l border-hearth-border pt-2 md:pt-0 md:pl-3">
+                      <div className="text-[10px] text-hearth-taupe uppercase font-semibold">
+                        {booking.waterfallSettlement.netBalance >= 0 ? 'Surplus Refund' : 'Deficit Demand'}
+                      </div>
+                      <div
+                        className={`font-ledger font-black text-base ${
+                          booking.waterfallSettlement.netBalance >= 0 ? 'text-[#166534]' : 'text-[#991B1B]'
+                        }`}
+                      >
+                        {booking.waterfallSettlement.netBalance >= 0 ? '+' : '-'}₹
+                        {Math.abs(booking.waterfallSettlement.netBalance).toLocaleString('en-IN')}
+                      </div>
+                      <div className="text-[10px] text-hearth-taupe">
+                        {booking.waterfallSettlement.netBalance >= 0
+                          ? '14-Day Vault Payout'
+                          : `Invoice: ${booking.waterfallSettlement.deficitInvoiceId || 'Pending'}`}
+                      </div>
+                    </div>
+                  </div>
+
+                  {booking.waterfallSettlement.mediatorNotes && (
+                    <div className="text-xs text-hearth-umber bg-hearth-card/90 px-3.5 py-2 rounded-xl border border-hearth-border flex items-start gap-2">
+                      <ShieldAlert className="w-4 h-4 text-hearth-terracotta shrink-0 mt-0.5" />
+                      <span>{booking.waterfallSettlement.mediatorNotes}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Individual Invoices & Receipts for this Product */}
               <div className="p-6 space-y-3 bg-hearth-parchment/40">
                 <div className="flex items-center justify-between">
@@ -329,11 +432,47 @@ export const FiveInvoiceLedgerView: React.FC = () => {
                               >
                                 {isPaid ? 'Paid' : inv.paymentState}
                               </span>
+
+                              {inv.overdueStage && inv.overdueStage !== 'NONE' && (
+                                <span
+                                  className={`inline-block px-2.5 py-0.5 rounded-pill text-[10px] font-bold border ${
+                                    inv.overdueStage === 'NOTICE_1'
+                                      ? 'bg-amber-100 text-amber-800 border-amber-300'
+                                      : inv.overdueStage === 'NOTICE_2'
+                                      ? 'bg-rose-100 text-rose-800 border-rose-300'
+                                      : 'bg-red-700 text-white border-red-800'
+                                  }`}
+                                >
+                                  {inv.overdueStage === 'NOTICE_1'
+                                    ? 'Notice 1 (T+1 Reminder)'
+                                    : inv.overdueStage === 'NOTICE_2'
+                                    ? `Notice 2 (T+5 Default${inv.lateFeeAssessed ? ` • +₹${inv.lateFeeAssessed} Fee` : ''})`
+                                    : 'Notice 3 (T+11 Terminated)'}
+                                </span>
+                              )}
                             </div>
 
                             <div className="font-semibold text-hearth-ink">
                               {inv.title}
                             </div>
+
+                            {/* Legal Notice Action Button if Notice exists */}
+                            {booking?.defaultNotices && booking.defaultNotices.length > 0 && (
+                              <div className="pt-0.5">
+                                <button
+                                  onClick={() => {
+                                    const match =
+                                      booking.defaultNotices?.find((n) => n.invoiceId === inv.id) ||
+                                      booking.defaultNotices?.[booking.defaultNotices.length - 1];
+                                    if (match) setSelectedNoticeModal(match);
+                                  }}
+                                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-pill bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-[10px] font-semibold transition-colors"
+                                >
+                                  <FileText className="w-3 h-3 text-rose-600" />
+                                  <span>View Legal Notice</span>
+                                </button>
+                              </div>
+                            )}
                             <div className="text-[11px] text-hearth-taupe">
                               Due: {inv.dueDate}
                               {inv.paidAt && ` • Paid on ${inv.paidAt}`}
@@ -359,10 +498,27 @@ export const FiveInvoiceLedgerView: React.FC = () => {
                             {!isPaid ? (
                               <button
                                 disabled={isSimulatingLatency}
-                                onClick={() => payInvoiceDocument(inv.id)}
-                                className="spring-btn px-4 py-2 rounded-pill bg-hearth-terracotta hover:bg-hearth-kiln text-white text-xs font-semibold shadow-sm"
+                                onClick={() => {
+                                  if (inv.overdueStage && inv.overdueStage !== 'NONE') {
+                                    curePaymentDefault({ bookingId: inv.bookingId, invoiceId: inv.id });
+                                  } else {
+                                    payInvoiceDocument(inv.id);
+                                  }
+                                }}
+                                className={`spring-btn px-4 py-2 rounded-pill text-white text-xs font-semibold shadow-sm inline-flex items-center gap-1.5 ${
+                                  inv.overdueStage && inv.overdueStage !== 'NONE'
+                                    ? 'bg-[#166534] hover:bg-[#14532D]'
+                                    : 'bg-hearth-terracotta hover:bg-hearth-kiln'
+                                }`}
                               >
-                                Pay ₹{inv.totalPayable.toLocaleString('en-IN')}
+                                {inv.overdueStage && inv.overdueStage !== 'NONE' ? (
+                                  <>
+                                    <CheckCircle2 className="w-3.5 h-3.5" />
+                                    <span>Pay & Cure Default ₹{inv.totalPayable.toLocaleString('en-IN')}</span>
+                                  </>
+                                ) : (
+                                  <span>Pay ₹{inv.totalPayable.toLocaleString('en-IN')}</span>
+                                )}
                               </button>
                             ) : (
                               <button
@@ -390,6 +546,109 @@ export const FiveInvoiceLedgerView: React.FC = () => {
           );
         })}
       </div>
+
+      {/* Legal Notice Modal */}
+      {selectedNoticeModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className="relative w-full max-w-2xl bg-hearth-card border border-hearth-border rounded-3xl shadow-2xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="p-6 bg-gradient-to-r from-rose-950 via-rose-900 to-amber-950 text-white flex items-start justify-between gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="px-2.5 py-0.5 rounded-pill bg-white/20 text-white text-[11px] font-bold font-mono">
+                    {selectedNoticeModal.noticeType}
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-pill bg-amber-400 text-amber-950 text-[10px] font-bold">
+                    Statutory Notice
+                  </span>
+                  {selectedNoticeModal.agentAuthCode && (
+                    <span className="px-2.5 py-0.5 rounded-pill bg-red-400 text-red-950 text-[10px] font-bold font-mono">
+                      Auth Code: {selectedNoticeModal.agentAuthCode}
+                    </span>
+                  )}
+                </div>
+                <h3 className="font-serif text-lg font-bold">
+                  {selectedNoticeModal.noticeTitle}
+                </h3>
+                <p className="text-xs text-rose-200">
+                  Issued: {selectedNoticeModal.issuedAt} • Deadline: {selectedNoticeModal.dueOrCureDeadline}
+                </p>
+              </div>
+
+              <button
+                onClick={() => setSelectedNoticeModal(null)}
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Notice Summary Metrics */}
+            <div className="grid grid-cols-3 gap-3 p-4 bg-hearth-oat border-b border-hearth-border text-xs">
+              <div>
+                <div className="text-[10px] text-hearth-taupe font-semibold uppercase">Principal Rent</div>
+                <div className="font-ledger font-bold text-hearth-ink">
+                  ₹{selectedNoticeModal.principalAmount.toLocaleString('en-IN')}
+                </div>
+              </div>
+              <div>
+                <div className="text-[10px] text-hearth-taupe font-semibold uppercase">Late Fee (BR-032)</div>
+                <div className="font-ledger font-bold text-[#991B1B]">
+                  ₹{selectedNoticeModal.lateFeeAmount.toLocaleString('en-IN')}
+                </div>
+              </div>
+              <div>
+                <div className="text-[10px] text-hearth-taupe font-semibold uppercase">Total Payable to Cure</div>
+                <div className="font-ledger font-bold text-hearth-terracotta">
+                  ₹{selectedNoticeModal.totalPayable.toLocaleString('en-IN')}
+                </div>
+              </div>
+            </div>
+
+            {/* Notice Text Content */}
+            <div className="p-6 max-h-[50vh] overflow-y-auto space-y-3 bg-hearth-parchment/60 font-mono text-xs text-hearth-ink leading-relaxed whitespace-pre-wrap border-b border-hearth-border">
+              {selectedNoticeModal.fullNoticeText}
+            </div>
+
+            {/* Modal Actions */}
+            <div className="p-4 bg-hearth-card flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(selectedNoticeModal.fullNoticeText);
+                    addToast({
+                      title: 'Notice Copied',
+                      description: 'Full legal notice text copied to clipboard.',
+                      variant: 'success',
+                    });
+                  }}
+                  className="px-3.5 py-1.5 rounded-pill bg-hearth-oat hover:bg-hearth-apricot border border-hearth-border text-xs font-medium text-hearth-umber inline-flex items-center gap-1.5 transition-colors"
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                  <span>Copy Text</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    window.print();
+                  }}
+                  className="px-3.5 py-1.5 rounded-pill bg-hearth-oat hover:bg-hearth-apricot border border-hearth-border text-xs font-medium text-hearth-umber inline-flex items-center gap-1.5 transition-colors"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  <span>Print Document</span>
+                </button>
+              </div>
+
+              <button
+                onClick={() => setSelectedNoticeModal(null)}
+                className="px-5 py-2 rounded-pill bg-hearth-ink text-white hover:bg-hearth-umber text-xs font-semibold shadow-sm transition-colors"
+              >
+                Close Notice
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
