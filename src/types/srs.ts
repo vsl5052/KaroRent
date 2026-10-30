@@ -75,6 +75,9 @@ export type VendorStatus =
   | 'Rejected'
   | 'Suspended'
   | 'Terminating — Continuity Active'
+  | 'Offboarding - Run-Off' // FR-VEN-009: Voluntary Offboarding & Run-Off to Expiry
+  | 'Closed / Offboarded' // FR-VEN-015: 100% rental & financial settlement completed
+  | 'Adversely Terminated / Blacklisted' // EX-036: Vendor abandoned run-off obligations
   | 'Terminated';
 
 export type VendorAgreementState =
@@ -112,6 +115,14 @@ export interface VendorRecord {
   };
   continuityManager?: string; // FR-VEN-011
   settlementHoldAmount: number; // FR-VEN-013
+  settlementReserveHeldAmount?: number; // FR-VEN-013: Segregated reserve held during run-off
+  runOffInitiatedAt?: string; // FR-VEN-009
+  runOffTargetCompletionDate?: string;
+  runOffActiveRentalsCount?: number;
+  runOffAffirmationAccepted?: boolean;
+  isBreachTakeoverTriggered?: boolean; // EX-036
+  breachTakeoverReason?: string;
+  emergencyPartnerAssigned?: string;
   commissionRatePercent: number; // FR-SET-001
   submittedAt: string;
   decisionNotes?: string;
@@ -638,7 +649,8 @@ export interface BlacklistEntry {
     | 'Heavy Asset Damage / Loss'
     | 'Extreme Policy Violation / Fraud'
     | 'Asset Retention & Unrecovered Balance Enforcement'
-    | 'Asset Recovery — Hostile Retention';
+    | 'Asset Recovery — Hostile Retention'
+    | 'Run-Off Service Abandonment (EX-036)';
   triggeringCaseOrBookingId: string;
   matchedIdentifiers: {
     phone: string;

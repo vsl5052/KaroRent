@@ -238,6 +238,34 @@ export const SettlementsFinanceView: React.FC = () => {
           </div>
         )}
 
+      {/* Voluntary Offboarding Segregated Settlement Reserve Hold Banner (FR-VEN-013) */}
+      {currentVendor.status === 'Offboarding - Run-Off' && (
+        <div className="p-5 rounded-3xl bg-amber-50 dark:bg-amber-950/40 border-2 border-amber-400 text-amber-950 dark:text-amber-100 space-y-2 shadow-sm">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-2 font-serif font-bold text-base">
+              <ShieldCheck className="w-5 h-5 text-amber-700" />
+              <span>Segregated Settlement Reserve Hold Active (FR-VEN-013)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1 rounded-pill bg-amber-200 text-amber-950 text-xs font-mono font-bold">
+                Run-Off Protection Active
+              </span>
+              <span className="px-3 py-1 rounded-pill bg-white/90 border border-amber-300 text-amber-950 text-xs font-mono font-bold">
+                Segregated Reserve: ₹
+                {(
+                  currentVendor.settlementReserveHeldAmount ||
+                  currentVendor.settlementHoldAmount ||
+                  15000
+                ).toLocaleString('en-IN')}
+              </span>
+            </div>
+          </div>
+          <p className="text-xs leading-relaxed text-amber-900 dark:text-amber-200">
+            <strong>Mandatory Run-Off Reserve (FR-VEN-013):</strong> This vendor is currently executing voluntary offboarding under Workflow WF-14. An amount of <strong>₹{(currentVendor.settlementReserveHeldAmount || currentVendor.settlementHoldAmount || 15000).toLocaleString('en-IN')}</strong> remains held in escrow to guarantee customer deposit refunds, unreturned assets, or emergency maintenance repairs until all field rentals expire.
+          </p>
+        </div>
+      )}
+
       {/* CARD 1: Current Possible Payouts */}
       <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-hearth-border pb-4">

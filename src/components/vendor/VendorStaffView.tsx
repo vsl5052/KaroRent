@@ -3,6 +3,7 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
+  Lock,
   MapPin,
   Package,
   Phone,
@@ -65,6 +66,11 @@ export const VendorStaffView: React.FC = () => {
 
   const currentVendor =
     vendors.find((v) => v.id === activeVendorId) || vendors[0];
+
+  const isRunOffVendor =
+    currentVendor.status === 'Offboarding - Run-Off' ||
+    currentVendor.status === 'Closed / Offboarded' ||
+    currentVendor.status === 'Adversely Terminated / Blacklisted';
 
   const vendorTechs = fieldTechnicians.filter(
     (t) => t.vendorId === currentVendor.id
@@ -257,13 +263,20 @@ export const VendorStaffView: React.FC = () => {
           )}
 
           {activePersona.role !== 'PLATFORM_ADMIN' && (
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="spring-btn px-4 py-2 rounded-pill bg-hearth-terracotta hover:bg-hearth-kiln text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm"
-            >
-              <UserPlus className="w-3.5 h-3.5" />
-              <span>Add Field Technician</span>
-            </button>
+            isRunOffVendor ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-pill bg-amber-100 text-amber-900 border border-amber-300 text-xs font-semibold shadow-sm">
+                <Lock className="w-3.5 h-3.5 text-amber-700" />
+                <span>Staff Credentialing Locked (Run-Off Active)</span>
+              </span>
+            ) : (
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="spring-btn px-4 py-2 rounded-pill bg-hearth-terracotta hover:bg-hearth-kiln text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm"
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                <span>Add Field Technician</span>
+              </button>
+            )
           )}
         </div>
       </div>
@@ -285,13 +298,15 @@ export const VendorStaffView: React.FC = () => {
             <p className="text-xs text-hearth-umber">
               No field technicians registered yet under {currentVendor.displayName}.
             </p>
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="px-4 py-2 rounded-pill bg-hearth-terracotta text-white text-xs font-semibold inline-flex items-center gap-1.5"
-            >
-              <UserPlus className="w-3.5 h-3.5" />
-              <span>Add First Technician</span>
-            </button>
+            {!isRunOffVendor && (
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="px-4 py-2 rounded-pill bg-hearth-terracotta text-white text-xs font-semibold inline-flex items-center gap-1.5"
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                <span>Add First Technician</span>
+              </button>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">

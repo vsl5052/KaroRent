@@ -2,10 +2,14 @@ import React, { useState } from 'react';
 import {
   AlertOctagon,
   ArrowRightLeft,
+  Building2,
   CheckCircle2,
   Clock,
   FileText,
+  Lock,
+  LogOut,
   ShieldAlert,
+  ShieldCheck,
   Sliders,
   XCircle,
   Zap,
@@ -27,6 +31,9 @@ export const AdminGovernanceView: React.FC = () => {
     updateMasterProductPricing,
     reviewVendorApplication,
     terminateVendorAndAssignContinuity,
+    initiateVendorVoluntaryOffboarding,
+    triggerVendorBreachTakeover,
+    completeVendorAmicableOffboarding,
     triggerDefaultNotice,
     curePaymentDefault,
     reportRepossessionObstruction,
@@ -35,6 +42,14 @@ export const AdminGovernanceView: React.FC = () => {
   } = useKaroRentStore();
 
   const [simBookingId, setSimBookingId] = useState<string>('BKG-2026-8892');
+  const [simVendorId, setSimVendorId] = useState<string>('VEN-201');
+  const [showBreachModal, setShowBreachModal] = useState<boolean>(false);
+  const [breachPartner, setBreachPartner] = useState<string>(
+    'KaroRent Rapid Response Fleet'
+  );
+  const [breachJustification, setBreachJustification] = useState<string>(
+    'Vendor abandoned field servicing / return pickup obligations during run-off (BR-034). Platform emergency fleet reassigned and settlement reserve forfeited.'
+  );
 
   // Inventory Decision State
   const [adminReasonByInv, setAdminReasonByInv] = useState<Record<string, string>>({
@@ -326,6 +341,165 @@ export const AdminGovernanceView: React.FC = () => {
                     <div className="text-[10px] text-[#166534]">
                       Reconcile Invoice & Lift Restrictions
                     </div>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })()}
+
+      {/* SECTION: Vendor Voluntary Offboarding & Run-Off Governance (Workflow WF-14 & Option A) */}
+      {(() => {
+        const simVendor =
+          vendors.find((v) => v.id === simVendorId) || vendors[0];
+        const activeRentalsForVendor = bookings.filter(
+          (b) =>
+            b.fulfillingVendorId === simVendor?.id &&
+            b.status !== 'Completed' &&
+            b.status !== 'Returned & Closed' &&
+            b.status !== 'Cancelled'
+        );
+        const isRunOff = simVendor?.status === 'Offboarding - Run-Off';
+        const isClosed = simVendor?.status === 'Closed / Offboarded';
+        const isAdverselyTerminated =
+          simVendor?.status === 'Adversely Terminated / Blacklisted';
+        const heldReserve =
+          simVendor?.settlementReserveHeldAmount ||
+          simVendor?.settlementHoldAmount ||
+          15000;
+
+        return (
+          <div className="rounded-3xl bg-gradient-to-r from-amber-950/20 via-orange-950/20 to-stone-900/30 border-2 border-amber-400 p-6 shadow-hearth space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-hearth-border pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-amber-600/20 text-amber-700 flex items-center justify-center">
+                  <ShieldAlert className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="font-serif text-lg font-bold text-hearth-ink flex items-center gap-2">
+                    <span>Vendor Voluntary Offboarding & Run-Off Governance</span>
+                    <span className="px-2 py-0.5 rounded-pill bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-mono font-bold">
+                      Workflow WF-14 / Option A
+                    </span>
+                  </h2>
+                  <p className="text-xs text-hearth-umber">
+                    Simulate & supervise "Run-Off to Expiry" (FR-VEN-009), Scoped Operations Mode (FR-VEN-011), Emergency Breach Takeover (EX-036), and Amicable Closure (FR-VEN-015).
+                  </p>
+                </div>
+              </div>
+
+              {/* Vendor Selector Dropdown */}
+              <div className="flex items-center gap-2">
+                <label className="text-xs font-semibold text-hearth-ink">
+                  Target Partner:
+                </label>
+                <select
+                  value={simVendorId}
+                  onChange={(e) => setSimVendorId(e.target.value)}
+                  className="px-3.5 py-1.5 rounded-pill bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] text-xs font-mono font-bold text-[#166534] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#166534]/30 cursor-pointer transition-all"
+                >
+                  {vendors.map((v) => (
+                    <option key={v.id} value={v.id} className="bg-white text-hearth-ink font-sans font-normal">
+                      {v.id} — {v.displayName} ({v.status})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {simVendor && (
+              <div className="space-y-3 text-xs">
+                {/* Active Vendor Telemetry Bar */}
+                <div className="p-3.5 rounded-2xl bg-hearth-card border border-hearth-border flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono font-bold text-hearth-ink">{simVendor.id}</span>
+                    <span className="font-semibold text-hearth-ink">{simVendor.legalBusinessName}</span>
+                    <span className="text-hearth-taupe font-mono text-[11px]">
+                      GSTIN: {simVendor.taxIdGstin}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span
+                      className={`px-3 py-0.5 rounded-pill text-[11px] font-mono font-bold border ${
+                        isRunOff
+                          ? 'bg-amber-100 text-amber-950 border-amber-300'
+                          : isClosed
+                          ? 'bg-emerald-100 text-emerald-950 border-emerald-300'
+                          : isAdverselyTerminated
+                          ? 'bg-red-700 text-white border-red-800'
+                          : 'bg-[#DCFCE7] text-[#166534] border-[#86EFAC]'
+                      }`}
+                    >
+                      Status: {simVendor.status}
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-pill bg-hearth-oat border border-hearth-border text-[11px] font-semibold text-hearth-ink">
+                      Active Field Rentals: {activeRentalsForVendor.length}
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-pill bg-amber-50 border border-amber-200 text-amber-900 text-[11px] font-bold">
+                      Segregated Reserve: ₹{heldReserve.toLocaleString('en-IN')}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Simulator Action Triggers */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                  {/* Action 1: WF-14 Initiate Run-Off */}
+                  <button
+                    disabled={isSimulatingLatency || isRunOff || isClosed}
+                    onClick={() => initiateVendorVoluntaryOffboarding(simVendor.id)}
+                    className={`p-3.5 rounded-2xl border text-left transition-all space-y-1 shadow-sm ${
+                      !isRunOff && !isClosed
+                        ? 'bg-amber-50 hover:bg-amber-100 text-amber-950 border-amber-300'
+                        : 'bg-hearth-oat text-hearth-taupe border-hearth-border opacity-60 cursor-not-allowed'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 font-bold text-xs">
+                      <LogOut className="w-4 h-4 text-amber-700" />
+                      <span>1. Initiate Run-Off to Expiry (WF-14)</span>
+                    </div>
+                    <p className="text-[11px] leading-relaxed">
+                      Delist public catalog immediately (FR-VEN-010) & restrict portal to scoped operations mode (FR-VEN-011).
+                    </p>
+                  </button>
+
+                  {/* Action 2: EX-036 Breach Takeover */}
+                  <button
+                    disabled={isSimulatingLatency || !isRunOff}
+                    onClick={() => setShowBreachModal(true)}
+                    className={`p-3.5 rounded-2xl border text-left transition-all space-y-1 shadow-sm ${
+                      isRunOff
+                        ? 'bg-rose-50 hover:bg-rose-100 text-rose-950 border-rose-300'
+                        : 'bg-hearth-oat text-hearth-taupe border-hearth-border opacity-60 cursor-not-allowed'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 font-bold text-xs">
+                      <AlertOctagon className="w-4 h-4 text-rose-700" />
+                      <span>2. Emergency Breach Takeover (EX-036)</span>
+                    </div>
+                    <p className="text-[11px] leading-relaxed">
+                      Reassign emergency fleet for field servicing, forfeit held reserve, and enroll partner into Blacklist (FR-BLK-002).
+                    </p>
+                  </button>
+
+                  {/* Action 3: FR-VEN-015 Amicable Closure */}
+                  <button
+                    disabled={isSimulatingLatency || !isRunOff}
+                    onClick={() => completeVendorAmicableOffboarding(simVendor.id)}
+                    className={`p-3.5 rounded-2xl border text-left transition-all space-y-1 shadow-sm ${
+                      isRunOff
+                        ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-950 border-emerald-300'
+                        : 'bg-hearth-oat text-hearth-taupe border-hearth-border opacity-60 cursor-not-allowed'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 font-bold text-xs">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-700" />
+                      <span>3. Finalize Amicable Closure (FR-VEN-015)</span>
+                    </div>
+                    <p className="text-[11px] leading-relaxed">
+                      Disburse segregated settlement reserve, close vendor account, and confirm Blacklist Immunity (BR-035).
+                    </p>
                   </button>
                 </div>
               </div>
@@ -659,6 +833,12 @@ export const AdminGovernanceView: React.FC = () => {
                         className={`px-2.5 py-0.5 rounded-pill text-[10px] font-semibold ${
                           v.status === 'Approved'
                             ? 'bg-[#DCFCE7] text-[#166534]'
+                            : v.status === 'Offboarding - Run-Off'
+                            ? 'bg-amber-100 text-amber-950 border border-amber-300 font-bold'
+                            : v.status === 'Closed / Offboarded'
+                            ? 'bg-emerald-100 text-emerald-950 border border-emerald-300 font-bold'
+                            : v.status === 'Adversely Terminated / Blacklisted'
+                            ? 'bg-red-700 text-white font-bold'
                             : v.status.includes('Terminat')
                             ? 'bg-[#FEE2E2] text-[#991B1B]'
                             : 'bg-[#FFEDD5] text-[#9A3412]'
@@ -811,6 +991,69 @@ export const AdminGovernanceView: React.FC = () => {
                 className="px-5 py-2 rounded-pill bg-[#991B1B] text-white text-xs font-semibold"
               >
                 Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* EX-036 Emergency Breach Takeover Modal */}
+      {showBreachModal && (
+        <div className="fixed inset-0 z-50 bg-[#1C1917]/55 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="w-full max-w-lg rounded-3xl bg-hearth-parchment border-2 border-red-500 p-6 shadow-hearth-lg space-y-4">
+            <div className="flex items-center gap-2 text-[#991B1B]">
+              <AlertOctagon className="w-5 h-5 text-red-600" />
+              <h3 className="font-serif text-lg font-bold">
+                Emergency Breach Takeover (EX-036)
+              </h3>
+            </div>
+            <p className="text-xs text-hearth-umber leading-relaxed">
+              Execute emergency fleet takeover for <strong>{simVendorId}</strong>. This will immediately forfeit the segregated settlement reserve and enroll the vendor and registered tax credentials into the Unified Blacklist (FR-BLK-002).
+            </p>
+            <div className="space-y-3 text-xs">
+              <div>
+                <label className="block font-semibold text-hearth-ink mb-1">
+                  Assigned Emergency Partner Fleet *
+                </label>
+                <input
+                  type="text"
+                  value={breachPartner}
+                  onChange={(e) => setBreachPartner(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-hearth-card border border-hearth-border text-hearth-ink"
+                />
+              </div>
+              <div>
+                <label className="block font-semibold text-hearth-ink mb-1">
+                  Breach Justification & Evidence *
+                </label>
+                <textarea
+                  rows={3}
+                  value={breachJustification}
+                  onChange={(e) => setBreachJustification(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-hearth-card border border-hearth-border text-hearth-ink"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                onClick={() => setShowBreachModal(false)}
+                className="px-4 py-2 rounded-pill bg-hearth-oat text-xs"
+              >
+                Cancel
+              </button>
+              <button
+                disabled={isSimulatingLatency}
+                onClick={async () => {
+                  await triggerVendorBreachTakeover({
+                    vendorId: simVendorId,
+                    justification: breachJustification,
+                    emergencyPartnerName: breachPartner,
+                  });
+                  setShowBreachModal(false);
+                }}
+                className="px-5 py-2 rounded-pill bg-[#991B1B] hover:bg-red-800 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm"
+              >
+                <AlertOctagon className="w-3.5 h-3.5" />
+                <span>Confirm Breach Takeover & Blacklist</span>
               </button>
             </div>
           </div>

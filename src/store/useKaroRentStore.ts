@@ -285,6 +285,13 @@ interface KaroRentState {
     contractualLateFees: number;
     mediatorNotes: string;
   }) => Promise<void>;
+  initiateVendorVoluntaryOffboarding: (vendorId: string) => Promise<void>;
+  triggerVendorBreachTakeover: (payload: {
+    vendorId: string;
+    justification: string;
+    emergencyPartnerName?: string;
+  }) => Promise<void>;
+  completeVendorAmicableOffboarding: (vendorId: string) => Promise<void>;
 }
 
 const simulateLatency = (ms = 320) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -3802,6 +3809,309 @@ export const useKaroRentStore = create<KaroRentState>()(
         });
       },
 
+      initiateVendorVoluntaryOffboarding: async (vendorId: string) => {
+        set({
+          isSimulatingLatency: true,
+          latencyActionLabel: 'Processing Voluntary Offboarding Request...',
+        });
+        await simulateLatency(350);
+
+        const state = get();
+        const vendor = state.vendors.find((v) => v.id === vendorId);
+        if (!vendor) {
+          set({ isSimulatingLatency: false, latencyActionLabel: null });
+          return;
+        }
+
+        const activeRentals = state.bookings.filter(
+          (b) =>
+            b.fulfillingVendorId === vendorId &&
+            b.status !== 'Returned & Closed' &&
+            b.status !== 'Cancelled'
+        );
+        const count = activeRentals.length;
+        const targetDates = activeRentals
+          .map((b) => b.endDate)
+          .filter(Boolean);
+        const targetCompletion =
+          targetDates.sort().reverse()[0] || '2027-04-15';
+
+        set((s) => ({
+          isSimulatingLatency: false,
+          latencyActionLabel: null,
+          virtualInventory: s.virtualInventory.map((item) =>
+            item.owningVendorId === vendorId
+              ? { ...item, livePublicEnabled: false }
+              : item
+          ),
+          vendors: s.vendors.map((v) =>
+            v.id === vendorId
+              ? {
+                  ...v,
+                  status: 'Offboarding - Run-Off' as const,
+                  runOffInitiatedAt: nowIST(),
+                  runOffTargetCompletionDate: targetCompletion,
+                  runOffActiveRentalsCount: count,
+                  runOffAffirmationAccepted: true,
+                  settlementReserveHeldAmount: v.settlementHoldAmount || 15000,
+                }
+              : v
+          ),
+          notifications: [
+            {
+              id: `NTF-${Date.now()}`,
+              eventCode: 'Run-Off Initiated',
+              title: `Voluntary Offboarding: ${vendor.legalBusinessName}`,
+              message: `Vendor entered Run-Off to Expiry (Option A). Public listings delisted. ${count} active customer rentals must be serviced until expiry (BR-034).`,
+              recipientRole: 'PLATFORM_ADMIN',
+              category: 'Inventory Approval',
+              priority: 'high',
+              read: false,
+              timestamp: 'Just now',
+              linkedView: 'ADMIN_GOVERNANCE',
+            },
+            {
+              id: `NTF-${Date.now()}-V`,
+              eventCode: 'Run-Off Confirmation',
+              title: `Run-Off to Expiry Active (FR-VEN-009)`,
+              message: `Your voluntary exit has been registered. Public trading is paused. Your portal is scoped to active field servicing for ${count} rentals. Blacklist immunity (BR-035) applies upon completion.`,
+              recipientRole: 'VENDOR_OWNER',
+              category: 'Inventory Approval',
+              priority: 'high',
+              read: false,
+              timestamp: 'Just now',
+              linkedView: 'VENDOR_PORTAL',
+            },
+            ...s.notifications,
+          ],
+          auditLogs: [
+            {
+              id: `AUD-${Date.now()}`,
+              timestamp: nowIST(),
+              actorName: s.activePersona.name,
+              actorRole: s.activePersona.roleBadge,
+              moduleCode: 'FR-VEN-009',
+              actionSummary: `Initiated Voluntary Offboarding (Option A: Run-Off to Expiry) for ${vendor.legalBusinessName}`,
+              affectedRecordId: vendor.id,
+              priorValue: `Status: ${vendor.status}`,
+              newValue: `Status: Offboarding - Run-Off • Active Rentals: ${count} • Completion: ${targetCompletion}`,
+              mandatoryReason:
+                'Vendor-initiated voluntary contract exit pursuant to Section 7.1 FR-VEN-009.',
+            },
+            ...s.auditLogs,
+          ],
+        }));
+
+        get().addToast({
+          title: 'Voluntary Offboarding Initiated',
+          description: `Public listings delisted. Run-Off to Expiry active for ${count} remaining rentals (BR-034).`,
+          variant: 'warning',
+        });
+      },
+
+      triggerVendorBreachTakeover: async ({
+        vendorId,
+        justification,
+        emergencyPartnerName,
+      }) => {
+        set({
+          isSimulatingLatency: true,
+          latencyActionLabel: 'Executing Emergency Breach Takeover (EX-036)...',
+        });
+        await simulateLatency(350);
+
+        const state = get();
+        const vendor = state.vendors.find((v) => v.id === vendorId);
+        if (!vendor) {
+          set({ isSimulatingLatency: false, latencyActionLabel: null });
+          return;
+        }
+
+        const partnerName =
+          emergencyPartnerName || 'KaroRent Rapid Response Fleet';
+        const heldReserve =
+          vendor.settlementReserveHeldAmount ||
+          vendor.settlementHoldAmount ||
+          15000;
+
+        const newBlacklistEntry: BlacklistEntry = {
+          id: `BLK-V-${Date.now()}`,
+          ledgerType: 'VENDOR_BLACKLIST',
+          entityId: vendor.id,
+          entityName: vendor.legalBusinessName,
+          categoryReason: 'Run-Off Service Abandonment (EX-036)',
+          triggeringCaseOrBookingId: 'EX-036 / BREACH-TAKEOVER',
+          matchedIdentifiers: {
+            phone: vendor.registeredPhone,
+            email: vendor.email,
+            taxIdOrGstin: vendor.taxIdGstin,
+            kycOrPan: vendor.panNumber,
+            bankOrPaymentFingerprint:
+              vendor.bankAccountMasked || `BANK-V-${vendor.id}`,
+            addressSnippet: vendor.serviceAreas.join(', '),
+          },
+          evidenceSummary:
+            justification ||
+            'Vendor initiated voluntary offboarding but abandoned field servicing/return obligations (BR-034). Payout reserve forfeited and emergency fleet dispatched.',
+          outstandingDuesAmount: heldReserve,
+          blockedAttemptsCount: 1,
+          status: 'Active Blacklist',
+          effectiveTimestamp: nowIST(),
+          enrolledByActor: 'Platform Super Administrator (EX-036)',
+        };
+
+        set((s) => ({
+          isSimulatingLatency: false,
+          latencyActionLabel: null,
+          vendors: s.vendors.map((v) =>
+            v.id === vendorId
+              ? {
+                  ...v,
+                  status: 'Adversely Terminated / Blacklisted' as const,
+                  isBreachTakeoverTriggered: true,
+                  breachTakeoverReason: justification,
+                  emergencyPartnerAssigned: partnerName,
+                  settlementHoldAmount: 0,
+                  settlementReserveHeldAmount: 0,
+                }
+              : v
+          ),
+          serviceTickets: s.serviceTickets.map((t) =>
+            t.vendorId === vendorId &&
+            t.status !== 'Resolved' &&
+            t.status !== 'Closed'
+              ? {
+                  ...t,
+                  assignedTechnicianName: `${partnerName} (Emergency Takeover)`,
+                  status: 'In Progress' as const,
+                }
+              : t
+          ),
+          blacklist: [newBlacklistEntry, ...s.blacklist],
+          notifications: [
+            {
+              id: `NTF-${Date.now()}`,
+              eventCode: 'Breach Takeover',
+              title: `CRITICAL: Vendor Breach Takeover (EX-036)`,
+              message: `Material breach executed against ${vendor.legalBusinessName}. Reserve ₹${heldReserve.toLocaleString('en-IN')} forfeited. Field operations reassigned to ${partnerName}.`,
+              recipientRole: 'PLATFORM_ADMIN',
+              category: 'Blacklist Alert',
+              priority: 'critical',
+              read: false,
+              timestamp: 'Just now',
+              linkedView: 'BLACKLIST_REGISTRY',
+            },
+            ...s.notifications,
+          ],
+          auditLogs: [
+            {
+              id: `AUD-${Date.now()}`,
+              timestamp: nowIST(),
+              actorName: s.activePersona.name,
+              actorRole: s.activePersona.roleBadge,
+              moduleCode: 'EX-036',
+              actionSummary: `Executed Emergency Breach Takeover against ${vendor.legalBusinessName}`,
+              affectedRecordId: vendor.id,
+              priorValue: `Status: ${vendor.status}`,
+              newValue: `Status: Adversely Terminated / Blacklisted • Forfeited Reserve: ₹${heldReserve.toLocaleString('en-IN')}`,
+              mandatoryReason: justification,
+            },
+            ...s.auditLogs,
+          ],
+        }));
+
+        get().addToast({
+          title: 'Emergency Breach Takeover Executed',
+          description: `Vendor adversely blacklisted. Reserve ₹${heldReserve.toLocaleString('en-IN')} forfeited and fleet reassigned.`,
+          variant: 'error',
+        });
+      },
+
+      completeVendorAmicableOffboarding: async (vendorId: string) => {
+        set({
+          isSimulatingLatency: true,
+          latencyActionLabel:
+            'Finalizing Amicable Account Closure (FR-VEN-015)...',
+        });
+        await simulateLatency(350);
+
+        const state = get();
+        const vendor = state.vendors.find((v) => v.id === vendorId);
+        if (!vendor) {
+          set({ isSimulatingLatency: false, latencyActionLabel: null });
+          return;
+        }
+
+        const remainingReserve =
+          vendor.settlementReserveHeldAmount ||
+          vendor.settlementHoldAmount ||
+          0;
+
+        set((s) => ({
+          isSimulatingLatency: false,
+          latencyActionLabel: null,
+          vendors: s.vendors.map((v) =>
+            v.id === vendorId
+              ? {
+                  ...v,
+                  status: 'Closed / Offboarded' as const,
+                  settlementHoldAmount: 0,
+                  settlementReserveHeldAmount: 0,
+                }
+              : v
+          ),
+          notifications: [
+            {
+              id: `NTF-${Date.now()}`,
+              eventCode: 'Amicable Closure',
+              title: `Vendor Amicably Closed: ${vendor.legalBusinessName}`,
+              message: `All customer rentals cleared. Reserve ₹${remainingReserve.toLocaleString('en-IN')} released to vendor bank account. Blacklist immunity affirmed (BR-035).`,
+              recipientRole: 'PLATFORM_ADMIN',
+              category: 'Inventory Approval',
+              priority: 'normal',
+              read: false,
+              timestamp: 'Just now',
+              linkedView: 'ADMIN_GOVERNANCE',
+            },
+            {
+              id: `NTF-${Date.now()}-V`,
+              eventCode: 'Amicable Closure',
+              title: `Account Formally Closed (FR-VEN-015)`,
+              message: `Congratulations! All rentals and return checks are formally cleared. Remaining payout balance of ₹${remainingReserve.toLocaleString('en-IN')} has been disbursed.`,
+              recipientRole: 'VENDOR_OWNER',
+              category: 'Inventory Approval',
+              priority: 'normal',
+              read: false,
+              timestamp: 'Just now',
+              linkedView: 'VENDOR_PORTAL',
+            },
+            ...s.notifications,
+          ],
+          auditLogs: [
+            {
+              id: `AUD-${Date.now()}`,
+              timestamp: nowIST(),
+              actorName: s.activePersona.name,
+              actorRole: s.activePersona.roleBadge,
+              moduleCode: 'FR-VEN-015',
+              actionSummary: `Completed Amicable Account Closure for ${vendor.legalBusinessName}`,
+              affectedRecordId: vendor.id,
+              priorValue: `Status: ${vendor.status}`,
+              newValue: `Status: Closed / Offboarded • Disbursed Reserve: ₹${remainingReserve.toLocaleString('en-IN')} • Blacklist Immunity: True`,
+              mandatoryReason:
+                'All active rentals completed and verified without default pursuant to BR-035.',
+            },
+            ...s.auditLogs,
+          ],
+        }));
+
+        get().addToast({
+          title: 'Final Amicable Closure Completed',
+          description: `Vendor marked Closed / Offboarded. Payout reserve disbursed. Blacklist immunity granted (BR-035).`,
+          variant: 'success',
+        });
+      },
+
       loginWithMobile: (mobileNumber: string) => {
         const cleanInput = mobileNumber.replace(/\D/g, '');
         if (cleanInput.length < 5) {
@@ -3868,7 +4178,7 @@ export const useKaroRentStore = create<KaroRentState>()(
       },
     }),
     {
-      name: 'karorent-live-platform-v13',
+      name: 'karorent-live-platform-v14',
       partialize: (state) => ({
         darkMode: state.darkMode,
         personas: state.personas,

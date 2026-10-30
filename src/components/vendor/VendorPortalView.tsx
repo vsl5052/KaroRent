@@ -1,9 +1,16 @@
 import React, { useState } from 'react';
 import {
   AlertOctagon,
+  AlertTriangle,
   Building2,
+  CheckCircle2,
+  Clock,
   Handshake,
+  Lock,
+  LogOut,
   PackagePlus,
+  ShieldAlert,
+  ShieldCheck,
   X,
 } from 'lucide-react';
 import { useKaroRentStore } from '../../store/useKaroRentStore';
@@ -24,8 +31,10 @@ export const VendorPortalView: React.FC = () => {
     vendors,
     virtualInventory,
     vendorProductRates,
+    bookings,
     submitVendorStagedInventoryChange,
     registerNewVendorProduct,
+    initiateVendorVoluntaryOffboarding,
     isSimulatingLatency,
   } = useKaroRentStore();
 
@@ -39,16 +48,36 @@ export const VendorPortalView: React.FC = () => {
       : activePersona.vendorId || 'VEN-201';
   const currentVendor =
     vendors.find((v) => v.id === activeVendorId) || vendors[0];
+
+  const isRunOffVendor = currentVendor.status === 'Offboarding - Run-Off';
+  const isClosedVendor = currentVendor.status === 'Closed / Offboarded';
+  const isAdverselyTerminated =
+    currentVendor.status === 'Adversely Terminated / Blacklisted' ||
+    currentVendor.status === 'Terminated';
+  const isScopedMode = isRunOffVendor || isClosedVendor || isAdverselyTerminated;
+
   const isRestrictedVendor =
     currentVendor.status === 'Terminating — Continuity Active' ||
-    currentVendor.status === 'Terminated' ||
+    isScopedMode ||
     Boolean(activePersona.isTerminatedVendor);
   const showRestrictionToAdmin =
     isRestrictedVendor && activePersona.role === 'PLATFORM_ADMIN';
 
+  const activeRentals = bookings.filter(
+    (b) =>
+      b.fulfillingVendorId === currentVendor.id &&
+      b.status !== 'Returned & Closed' &&
+      b.status !== 'Cancelled'
+  );
+  const activeRentalsCount = activeRentals.length;
+
   const vendorInventory = virtualInventory.filter(
     (i) => i.owningVendorId === currentVendor.id
   );
+
+  // Voluntary Offboarding Modal State
+  const [showOffboardingModal, setShowOffboardingModal] = useState(false);
+  const [offboardingAffirmation, setOffboardingAffirmation] = useState(false);
 
   // Inventory Edit State
   const [editingInvId, setEditingInvId] = useState<string | null>(null);
@@ -139,9 +168,24 @@ export const VendorPortalView: React.FC = () => {
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#FAF8F5] via-[#FAF8F5]/95 to-transparent flex items-center p-6 sm:p-8">
           <div className="max-w-xl space-y-2.5">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-pill bg-hearth-card border border-hearth-border text-[11px] font-mono text-hearth-terracotta font-semibold">
-              <Building2 className="w-3.5 h-3.5" />
-              <span>Vendor Inventory • {currentVendor.id}</span>
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-pill bg-hearth-card border border-hearth-border text-[11px] font-mono text-hearth-terracotta font-semibold">
+                <Building2 className="w-3.5 h-3.5" />
+                <span>Vendor Inventory • {currentVendor.id}</span>
+              </div>
+              <span
+                className={`px-3 py-0.5 rounded-pill text-[11px] font-mono font-bold border ${
+                  isRunOffVendor
+                    ? 'bg-amber-100 text-amber-950 border-amber-300'
+                    : isClosedVendor
+                    ? 'bg-emerald-100 text-emerald-950 border-emerald-300'
+                    : isAdverselyTerminated
+                    ? 'bg-red-700 text-white border-red-800'
+                    : 'bg-[#DCFCE7] text-[#166534] border-[#86EFAC]'
+                }`}
+              >
+                {currentVendor.status}
+              </span>
             </div>
             <h1 className="font-serif text-2xl sm:text-3xl font-bold text-[#1C1917]">
               {currentVendor.legalBusinessName}
@@ -151,13 +195,32 @@ export const VendorPortalView: React.FC = () => {
             </p>
             <div className="flex flex-wrap items-center gap-2 pt-1">
               {activePersona.role !== 'PLATFORM_ADMIN' && (
-                <button
-                  onClick={() => setShowNewProductModal(true)}
-                  className="spring-btn px-4 py-2 rounded-pill bg-hearth-terracotta hover:bg-hearth-kiln text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm"
-                >
-                  <PackagePlus className="w-3.5 h-3.5" />
-                  <span>Register New Product</span>
-                </button>
+                <>
+                  {isScopedMode ? (
+                    <span className="px-3.5 py-2 rounded-pill bg-amber-100 text-amber-900 border border-amber-300 text-xs font-semibold flex items-center gap-1.5 shadow-sm">
+                      <Lock className="w-3.5 h-3.5" />
+                      <span>Listing Additions Locked (Run-Off Mode)</span>
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => setShowNewProductModal(true)}
+                      className="spring-btn px-4 py-2 rounded-pill bg-hearth-terracotta hover:bg-hearth-kiln text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm"
+                    >
+                      <PackagePlus className="w-3.5 h-3.5" />
+                      <span>Register New Product</span>
+                    </button>
+                  )}
+
+                  {!isScopedMode && currentVendor.status === 'Approved' && (
+                    <button
+                      onClick={() => setShowOffboardingModal(true)}
+                      className="spring-btn px-4 py-2 rounded-pill bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-all"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>Request Voluntary Exit (Option A)</span>
+                    </button>
+                  )}
+                </>
               )}
 
               {activePersona.role === 'PLATFORM_ADMIN' && (
@@ -170,7 +233,7 @@ export const VendorPortalView: React.FC = () => {
                   >
                     {vendors.map((v) => (
                       <option key={v.id} value={v.id} className="bg-white text-hearth-ink font-sans font-normal">
-                        {v.id} — {v.displayName}
+                        {v.id} — {v.displayName} ({v.status})
                       </option>
                     ))}
                   </select>
@@ -180,6 +243,77 @@ export const VendorPortalView: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Voluntary Offboarding Run-Off to Expiry Banner (FR-VEN-009 / FR-VEN-011) */}
+      {isRunOffVendor && (
+        <div className="p-5 rounded-3xl bg-amber-50 dark:bg-amber-950/40 border-2 border-amber-400 text-amber-950 dark:text-amber-100 space-y-2.5 shadow-sm">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-2 font-serif font-bold text-base">
+              <ShieldAlert className="w-5 h-5 text-amber-700" />
+              <span>Voluntary Offboarding — Run-Off to Expiry (Option A)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1 rounded-pill bg-amber-200 text-amber-950 text-xs font-mono font-bold">
+                Run-Off Phase Active
+              </span>
+              <span className="px-3 py-1 rounded-pill bg-white/90 border border-amber-300 text-amber-950 text-xs font-mono font-bold">
+                Held Reserve: ₹
+                {(
+                  currentVendor.settlementReserveHeldAmount ||
+                  currentVendor.settlementHoldAmount ||
+                  15000
+                ).toLocaleString('en-IN')}
+              </span>
+            </div>
+          </div>
+          <p className="text-xs leading-relaxed text-amber-900 dark:text-amber-200">
+            <strong>Trading Cutoff Active (FR-VEN-010):</strong> All public listings are delisted and new product registration is locked.
+            Under <strong>BR-034 (Run-Off Operational Duty)</strong>, your team remains contractually bound to fulfill all active customer rentals, breakdown repairs, and doorstep return pickup inspections (`FR-RET-002`) until final contract maturity.
+            Completing all obligations guarantees <strong>Amicable Offboarding Blacklist Immunity (BR-035)</strong>.
+          </p>
+          <div className="pt-2 flex items-center justify-between text-xs font-semibold text-amber-800 dark:text-amber-300 border-t border-amber-200 dark:border-amber-900">
+            <span>Remaining Active Rentals in Field: <strong>{activeRentalsCount}</strong></span>
+            <span>Target Completion: <strong>{currentVendor.runOffTargetCompletionDate || '2027-04-15'}</strong></span>
+          </div>
+        </div>
+      )}
+
+      {/* Amicable Closure Banner (FR-VEN-015) */}
+      {isClosedVendor && (
+        <div className="p-5 rounded-3xl bg-emerald-50 dark:bg-emerald-950/40 border-2 border-emerald-400 text-emerald-950 dark:text-emerald-100 space-y-2 shadow-sm">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-2 font-serif font-bold text-base">
+              <CheckCircle2 className="w-5 h-5 text-emerald-700" />
+              <span>Partner Account Formally Closed & Offboarded (FR-VEN-015)</span>
+            </div>
+            <span className="px-3 py-1 rounded-pill bg-emerald-200 text-emerald-900 text-xs font-mono font-bold">
+              Blacklist Immunity Confirmed (BR-035)
+            </span>
+          </div>
+          <p className="text-xs leading-relaxed text-emerald-900 dark:text-emerald-200">
+            All customer rentals reached completed maturity with verified return condition sign-offs. All customer security deposits have been settled and your accrued payout reserve has been disbursed.
+          </p>
+        </div>
+      )}
+
+      {/* Adverse Termination / Breach Takeover Banner (EX-036) */}
+      {isAdverselyTerminated && (
+        <div className="p-5 rounded-3xl bg-red-50 dark:bg-red-950/40 border-2 border-red-500 text-red-950 dark:text-red-100 space-y-2 shadow-sm">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-2 font-serif font-bold text-base">
+              <AlertOctagon className="w-5 h-5 text-red-600" />
+              <span>Adversely Terminated & Blacklisted (EX-036 Breach Takeover)</span>
+            </div>
+            <span className="px-3 py-1 rounded-pill bg-red-700 text-white text-xs font-mono font-bold">
+              Reserve Forfeited (FR-BLK-002)
+            </span>
+          </div>
+          <p className="text-xs leading-relaxed text-red-900 dark:text-red-200">
+            {currentVendor.breachTakeoverReason ||
+              'Material breach: Vendor abandoned field servicing / return pickup obligations during run-off (BR-034). Platform emergency fleet reassigned and settlement reserve forfeited.'}
+          </p>
+        </div>
+      )}
 
       {/* Restricted Banner (Platform Operator Only) */}
       {showRestrictionToAdmin && (
@@ -242,16 +376,20 @@ export const VendorPortalView: React.FC = () => {
                             </span>
                             <span
                               className={`px-2.5 py-0.5 rounded-pill text-[10px] font-semibold ${
-                                inv.livePublicEnabled ||
-                                (isRestrictedVendor &&
-                                  activePersona.role !== 'PLATFORM_ADMIN')
+                                isScopedMode
+                                  ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                                  : inv.livePublicEnabled ||
+                                    (isRestrictedVendor &&
+                                      activePersona.role !== 'PLATFORM_ADMIN')
                                   ? 'bg-[#DCFCE7] text-[#166534] border border-[#BBF7D0]'
                                   : 'bg-hearth-oat text-hearth-taupe border border-hearth-border'
                               }`}
                             >
-                              {inv.livePublicEnabled ||
-                              (isRestrictedVendor &&
-                                activePersona.role !== 'PLATFORM_ADMIN')
+                              {isScopedMode
+                                ? 'Delisted (Run-Off)'
+                                : inv.livePublicEnabled ||
+                                (isRestrictedVendor &&
+                                  activePersona.role !== 'PLATFORM_ADMIN')
                                 ? 'Active'
                                 : 'Paused'}
                             </span>
@@ -344,6 +482,17 @@ export const VendorPortalView: React.FC = () => {
                       <div className="flex items-center justify-between text-xs">
                         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-hearth-sand text-hearth-taupe text-[11px] font-medium border border-hearth-border">
                           Read-Only View (Vendor Managed)
+                        </span>
+                        <span className="text-[10px] font-mono text-hearth-taupe">
+                          Monthly Active Value: ₹
+                          {(inv.rentedQuantity * agreedRate).toLocaleString('en-IN')}
+                        </span>
+                      </div>
+                    ) : isScopedMode ? (
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-pill bg-amber-100 text-amber-900 border border-amber-300 text-xs font-semibold shadow-sm">
+                          <Lock className="w-3.5 h-3.5 text-amber-700" />
+                          <span>Catalog Updates Locked (Run-Off Active)</span>
                         </span>
                         <span className="text-[10px] font-mono text-hearth-taupe">
                           Monthly Active Value: ₹
@@ -630,6 +779,161 @@ export const VendorPortalView: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* Voluntary Offboarding Request Modal (Option A: Run-Off to Expiry / WF-14) */}
+      {showOffboardingModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-hearth-card border border-hearth-border rounded-3xl p-6 sm:p-7 max-w-2xl w-full shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-start justify-between gap-3">
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-pill bg-amber-100 text-amber-900 border border-amber-300 text-xs font-semibold">
+                  <ShieldAlert className="w-4 h-4 text-amber-700" />
+                  <span>Workflow WF-14 • Run-Off to Expiry</span>
+                </div>
+                <h3 className="font-serif text-xl sm:text-2xl font-bold text-hearth-ink">
+                  Voluntary Partner Offboarding Request
+                </h3>
+                <p className="text-xs text-hearth-taupe">
+                  Partner: <strong className="text-hearth-ink">{currentVendor.legalBusinessName} ({currentVendor.id})</strong>
+                </p>
+              </div>
+              <button
+                onClick={() => setShowOffboardingModal(false)}
+                className="text-hearth-taupe hover:text-hearth-ink text-lg font-bold p-1 rounded-lg hover:bg-hearth-oat"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Core Regulatory Specifications Cards */}
+            <div className="space-y-3 text-xs">
+              <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-300 text-amber-950 dark:text-amber-100 space-y-1.5">
+                <div className="flex items-center gap-2 font-bold text-amber-900 dark:text-amber-200">
+                  <Lock className="w-4 h-4 text-amber-700 shrink-0" />
+                  <span>FR-VEN-010: Immediate Catalog Trading Cutoff</span>
+                </div>
+                <p className="leading-relaxed">
+                  Upon submission, all public listings for your warehouse inventory will be delisted immediately from the KaroRent storefront. No new customer bookings can be placed for your assets.
+                </p>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-blue-50 dark:bg-blue-950/30 border border-blue-300 text-blue-950 dark:text-blue-100 space-y-1.5">
+                <div className="flex items-center gap-2 font-bold text-blue-900 dark:text-blue-200">
+                  <ShieldCheck className="w-4 h-4 text-blue-700 shrink-0" />
+                  <span>BR-034 & FR-VEN-011: Operational Duty Continuity in Scoped Mode</span>
+                </div>
+                <p className="leading-relaxed">
+                  Your partner portal will enter <strong>Scoped Operations Mode</strong>. Under business rule <strong>BR-034</strong>, your organization remains contractually bound to service breakdown tickets, deliver replacement items, and execute authorized return pickup photo inspections (FR-RET-002) until every customer booking reaches maturity.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="p-3.5 rounded-2xl bg-hearth-oat border border-hearth-border space-y-1">
+                  <div className="text-hearth-taupe text-[11px] font-medium">Segregated Reserve Hold (FR-VEN-013)</div>
+                  <div className="font-ledger text-lg font-bold text-hearth-ink">
+                    ₹{(currentVendor.settlementReserveHeldAmount || currentVendor.settlementHoldAmount || 15000).toLocaleString('en-IN')}
+                  </div>
+                  <p className="text-[10px] text-hearth-taupe leading-snug">
+                    Held in segregated platform ledger until final return inspections & deposit refunds are settled.
+                  </p>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-300 space-y-1">
+                  <div className="text-emerald-800 dark:text-emerald-300 text-[11px] font-medium">Blacklist Immunity (BR-035)</div>
+                  <div className="font-serif text-sm font-bold text-emerald-900 dark:text-emerald-100 flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span>Amicable Exit Guaranteed</span>
+                  </div>
+                  <p className="text-[10px] text-emerald-800 dark:text-emerald-300 leading-snug">
+                    Honoring all active rentals ensures 100% immunity from platform blacklist and full reserve release.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Active Rentals Summary */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs font-semibold text-hearth-ink">
+                <span>Active Customer Rentals to Run-Off ({activeRentalsCount})</span>
+                <span className="text-[11px] text-hearth-taupe font-mono">Service Continuity Guaranteed</span>
+              </div>
+              {activeRentals.length === 0 ? (
+                <div className="p-3.5 rounded-2xl bg-hearth-oat text-xs text-hearth-taupe text-center">
+                  No active customer rentals currently linked to this vendor. Immediate amicable closure can proceed.
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
+                  {activeRentals.map((b) => (
+                    <div
+                      key={b.id}
+                      className="p-3 rounded-2xl bg-hearth-oat border border-hearth-border flex items-center justify-between gap-2 text-xs"
+                    >
+                      <div>
+                        <div className="font-bold text-hearth-ink">{b.productTitle}</div>
+                        <div className="text-[11px] text-hearth-taupe font-mono">
+                          Booking {b.id} • Customer: {b.customerId}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span className="px-2.5 py-0.5 rounded-pill bg-[#DCFCE7] text-[#166534] border border-[#86EFAC] text-[10px] font-semibold">
+                          {b.tenureMonths} Mo Tenure
+                        </span>
+                        <div className="text-[10px] text-hearth-taupe font-ledger mt-0.5">
+                          ₹{b.monthlyRentRate.toLocaleString('en-IN')}/mo
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Affirmation Checkbox */}
+            <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 space-y-2">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={offboardingAffirmation}
+                  onChange={(e) => setOffboardingAffirmation(e.target.checked)}
+                  className="mt-1 w-4 h-4 rounded text-hearth-terracotta border-amber-300 focus:ring-hearth-terracotta"
+                />
+                <span className="text-xs text-amber-950 dark:text-amber-100 leading-relaxed">
+                  <strong>Mandatory Legal Affirmation (Option A — Run-Off to Expiry):</strong> I hereby formally request voluntary offboarding for {currentVendor.legalBusinessName}. I acknowledge our contractual duty under <strong>BR-034</strong> to service all active customer rentals, honor maintenance visits, and complete authorized return pickup inspections. I understand that breach or abandonment of service will trigger <strong>EX-036 Emergency Fleet Takeover</strong>, forfeiture of our held reserve (₹{(currentVendor.settlementReserveHeldAmount || currentVendor.settlementHoldAmount || 15000).toLocaleString('en-IN')}), and immediate enrollment into the Unified Blacklist (FR-BLK-002).
+                </span>
+              </label>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center justify-end gap-3 pt-2 border-t border-hearth-border">
+              <button
+                type="button"
+                onClick={() => setShowOffboardingModal(false)}
+                className="px-4 py-2 rounded-pill bg-hearth-oat hover:bg-hearth-sand text-hearth-umber text-xs font-semibold"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={!offboardingAffirmation || isSimulatingLatency}
+                onClick={async () => {
+                  await initiateVendorVoluntaryOffboarding(currentVendor.id);
+                  setShowOffboardingModal(false);
+                }}
+                className={`spring-btn px-5 py-2.5 rounded-pill text-xs font-bold flex items-center gap-2 shadow-sm ${
+                  offboardingAffirmation && !isSimulatingLatency
+                    ? 'bg-amber-700 hover:bg-amber-800 text-white'
+                    : 'bg-hearth-oat text-hearth-taupe cursor-not-allowed border border-hearth-border'
+                }`}
+              >
+                <LogOut className="w-4 h-4" />
+                <span>
+                  {isSimulatingLatency
+                    ? 'Initiating Run-Off...'
+                    : 'Confirm & Initiate Run-Off to Expiry'}
+                </span>
+              </button>
+            </div>
           </div>
         </div>
       )}
