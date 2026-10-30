@@ -956,6 +956,63 @@ export const INITIAL_BOOKINGS: BookingOrder[] = [
     gstPercent: 18,
     agreementId: 'AGR-2026-8830',
     deliveryCompletedAt: '2026-08-16 14:00 IST',
+    deliveryEvidencePhoto:
+      'https://images.unsplash.com/photo-1615873968403-89e068629265?auto=format&fit=crop&w=800&q=80',
+    repossessionAssignment: {
+      technicianId: 'TECH-101',
+      technicianName: 'Rajan Kumar',
+      technicianPhone: '+91 97400 55667',
+      technicianPhoto:
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
+      scheduledDate: '2026-10-29',
+      scheduledTimeSlot: '11:00 AM – 03:00 PM',
+      taskType: 'REPOSSESSION',
+      reason: 'Statutory Asset Repossession',
+      assignedAt: '2026-10-28 10:00 IST',
+      status: 'Scheduled',
+      notes:
+        'Statutory repossession order REPO-AUTH-8830-9281. Doorstep recovery photo mandatory.',
+    },
+    returnRecord: {
+      returnRequestedAt: '2026-10-28 09:30 IST',
+      preferredPickupSlot:
+        '2026-10-29 • 11:00 AM - 03:00 PM (Statutory Repossession)',
+      assignedPickupStaff: 'Rajan Kumar (Field Service)',
+      pickupStatus: 'Under Inspection',
+      preDispatchPhoto:
+        'https://images.unsplash.com/photo-1615873968403-89e068629265?auto=format&fit=crop&w=800&q=80',
+      preDispatchPhotos: [
+        'https://images.unsplash.com/photo-1615873968403-89e068629265?auto=format&fit=crop&w=800&q=80',
+      ],
+      preDispatchNotes:
+        'Original dispatch verification photo and installation record at Whitefield.',
+      customerPremisePickupPhoto:
+        'https://images.unsplash.com/photo-1585338107529-13afc5f02586?auto=format&fit=crop&w=700&q=80',
+      customerPremisePickupPhotos: [
+        'https://images.unsplash.com/photo-1585338107529-13afc5f02586?auto=format&fit=crop&w=700&q=80',
+      ],
+      assignedStaffId: 'TECH-101',
+      assignedStaffPhone: '+91 97400 55667',
+      assignedStaffPhoto:
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
+      pickupPhotoExifTimestamp: '2026-10-29 12:45 IST',
+      pickupPhotoGeoTag:
+        '12.9698° N, 77.7499° E (Whitefield Doorstep Verified)',
+      warehouseReturnPhoto:
+        'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=700&q=80',
+      warehouseReturnPhotos: [
+        'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=700&q=80',
+      ],
+      warehouseInspectionFinding: 'Severe Damage / Loss',
+      proposedDeductionAmount: 3500,
+      approvedDeductionAmount: 0,
+      transitDamageBlockedByBR026: false,
+      findingDescription:
+        'Compressor mounting damage and unreturned remote unit identified at Domlur warehouse intake.',
+      customerResponse: 'Disputed',
+      customerDisputeNotes:
+        'Customer disputed de-installation damage during repossession handover.',
+    },
     defaultNotices: [
       {
         id: 'NOTC-1-8830',

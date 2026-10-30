@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   AlertTriangle,
   Camera,
@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useKaroRentStore } from '../../store/useKaroRentStore';
 import { mandatoryReasonSchema } from '../../lib/validation';
+import { ReturnInspectionRecord } from '../../types/srs';
 
 interface StagePhotoGalleryProps {
   stageBadge: string;
@@ -146,10 +147,40 @@ export const ThreeWayInspectionView: React.FC = () => {
     addToast,
   } = useKaroRentStore();
 
-  const returnBookings = bookings.filter((b) => b.returnRecord || b.waterfallSettlement || b.status.includes('Terminated') || b.status.includes('Asset Recovery'));
+  const roleFilteredBookings = bookings.filter((b) => {
+    if (
+      activePersona.role === 'CUSTOMER_INDIVIDUAL' ||
+      activePersona.role === 'CUSTOMER_BUSINESS'
+    ) {
+      return b.customerId === activePersona.customerId;
+    }
+    if (activePersona.role === 'VENDOR_OWNER') {
+      return b.fulfillingVendorId === activePersona.vendorId;
+    }
+    return true;
+  });
+
+  const returnBookings = roleFilteredBookings.filter(
+    (b) =>
+      Boolean(b.returnRecord) ||
+      Boolean(b.waterfallSettlement) ||
+      b.status.includes('Terminated') ||
+      b.status.includes('Asset Recovery') ||
+      b.status.includes('Return')
+  );
+
   const [selectedBookingId, setSelectedBookingId] = useState<string>(
     returnBookings[0]?.id || 'BKG-2026-8790'
   );
+
+  useEffect(() => {
+    if (
+      returnBookings.length > 0 &&
+      !returnBookings.some((b) => b.id === selectedBookingId)
+    ) {
+      setSelectedBookingId(returnBookings[0].id);
+    }
+  }, [returnBookings, selectedBookingId]);
 
   // Statutory 4-Tier Waterfall Settlement State (BR-033)
   const [wfUnpaidRent, setWfUnpaidRent] = useState<number>(0);
@@ -190,10 +221,122 @@ export const ThreeWayInspectionView: React.FC = () => {
 
   const activeBooking =
     returnBookings.find((b) => b.id === selectedBookingId) || returnBookings[0];
-  const returnRec = activeBooking?.returnRecord;
-  const ledger = depositLedgers.find((d) => d.bookingId === activeBooking?.id);
 
-  if (!activeBooking || !returnRec) return null;
+  useEffect(() => {
+    if (!activeBooking) return;
+    const bookingInvoices = invoices.filter((i) => i.bookingId === activeBooking.id);
+    const overdueInvoices = bookingInvoices.filter(
+      (i) => i.paymentState === 'Pending' || i.paymentState === 'Failed'
+    );
+    const unpaidRent = overdueInvoices
+      .filter((i) => i.chargeType === 'PERIODIC_RENTAL_INVOICE')
+      .reduce((sum, i) => sum + i.totalPayable, 0);
+    const lateFees =
+      activeBooking.defaultNotices?.reduce(
+        (sum, n) => Math.max(sum, n.lateFeeAmount || 0),
+        0
+      ) || 0;
+    const proposedDeduction =
+      activeBooking.returnRecord?.proposedDeductionAmount ||
+      (activeBooking.status.includes('Terminated') ? 3500 : 0);
+
+    setWfUnpaidRent(
+      unpaidRent > 0
+        ? unpaidRent
+        : activeBooking.status.includes('Terminated')
+        ? 2131
+        : 0
+    );
+    setWfLogisticsFee(1200);
+    setWfVerifiedDamage(proposedDeduction);
+    setWfLateFees(
+      lateFees > 0
+        ? lateFees
+        : activeBooking.status.includes('Terminated')
+        ? 500
+        : 0
+    );
+  }, [activeBooking?.id, invoices]);
+
+  if (!activeBooking) {
+    return (
+      <div className="space-y-8">
+        <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h1 className="font-serif text-2xl font-bold text-hearth-ink">
+              {activePersona.role === 'VENDOR_OWNER' ? 'Returned Products' : 'Returns'}
+            </h1>
+            <p className="text-xs text-hearth-umber mt-0.5">
+              {activePersona.role === 'VENDOR_OWNER'
+                ? 'Review return pickup photos and log warehouse condition checks.'
+                : 'Review return pickup photos, item condition, and deposit refunds.'}
+            </p>
+          </div>
+        </div>
+        <div className="p-12 text-center rounded-[24px] bg-hearth-card border border-hearth-border shadow-hearth space-y-3">
+          <Camera className="w-12 h-12 mx-auto text-hearth-taupe opacity-60" />
+          <h3 className="font-serif text-lg font-bold text-hearth-ink">
+            No Returns In Progress
+          </h3>
+          <p className="text-xs text-hearth-taupe max-w-md mx-auto">
+            {activePersona.role === 'VENDOR_OWNER'
+              ? 'There are currently no items pending return inspection or warehouse intake for your catalog.'
+              : 'You have no active returns or inspection cases. When you return a rented product, you will be able to track its 3-way photo comparison and deposit refund status right here.'}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const fallbackReturnRecord: ReturnInspectionRecord = {
+    returnRequestedAt: activeBooking.createdAt || '2026-10-28',
+    preferredPickupSlot: activeBooking.status.includes('Terminated')
+      ? 'Statutory Repossession Window'
+      : 'Scheduled Pickup Window',
+    assignedPickupStaff:
+      activeBooking.repossessionAssignment?.technicianName ||
+      activeBooking.deliveryAssignment?.technicianName ||
+      'Field Technician (Pending Assignment)',
+    pickupStatus:
+      activeBooking.status === 'Returned & Closed'
+        ? 'Finalised'
+        : activeBooking.status.includes('Terminated') ||
+          activeBooking.status.includes('Asset Recovery')
+        ? 'Under Inspection'
+        : 'Scheduled',
+    preDispatchPhoto:
+      activeBooking.deliveryEvidencePhoto ||
+      'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=700&q=80',
+    preDispatchPhotos: [
+      activeBooking.deliveryEvidencePhoto ||
+        'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=700&q=80',
+    ],
+    preDispatchNotes:
+      'Original dispatch verification photo and onboarding condition record.',
+    customerPremisePickupPhoto:
+      activeBooking.repossessionAssignment?.doorstepPhotoUrl,
+    customerPremisePickupPhotos: activeBooking.repossessionAssignment
+      ?.doorstepPhotoUrl
+      ? [activeBooking.repossessionAssignment.doorstepPhotoUrl]
+      : [],
+    assignedStaffId:
+      activeBooking.repossessionAssignment?.technicianId || 'TECH-101',
+    assignedStaffPhone:
+      activeBooking.repossessionAssignment?.technicianPhone ||
+      '+91 97400 55667',
+    assignedStaffPhoto:
+      activeBooking.repossessionAssignment?.technicianPhoto,
+    pickupPhotoExifTimestamp:
+      activeBooking.repossessionAssignment?.completedAt,
+    warehouseInspectionFinding: undefined,
+    proposedDeductionAmount: 0,
+    approvedDeductionAmount: 0,
+    transitDamageBlockedByBR026: false,
+    customerResponse: 'Pending Customer Review',
+  };
+
+  const returnRec = activeBooking.returnRecord || fallbackReturnRecord;
+  const ledger = depositLedgers.find((d) => d.bookingId === activeBooking.id);
 
   const originalDeposit =
     ledger?.collectedDeposit || activeBooking.securityDepositAmount;
@@ -203,13 +346,15 @@ export const ThreeWayInspectionView: React.FC = () => {
 
   const beforeDeliveryPhotos =
     returnRec.preDispatchPhotos && returnRec.preDispatchPhotos.length > 0
-      ? returnRec.preDispatchPhotos
-      : [returnRec.preDispatchPhoto];
+      ? returnRec.preDispatchPhotos.filter(Boolean)
+      : returnRec.preDispatchPhoto
+      ? [returnRec.preDispatchPhoto]
+      : [];
 
   const doorstepPickupPhotos =
     returnRec.customerPremisePickupPhotos &&
     returnRec.customerPremisePickupPhotos.length > 0
-      ? returnRec.customerPremisePickupPhotos
+      ? returnRec.customerPremisePickupPhotos.filter(Boolean)
       : returnRec.customerPremisePickupPhoto
       ? [returnRec.customerPremisePickupPhoto]
       : [];
@@ -217,8 +362,12 @@ export const ThreeWayInspectionView: React.FC = () => {
   const warehousePhotos =
     returnRec.warehouseReturnPhotos &&
     returnRec.warehouseReturnPhotos.length > 0
-      ? returnRec.warehouseReturnPhotos
-      : [returnRec.warehouseReturnPhoto || returnRec.preDispatchPhoto];
+      ? returnRec.warehouseReturnPhotos.filter(Boolean)
+      : returnRec.warehouseReturnPhoto
+      ? [returnRec.warehouseReturnPhoto]
+      : returnRec.preDispatchPhoto
+      ? [returnRec.preDispatchPhoto]
+      : [];
 
   const linkedDispute = disputeCases.find((d) => d.bookingId === activeBooking.id);
   const hasCustomerDispute = returnRec.customerResponse === 'Disputed' || Boolean(linkedDispute);
@@ -314,7 +463,7 @@ export const ThreeWayInspectionView: React.FC = () => {
           >
             {returnBookings.map((b) => (
               <option key={b.id} value={b.id} className="bg-white text-hearth-ink font-sans font-normal">
-                {b.id} — {b.productTitle.slice(0, 28)} ({b.returnRecord?.pickupStatus})
+                {b.id} — {b.productTitle.slice(0, 28)} ({b.returnRecord?.pickupStatus || b.status})
               </option>
             ))}
           </select>
