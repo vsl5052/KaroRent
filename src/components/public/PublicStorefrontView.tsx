@@ -161,7 +161,7 @@ export const PublicStorefrontView: React.FC = () => {
       <div className="space-y-6">
         <div className="flex items-end justify-between">
           <div>
-            <div className="text-xs font-bold uppercase tracking-wider text-[#008BA3] dark:text-[#00C4DF] flex items-center gap-1.5">
+            <div className="text-xs font-bold uppercase tracking-wider text-[#059669] dark:text-[#10B981] flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5" />
               <span>EXPLORE CURATED COLLECTIONS</span>
             </div>
@@ -171,7 +171,7 @@ export const PublicStorefrontView: React.FC = () => {
           </div>
           <button
             onClick={() => openSectionCatalog('Living Room')}
-            className="text-xs font-bold text-slate-600 hover:text-[#008BA3] dark:text-slate-400 dark:hover:text-[#00C4DF] flex items-center gap-1 transition-colors"
+            className="text-xs font-bold text-slate-600 hover:text-[#059669] dark:text-slate-400 dark:hover:text-[#10B981] flex items-center gap-1 transition-colors"
           >
             <span>View All Sections</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -183,22 +183,22 @@ export const PublicStorefrontView: React.FC = () => {
             <button
               key={space.name}
               onClick={() => openSectionCatalog(space.section)}
-              className="group text-left p-4 rounded-3xl bg-white dark:bg-[#16181B] border border-slate-200 dark:border-[#242B33] hover:border-[#00C4DF] shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col items-center text-center focus:outline-none"
+              className="group text-left p-4 rounded-3xl bg-white dark:bg-[#0C231C] border border-slate-200 dark:border-[#1E4E40] hover:border-[#10B981] shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col items-center text-center focus:outline-none"
             >
-              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden mb-3 border-2 border-transparent group-hover:border-[#00C4DF] transition-all shadow-md">
+              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden mb-3 border-2 border-transparent group-hover:border-[#10B981] transition-all shadow-md">
                 <img
                   src={space.image}
                   alt={space.name}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
               </div>
-              <h3 className="font-serif font-bold text-sm text-slate-900 dark:text-white group-hover:text-[#008BA3] dark:group-hover:text-[#00C4DF] transition-colors">
+              <h3 className="font-serif font-bold text-sm text-slate-900 dark:text-white group-hover:text-[#059669] dark:group-hover:text-[#10B981] transition-colors">
                 {space.name}
               </h3>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
                 {space.tagline}
               </p>
-              <span className="mt-2 text-[10px] font-bold px-2 py-0.5 rounded-pill bg-slate-100 dark:bg-[#1E2328] text-[#008BA3] dark:text-[#00C4DF] border border-slate-200 dark:border-[#242B33]">
+              <span className="mt-2 text-[10px] font-bold px-2 py-0.5 rounded-pill bg-slate-100 dark:bg-[#13332A] text-[#059669] dark:text-[#10B981] border border-slate-200 dark:border-[#1E4E40]">
                 {space.count}
               </span>
             </button>
@@ -210,7 +210,7 @@ export const PublicStorefrontView: React.FC = () => {
       <div className="space-y-6">
         <div className="flex items-end justify-between">
           <div>
-            <div className="text-xs font-bold uppercase tracking-wider text-[#008BA3] dark:text-[#00C4DF] flex items-center gap-1.5">
+            <div className="text-xs font-bold uppercase tracking-wider text-[#059669] dark:text-[#10B981] flex items-center gap-1.5">
               <Package className="w-3.5 h-3.5" />
               <span>CURATED LIVING BUNDLES</span>
             </div>
@@ -223,7 +223,7 @@ export const PublicStorefrontView: React.FC = () => {
           </div>
           <button
             onClick={() => openSectionCatalog('BHK Combos')}
-            className="text-xs font-bold text-slate-600 hover:text-[#008BA3] dark:text-slate-400 dark:hover:text-[#00C4DF] flex items-center gap-1 transition-colors"
+            className="text-xs font-bold text-slate-600 hover:text-[#059669] dark:text-slate-400 dark:hover:text-[#10B981] flex items-center gap-1 transition-colors"
           >
             <span>Explore All Combos</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -235,26 +235,26 @@ export const PublicStorefrontView: React.FC = () => {
             <div
               key={pkg.id}
               onClick={() => setActiveDetailProductId(pkg.productIdRef)}
-              className="group cursor-pointer rounded-3xl overflow-hidden bg-white dark:bg-[#16181B] border border-slate-200 dark:border-[#242B33] hover:border-[#00C4DF] shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col justify-between"
+              className="group cursor-pointer rounded-3xl overflow-hidden bg-white dark:bg-[#0C231C] border border-slate-200 dark:border-[#1E4E40] hover:border-[#10B981] shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col justify-between"
             >
               <div>
-                <div className="relative h-56 overflow-hidden bg-slate-100 dark:bg-[#111315]">
+                <div className="relative h-56 overflow-hidden bg-slate-100 dark:bg-[#061712]">
                   <img
                     src={pkg.imageUrl}
                     alt={pkg.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-95 dark:opacity-90"
                   />
-                  <div className="absolute top-3 left-3 px-3 py-1 rounded-pill bg-[#00C4DF] text-black text-[10px] font-extrabold shadow-sm">
+                  <div className="absolute top-3 left-3 px-3 py-1 rounded-pill bg-[#10B981] text-emerald-950 text-[10px] font-extrabold shadow-sm">
                     Combo Package
                   </div>
                   <div className="absolute bottom-3 left-3 px-3 py-1 rounded-pill bg-black/60 backdrop-blur-md text-white text-[10px] flex items-center gap-1.5">
-                    <Truck className="w-3 h-3 text-[#00C4DF]" />
+                    <Truck className="w-3 h-3 text-[#10B981]" />
                     <span>Doorstep Setup</span>
                   </div>
                 </div>
 
                 <div className="p-5 space-y-3">
-                  <h3 className="font-serif text-lg font-bold text-slate-900 dark:text-white group-hover:text-[#008BA3] dark:group-hover:text-[#00C4DF] transition-colors">
+                  <h3 className="font-serif text-lg font-bold text-slate-900 dark:text-white group-hover:text-[#059669] dark:group-hover:text-[#10B981] transition-colors">
                     {pkg.title}
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400">{pkg.tagline}</p>
@@ -268,7 +268,7 @@ export const PublicStorefrontView: React.FC = () => {
                         key={idx}
                         className="text-xs text-slate-700 dark:text-slate-300 flex items-center gap-2"
                       >
-                        <CheckCircle2 className="w-3.5 h-3.5 text-[#009BB5] dark:text-[#00C4DF] shrink-0" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[#059669] dark:text-[#10B981] shrink-0" />
                         <span>{item}</span>
                       </div>
                     ))}
@@ -277,7 +277,7 @@ export const PublicStorefrontView: React.FC = () => {
               </div>
 
               {/* Bottom Pricing Row */}
-              <div className="p-5 pt-3 bg-slate-50 dark:bg-[#111315]/70 border-t border-slate-200 dark:border-[#242B33] flex items-center justify-between">
+              <div className="p-5 pt-3 bg-slate-50 dark:bg-[#061712]/70 border-t border-slate-200 dark:border-[#1E4E40] flex items-center justify-between">
                 <div>
                   <div className="flex items-baseline gap-2">
                     <span className="font-serif font-bold text-xl text-slate-900 dark:text-white font-ledger">
@@ -293,7 +293,7 @@ export const PublicStorefrontView: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="text-xs font-bold text-[#008BA3] dark:text-[#00C4DF] group-hover:underline">
+                <div className="text-xs font-bold text-[#059669] dark:text-[#10B981] group-hover:underline">
                   View Details →
                 </div>
               </div>
@@ -303,7 +303,7 @@ export const PublicStorefrontView: React.FC = () => {
       </div>
 
       {/* 4. Steal Deals • Under ₹999/mo */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-slate-50/80 dark:bg-[#16181B] border border-slate-200 dark:border-[#242B33] shadow-sm space-y-6 transition-colors">
+      <div className="p-6 sm:p-8 rounded-3xl bg-slate-50/80 dark:bg-[#0C231C] border border-slate-200 dark:border-[#1E4E40] shadow-sm space-y-6 transition-colors">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill bg-[#F59E0B] text-black text-[10px] font-extrabold uppercase tracking-wide">
@@ -320,7 +320,7 @@ export const PublicStorefrontView: React.FC = () => {
 
           <button
             onClick={() => openSectionCatalog('% Steal Deals')}
-            className="text-xs font-bold text-[#008BA3] dark:text-[#00C4DF] hover:underline flex items-center gap-1 shrink-0"
+            className="text-xs font-bold text-[#059669] dark:text-[#10B981] hover:underline flex items-center gap-1 shrink-0"
           >
             <span>See All Steal Deals</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -337,10 +337,10 @@ export const PublicStorefrontView: React.FC = () => {
               <div
                 key={product.id}
                 onClick={() => setActiveDetailProductId(product.id)}
-                className="group cursor-pointer rounded-2xl overflow-hidden bg-white dark:bg-[#111315] border border-slate-200 dark:border-[#242B33] hover:border-[#F59E0B] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+                className="group cursor-pointer rounded-2xl overflow-hidden bg-white dark:bg-[#061712] border border-slate-200 dark:border-[#1E4E40] hover:border-[#F59E0B] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
               >
                 <div>
-                  <div className="relative h-44 overflow-hidden bg-slate-100 dark:bg-[#16181B]">
+                  <div className="relative h-44 overflow-hidden bg-slate-100 dark:bg-[#0C231C]">
                     <img
                       src={product.lifestyleImage}
                       alt={product.title}
@@ -352,10 +352,10 @@ export const PublicStorefrontView: React.FC = () => {
                   </div>
 
                   <div className="p-4 space-y-1">
-                    <div className="text-[10px] font-bold uppercase text-[#008BA3] dark:text-[#00C4DF]">
+                    <div className="text-[10px] font-bold uppercase text-[#059669] dark:text-[#10B981]">
                       {product.category}
                     </div>
-                    <h3 className="font-serif font-bold text-sm text-slate-900 dark:text-white group-hover:text-[#008BA3] dark:group-hover:text-[#00C4DF] line-clamp-1">
+                    <h3 className="font-serif font-bold text-sm text-slate-900 dark:text-white group-hover:text-[#059669] dark:group-hover:text-[#10B981] line-clamp-1">
                       {product.title}
                     </h3>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">
@@ -364,7 +364,7 @@ export const PublicStorefrontView: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="p-4 pt-2 border-t border-slate-200 dark:border-[#242B33] bg-slate-50 dark:bg-[#16181B]/40 flex items-center justify-between">
+                <div className="p-4 pt-2 border-t border-slate-200 dark:border-[#1E4E40] bg-slate-50 dark:bg-[#0C231C]/40 flex items-center justify-between">
                   <div>
                     <div className="font-serif font-bold text-base text-slate-900 dark:text-white font-ledger">
                       ₹{rate.toLocaleString('en-IN')}{' '}
@@ -374,7 +374,7 @@ export const PublicStorefrontView: React.FC = () => {
                       ₹{crossedOut.toLocaleString('en-IN')}/mo
                     </div>
                   </div>
-                  <span className="text-xs font-bold text-[#008BA3] dark:text-[#00C4DF] group-hover:underline">
+                  <span className="text-xs font-bold text-[#059669] dark:text-[#10B981] group-hover:underline">
                     View →
                   </span>
                 </div>
@@ -388,7 +388,7 @@ export const PublicStorefrontView: React.FC = () => {
       <div className="space-y-6">
         <div className="flex items-end justify-between">
           <div>
-            <div className="text-xs font-bold uppercase tracking-wider text-[#008BA3] dark:text-[#00C4DF] flex items-center gap-1.5">
+            <div className="text-xs font-bold uppercase tracking-wider text-[#059669] dark:text-[#10B981] flex items-center gap-1.5">
               <Award className="w-3.5 h-3.5" />
               <span>TOP RATED CUSTOMER FAVORITES</span>
             </div>
@@ -401,7 +401,7 @@ export const PublicStorefrontView: React.FC = () => {
           </div>
           <button
             onClick={() => openSectionCatalog('Living Room')}
-            className="text-xs font-bold text-slate-600 hover:text-[#008BA3] dark:text-slate-400 dark:hover:text-[#00C4DF] flex items-center gap-1 transition-colors"
+            className="text-xs font-bold text-slate-600 hover:text-[#059669] dark:text-slate-400 dark:hover:text-[#10B981] flex items-center gap-1 transition-colors"
           >
             <span>Explore All Sections</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -417,25 +417,25 @@ export const PublicStorefrontView: React.FC = () => {
               <div
                 key={product.id}
                 onClick={() => setActiveDetailProductId(product.id)}
-                className="group cursor-pointer rounded-2xl overflow-hidden bg-white dark:bg-[#16181B] border border-slate-200 dark:border-[#242B33] hover:border-[#00C4DF] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+                className="group cursor-pointer rounded-2xl overflow-hidden bg-white dark:bg-[#0C231C] border border-slate-200 dark:border-[#1E4E40] hover:border-[#10B981] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
               >
                 <div>
-                  <div className="relative h-48 overflow-hidden bg-slate-100 dark:bg-[#111315]">
+                  <div className="relative h-48 overflow-hidden bg-slate-100 dark:bg-[#061712]">
                     <img
                       src={product.lifestyleImage}
                       alt={product.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-95 dark:opacity-90"
                     />
-                    <div className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-pill bg-[#00C4DF] text-black text-[10px] font-extrabold shadow-sm">
+                    <div className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-pill bg-[#10B981] text-emerald-950 text-[10px] font-extrabold shadow-sm">
                       ⭐ 4.9 Bestseller
                     </div>
                   </div>
 
                   <div className="p-4 space-y-1.5">
-                    <div className="text-[10px] font-bold uppercase text-[#008BA3] dark:text-[#00C4DF]">
+                    <div className="text-[10px] font-bold uppercase text-[#059669] dark:text-[#10B981]">
                       {product.category}
                     </div>
-                    <h3 className="font-serif font-bold text-base text-slate-900 dark:text-white group-hover:text-[#008BA3] dark:group-hover:text-[#00C4DF] line-clamp-1">
+                    <h3 className="font-serif font-bold text-base text-slate-900 dark:text-white group-hover:text-[#059669] dark:group-hover:text-[#10B981] line-clamp-1">
                       {product.title}
                     </h3>
                     <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
@@ -444,17 +444,17 @@ export const PublicStorefrontView: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="p-4 pt-2 border-t border-slate-200 dark:border-[#242B33] bg-slate-50 dark:bg-[#111315]/40 flex items-center justify-between">
+                <div className="p-4 pt-2 border-t border-slate-200 dark:border-[#1E4E40] bg-slate-50 dark:bg-[#061712]/40 flex items-center justify-between">
                   <div>
                     <div className="font-serif font-bold text-base text-slate-900 dark:text-white font-ledger">
                       ₹{rate.toLocaleString('en-IN')}{' '}
                       <span className="text-xs font-normal text-slate-500 dark:text-slate-400">/ mo</span>
                     </div>
-                    <div className="text-[10px] text-[#008BA3] dark:text-[#00C4DF] font-semibold">
+                    <div className="text-[10px] text-[#059669] dark:text-[#10B981] font-semibold">
                       Prompt Delivery
                     </div>
                   </div>
-                  <span className="text-xs font-bold text-[#008BA3] dark:text-[#00C4DF] group-hover:underline">
+                  <span className="text-xs font-bold text-[#059669] dark:text-[#10B981] group-hover:underline">
                     View Details →
                   </span>
                 </div>
@@ -465,7 +465,7 @@ export const PublicStorefrontView: React.FC = () => {
       </div>
 
       {/* 6. FAQs Accordion */}
-      <div className="rounded-3xl bg-white dark:bg-[#16181B] border border-slate-200 dark:border-[#242B33] p-6 sm:p-10 shadow-sm space-y-6">
+      <div className="rounded-3xl bg-white dark:bg-[#0C231C] border border-slate-200 dark:border-[#1E4E40] p-6 sm:p-10 shadow-sm space-y-6">
         <div className="space-y-1">
           <h2 className="font-serif text-2xl font-bold text-slate-900 dark:text-white">
             Frequently Asked Questions
@@ -475,14 +475,14 @@ export const PublicStorefrontView: React.FC = () => {
           </p>
         </div>
 
-        <div className="divide-y divide-slate-200 dark:divide-[#242B33]">
+        <div className="divide-y divide-slate-200 dark:divide-[#1E4E40]">
           {FAQS.map((faq, idx) => {
             const isOpen = openFaqIndex === idx;
             return (
               <div key={idx} className="py-4">
                 <button
                   onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
-                  className="w-full text-left flex items-center justify-between gap-4 font-serif font-bold text-sm text-slate-900 dark:text-white hover:text-[#008BA3] dark:hover:text-[#00C4DF] transition-colors"
+                  className="w-full text-left flex items-center justify-between gap-4 font-serif font-bold text-sm text-slate-900 dark:text-white hover:text-[#059669] dark:hover:text-[#10B981] transition-colors"
                 >
                   <span>{faq.q}</span>
                   {isOpen ? (

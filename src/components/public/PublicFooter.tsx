@@ -20,12 +20,12 @@ export const PublicFooter: React.FC = () => {
     useKaroRentStore();
 
   return (
-    <footer className="bg-[#111315] border-t border-[#242B33] text-white text-xs mt-16 select-none">
+    <footer className="bg-[#061712] border-t border-[#1E4E40] text-white text-xs mt-16 select-none">
       {/* 4 Pillars Trust Strip */}
-      <div className="border-b border-[#242B33] bg-[#16181B]">
+      <div className="border-b border-[#1E4E40] bg-[#0C231C]">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="flex items-start gap-3.5">
-            <div className="w-10 h-10 rounded-2xl bg-[#00C4DF]/15 text-[#00C4DF] flex items-center justify-center shrink-0 shadow-sm border border-[#00C4DF]/30">
+            <div className="w-10 h-10 rounded-2xl bg-[#10B981]/15 text-[#10B981] flex items-center justify-center shrink-0 shadow-sm border border-[#10B981]/30">
               <Truck className="w-5 h-5" />
             </div>
             <div>
@@ -39,7 +39,7 @@ export const PublicFooter: React.FC = () => {
           </div>
 
           <div className="flex items-start gap-3.5">
-            <div className="w-10 h-10 rounded-2xl bg-[#00C4DF]/15 text-[#00C4DF] flex items-center justify-center shrink-0 shadow-sm border border-[#00C4DF]/30">
+            <div className="w-10 h-10 rounded-2xl bg-[#10B981]/15 text-[#10B981] flex items-center justify-center shrink-0 shadow-sm border border-[#10B981]/30">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
@@ -87,28 +87,28 @@ export const PublicFooter: React.FC = () => {
         {/* Brand Column */}
         <div className="lg:col-span-2 space-y-3.5">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-2xl bg-[#00C4DF] text-black flex items-center justify-center font-serif font-bold text-xl shadow-sm">
+            <div className="w-9 h-9 rounded-2xl bg-[#10B981] text-emerald-950 flex items-center justify-center font-serif font-bold text-xl shadow-sm">
               K
             </div>
             <div>
               <span className="font-serif text-2xl font-bold tracking-tight text-white block leading-none">
                 KaroRent
               </span>
-              <span className="text-[10px] text-slate-400 uppercase tracking-wider">
-                Dark Slate Minimalist
+              <span className="text-[10px] text-emerald-400 uppercase tracking-wider">
+                Royal Emerald Boutique
               </span>
             </div>
           </div>
           <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
-            India's dark slate minimalist rental platform connecting discerning homes with certified local furniture manufacturers and appliance merchants. Experience fine living with zero ownership encumbrance.
+            India's luxury home rental platform connecting discerning homes with certified local furniture manufacturers and appliance merchants. Experience fine living with zero ownership encumbrance.
           </p>
           <div className="pt-2 flex items-center gap-4 text-xs font-semibold text-slate-300">
             <span className="flex items-center gap-1.5">
-              <Phone className="w-3.5 h-3.5 text-[#00C4DF]" />
+              <Phone className="w-3.5 h-3.5 text-[#10B981]" />
               <span>+91 80 4921 8800</span>
             </span>
             <span className="flex items-center gap-1.5">
-              <Mail className="w-3.5 h-3.5 text-[#00C4DF]" />
+              <Mail className="w-3.5 h-3.5 text-[#10B981]" />
               <span>support@karorent.in</span>
             </span>
           </div>
@@ -126,7 +126,7 @@ export const PublicFooter: React.FC = () => {
                   setActiveTab('MARKETPLACE');
                   setSelectedCategory('Living Room');
                 }}
-                className="hover:text-[#00C4DF] transition-colors"
+                className="hover:text-[#10B981] transition-colors"
               >
                 Living Room Sofas & TV Units
               </button>
@@ -137,7 +137,7 @@ export const PublicFooter: React.FC = () => {
                   setActiveTab('MARKETPLACE');
                   setSelectedCategory('Cooling & Air');
                 }}
-                className="hover:text-[#00C4DF] transition-colors"
+                className="hover:text-[#10B981] transition-colors"
               >
                 Inverter Split Air Conditioners
               </button>
@@ -148,7 +148,7 @@ export const PublicFooter: React.FC = () => {
                   setActiveTab('MARKETPLACE');
                   setSelectedCategory('Living Room');
                 }}
-                className="hover:text-[#00C4DF] transition-colors"
+                className="hover:text-[#10B981] transition-colors"
               >
                 Wardrobes & Storage Units
               </button>
@@ -159,7 +159,7 @@ export const PublicFooter: React.FC = () => {
                   setActiveTab('MARKETPLACE');
                   setSelectedCategory('Kitchen & Appliances');
                 }}
-                className="hover:text-[#00C4DF] transition-colors"
+                className="hover:text-[#10B981] transition-colors"
               >
                 Smart Washing Machines & Fridges
               </button>
@@ -170,7 +170,7 @@ export const PublicFooter: React.FC = () => {
                   setActiveTab('MARKETPLACE');
                   setSelectedCategory('Water Purifiers');
                 }}
-                className="hover:text-[#00C4DF] transition-colors"
+                className="hover:text-[#10B981] transition-colors"
               >
                 RO + UV Water Purifiers
               </button>
@@ -185,23 +185,23 @@ export const PublicFooter: React.FC = () => {
           </div>
           <ul className="space-y-2 text-xs text-slate-400 font-mono">
             <li className="flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-[#00C4DF] shrink-0" />
+              <MapPin className="w-3.5 h-3.5 text-[#10B981] shrink-0" />
               <span>Zone 560038</span>
             </li>
             <li className="flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-[#00C4DF] shrink-0" />
+              <MapPin className="w-3.5 h-3.5 text-[#10B981] shrink-0" />
               <span>Zone 560034</span>
             </li>
             <li className="flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-[#00C4DF] shrink-0" />
+              <MapPin className="w-3.5 h-3.5 text-[#10B981] shrink-0" />
               <span>Zone 560066</span>
             </li>
             <li className="flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-[#00C4DF] shrink-0" />
+              <MapPin className="w-3.5 h-3.5 text-[#10B981] shrink-0" />
               <span>Zone 560102</span>
             </li>
             <li className="flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-[#00C4DF] shrink-0" />
+              <MapPin className="w-3.5 h-3.5 text-[#10B981] shrink-0" />
               <span>Zone 560042</span>
             </li>
           </ul>
@@ -216,28 +216,28 @@ export const PublicFooter: React.FC = () => {
             <li>
               <button
                 onClick={() => setIsLoginModalOpen(true)}
-                className="hover:text-[#00C4DF] transition-colors font-semibold text-[#00C4DF]"
+                className="hover:text-[#10B981] transition-colors font-semibold text-[#10B981]"
               >
                 List Your Inventory (Partner Onboarding)
               </button>
             </li>
             <li>
-              <span className="hover:text-[#00C4DF] cursor-pointer">
+              <span className="hover:text-[#10B981] cursor-pointer">
                 Deposit Protection Policy
               </span>
             </li>
             <li>
-              <span className="hover:text-[#00C4DF] cursor-pointer">
+              <span className="hover:text-[#10B981] cursor-pointer">
                 3-Way Return Photo Verification
               </span>
             </li>
             <li>
-              <span className="hover:text-[#00C4DF] cursor-pointer">
+              <span className="hover:text-[#10B981] cursor-pointer">
                 Digital OTP Lease Agreements
               </span>
             </li>
             <li>
-              <span className="hover:text-[#00C4DF] cursor-pointer">
+              <span className="hover:text-[#10B981] cursor-pointer">
                 Partner Continuity & Service Terms
               </span>
             </li>
@@ -246,7 +246,7 @@ export const PublicFooter: React.FC = () => {
       </div>
 
       {/* Bottom Legal Strip */}
-      <div className="border-t border-[#242B33] py-6 px-4 sm:px-6 lg:px-8 bg-[#0C1014]">
+      <div className="border-t border-[#1E4E40] py-6 px-4 sm:px-6 lg:px-8 bg-[#040F0C]">
         <div className="max-w-[1440px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-400">
           <div>
             © 2026 KaroRent Technologies Pvt. Ltd. All rights reserved.

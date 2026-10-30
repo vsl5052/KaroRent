@@ -55,7 +55,7 @@ export const LoginModal: React.FC = () => {
       name: 'Ananya Sharma',
       phone: '+91 98450 11223',
       badge: 'Customer',
-      icon: <UserCheck className="w-4 h-4 text-[#008BA3] dark:text-[#00C4DF]" />,
+      icon: <UserCheck className="w-4 h-4 text-[#059669] dark:text-[#10B981]" />,
       desc: 'Active rentals, deposit ledger & e-sign contracts',
     },
     {
@@ -87,11 +87,11 @@ export const LoginModal: React.FC = () => {
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
       {/* Modal Dialog Card */}
-      <div className="bg-white dark:bg-[#16181B] border border-slate-200 dark:border-[#242B33] rounded-3xl max-w-lg w-full shadow-2xl overflow-hidden flex flex-col max-h-[92vh] transition-colors">
+      <div className="bg-white dark:bg-[#0C231C] border border-slate-200 dark:border-[#1E4E40] rounded-3xl max-w-lg w-full shadow-2xl overflow-hidden flex flex-col max-h-[92vh] transition-colors">
         {/* Modal Top Header */}
-        <div className="px-6 py-5 bg-slate-50 dark:bg-[#111315] border-b border-slate-200 dark:border-[#242B33] flex items-center justify-between gap-3">
+        <div className="px-6 py-5 bg-slate-50 dark:bg-[#061712] border-b border-slate-200 dark:border-[#1E4E40] flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#00C4DF] text-black flex items-center justify-center font-bold text-xl shadow-sm">
+            <div className="w-10 h-10 rounded-2xl bg-[#10B981] text-emerald-950 flex items-center justify-center font-bold text-xl shadow-sm">
               K
             </div>
             <div>
@@ -105,7 +105,7 @@ export const LoginModal: React.FC = () => {
           </div>
           <button
             onClick={() => setIsLoginModalOpen(false)}
-            className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-[#1E2328] dark:hover:bg-[#242B33] text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white flex items-center justify-center transition-all"
+            className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-[#13332A] dark:hover:bg-[#1E4E40] text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white flex items-center justify-center transition-all"
             title="Close"
           >
             <X className="w-4 h-4" />
@@ -134,7 +134,7 @@ export const LoginModal: React.FC = () => {
                   value={phoneInput}
                   onChange={(e) => setPhoneInput(e.target.value)}
                   placeholder="+91 98450 11223"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white dark:bg-[#1E2328] border border-slate-200 dark:border-[#242B33] text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#00C4DF]/40"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white dark:bg-[#13332A] border border-slate-200 dark:border-[#1E4E40] text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#10B981]/40"
                 />
               </div>
               <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
@@ -147,7 +147,7 @@ export const LoginModal: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setOtpSent(true)}
-                className="text-[#008BA3] dark:text-[#00C4DF] font-semibold hover:underline"
+                className="text-[#059669] dark:text-[#10B981] font-semibold hover:underline"
               >
                 {otpSent ? 'Resend OTP' : 'Send OTP'}
               </button>
@@ -160,14 +160,14 @@ export const LoginModal: React.FC = () => {
                 value={otpInput}
                 onChange={(e) => setOtpInput(e.target.value)}
                 placeholder="Enter 4-digit OTP"
-                className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white dark:bg-[#1E2328] border border-slate-200 dark:border-[#242B33] text-xs font-mono font-bold tracking-widest text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#00C4DF]/40"
+                className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white dark:bg-[#13332A] border border-slate-200 dark:border-[#1E4E40] text-xs font-mono font-bold tracking-widest text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#10B981]/40"
               />
             </div>
 
             <button
               type="submit"
               disabled={isSimulatingLatency}
-              className="spring-btn w-full py-3 rounded-pill bg-[#00C4DF] hover:bg-[#00B2D6] text-black text-xs font-bold shadow-md shadow-[#00C4DF]/20 flex items-center justify-center gap-1.5 transition-all"
+              className="spring-btn w-full py-3 rounded-pill bg-[#10B981] hover:bg-[#059669] text-emerald-950 hover:text-white text-xs font-bold shadow-md shadow-[#10B981]/20 flex items-center justify-center gap-1.5 transition-all"
             >
               <LogIn className="w-4 h-4" />
               <span>Verify & Continue to Account</span>
@@ -175,9 +175,9 @@ export const LoginModal: React.FC = () => {
           </form>
 
           {/* Quick 1-Click Role Testing */}
-          <div className="pt-3 border-t border-slate-200 dark:border-[#242B33]">
+          <div className="pt-3 border-t border-slate-200 dark:border-[#1E4E40]">
             <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-[#008BA3] dark:text-[#00C4DF]" />
+              <Sparkles className="w-3.5 h-3.5 text-[#059669] dark:text-[#10B981]" />
               <span>Quick 1-Click Test Sign-In by Role</span>
             </div>
 
@@ -187,16 +187,16 @@ export const LoginModal: React.FC = () => {
                   key={idx}
                   type="button"
                   onClick={() => handleQuickLogin(acc.phone)}
-                  className="w-full p-2.5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-[#1E2328]/70 dark:hover:bg-[#1E2328] border border-slate-200 dark:border-[#242B33] text-left transition-all flex items-center justify-between group"
+                  className="w-full p-2.5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-[#13332A]/70 dark:hover:bg-[#13332A] border border-slate-200 dark:border-[#1E4E40] text-left transition-all flex items-center justify-between group"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="p-2 rounded-xl bg-white dark:bg-[#16181B] border border-slate-200 dark:border-[#242B33] shrink-0">
+                    <div className="p-2 rounded-xl bg-white dark:bg-[#0C231C] border border-slate-200 dark:border-[#1E4E40] shrink-0">
                       {acc.icon}
                     </div>
                     <div className="min-w-0">
-                      <div className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-[#008BA3] dark:group-hover:text-[#00C4DF] flex items-center gap-1.5 truncate">
+                      <div className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-[#059669] dark:group-hover:text-[#10B981] flex items-center gap-1.5 truncate">
                         <span>{acc.name}</span>
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-pill bg-white dark:bg-[#16181B] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-[#242B33] shrink-0">
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-pill bg-white dark:bg-[#0C231C] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-[#1E4E40] shrink-0">
                           {acc.badge}
                         </span>
                       </div>
@@ -205,7 +205,7 @@ export const LoginModal: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  <span className="text-[10px] font-bold text-[#008BA3] dark:text-[#00C4DF] shrink-0 group-hover:underline ml-2">
+                  <span className="text-[10px] font-bold text-[#059669] dark:text-[#10B981] shrink-0 group-hover:underline ml-2">
                     Sign In →
                   </span>
                 </button>
@@ -215,7 +215,7 @@ export const LoginModal: React.FC = () => {
         </div>
 
         {/* Modal Bottom Footer */}
-        <div className="px-6 py-3 bg-slate-50 dark:bg-[#111315] border-t border-slate-200 dark:border-[#242B33] flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+        <div className="px-6 py-3 bg-slate-50 dark:bg-[#061712] border-t border-slate-200 dark:border-[#1E4E40] flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
           <span>Secure mobile login with SMS authentication</span>
           <button
             onClick={() => setIsLoginModalOpen(false)}

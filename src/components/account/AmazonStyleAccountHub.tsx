@@ -73,7 +73,7 @@ export const AmazonStyleAccountHub: React.FC = () => {
     {
       title: 'Your Rentals & Orders',
       description: 'Track active deliveries, tenure countdown, extensions, and returns',
-      icon: <Package className="w-9 h-9 text-[#008BA3] dark:text-[#00C4DF]" />,
+      icon: <Package className="w-9 h-9 text-[#059669] dark:text-[#10B981]" />,
       tab: 'MY_RENTALS',
       badge:
         customerActiveRentals.length > 0
@@ -118,7 +118,7 @@ export const AmazonStyleAccountHub: React.FC = () => {
     {
       title: 'Showroom & Inventory',
       description: 'Manage registered products, declared stock, and public catalog visibility',
-      icon: <Building2 className="w-9 h-9 text-[#008BA3] dark:text-[#00C4DF]" />,
+      icon: <Building2 className="w-9 h-9 text-[#059669] dark:text-[#10B981]" />,
       tab: 'VENDOR_PORTAL',
     },
     {
@@ -158,7 +158,7 @@ export const AmazonStyleAccountHub: React.FC = () => {
     {
       title: 'My Daily Assigned Tasks',
       description: 'Active deliveries, AC measurement surveys, and breakdown repairs today',
-      icon: <Wrench className="w-9 h-9 text-[#008BA3] dark:text-[#00C4DF]" />,
+      icon: <Wrench className="w-9 h-9 text-[#059669] dark:text-[#10B981]" />,
       tab: 'FIELD_OPERATIONS',
     },
     {
@@ -180,7 +180,7 @@ export const AmazonStyleAccountHub: React.FC = () => {
     {
       title: 'Catalog & Inventory Governance',
       description: 'Review staged stock updates, source reassignments, and pricing engine',
-      icon: <Layers className="w-9 h-9 text-[#008BA3] dark:text-[#00C4DF]" />,
+      icon: <Layers className="w-9 h-9 text-[#059669] dark:text-[#10B981]" />,
       tab: 'ADMIN_GOVERNANCE',
     },
     {
@@ -232,7 +232,7 @@ export const AmazonStyleAccountHub: React.FC = () => {
           <div className="flex items-center gap-2 text-xs font-semibold text-hearth-taupe">
             <span>KaroRent Account Hub</span>
             <span>•</span>
-            <span className="font-mono text-[#008BA3] dark:text-[#00C4DF] font-bold">
+            <span className="font-mono text-[#059669] dark:text-[#10B981] font-bold">
               {activePersona.customerId || activePersona.vendorId || 'Console'}
             </span>
           </div>
@@ -249,7 +249,7 @@ export const AmazonStyleAccountHub: React.FC = () => {
             onClick={() => setActiveTab('MARKETPLACE')}
             className="spring-btn px-4 py-2 rounded-pill bg-hearth-oat hover:bg-hearth-sand text-hearth-ink text-xs font-semibold border border-hearth-border flex items-center gap-1.5 transition-all"
           >
-            <Home className="w-3.5 h-3.5 text-[#008BA3] dark:text-[#00C4DF]" />
+            <Home className="w-3.5 h-3.5 text-[#059669] dark:text-[#10B981]" />
             <span>Browse Catalog</span>
           </button>
 
@@ -269,15 +269,15 @@ export const AmazonStyleAccountHub: React.FC = () => {
           <button
             key={idx}
             onClick={() => setActiveTab(tile.tab)}
-            className="spring-card text-left p-6 rounded-3xl bg-hearth-card border border-hearth-border hover:border-[#008BA3]/50 dark:hover:border-[#00C4DF]/50 shadow-hearth hover:shadow-lg flex items-start gap-4 transition-all group"
+            className="spring-card text-left p-6 rounded-3xl bg-hearth-card border border-hearth-border hover:border-[#059669]/50 dark:hover:border-[#10B981]/50 shadow-hearth hover:shadow-lg flex items-start gap-4 transition-all group"
           >
-            <div className="p-3 rounded-2xl bg-hearth-oat/80 group-hover:bg-cyan-50 dark:group-hover:bg-[#00C4DF]/10 transition-colors shrink-0">
+            <div className="p-3 rounded-2xl bg-hearth-oat/80 group-hover:bg-emerald-50 dark:group-hover:bg-[#10B981]/10 transition-colors shrink-0">
               {tile.icon}
             </div>
 
             <div className="space-y-1 flex-1 min-w-0">
               <div className="flex items-center justify-between gap-2">
-                <h3 className="text-base font-bold text-hearth-ink group-hover:text-[#008BA3] dark:group-hover:text-[#00C4DF] transition-colors truncate">
+                <h3 className="text-base font-bold text-hearth-ink group-hover:text-[#059669] dark:group-hover:text-[#10B981] transition-colors truncate">
                   {tile.title}
                 </h3>
                 {tile.badge && (
@@ -285,7 +285,7 @@ export const AmazonStyleAccountHub: React.FC = () => {
                     className={`px-2 py-0.5 rounded-pill text-[10px] font-mono font-bold shrink-0 ${
                       tile.badgeVariant === 'green'
                         ? 'bg-[#DCFCE7] text-[#166534] dark:bg-emerald-950 dark:text-emerald-400 border border-[#86EFAC] dark:border-emerald-800'
-                        : 'bg-cyan-50 dark:bg-cyan-950/60 text-[#008BA3] dark:text-[#00C4DF] border border-cyan-200 dark:border-cyan-800'
+                        : 'bg-emerald-50 dark:bg-emerald-950/60 text-[#059669] dark:text-[#10B981] border border-emerald-200 dark:border-emerald-800'
                     }`}
                   >
                     {tile.badge}
@@ -303,7 +303,7 @@ export const AmazonStyleAccountHub: React.FC = () => {
       {/* Profile & KYC Summary Strip (For Customer or Vendor) */}
       <div className="rounded-3xl bg-hearth-card border border-hearth-border p-6 shadow-hearth flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-cyan-100 dark:bg-cyan-950/80 text-[#008BA3] dark:text-[#00C4DF] font-bold text-xl flex items-center justify-center shadow-sm">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950/80 text-[#059669] dark:text-[#10B981] font-bold text-xl flex items-center justify-center shadow-sm">
             {activePersona.name.charAt(0)}
           </div>
           <div>
@@ -337,19 +337,19 @@ export const AmazonStyleAccountHub: React.FC = () => {
             Account & Security Preferences
           </div>
           <ul className="space-y-2 text-hearth-umber">
-            <li className="hover:text-[#008BA3] dark:hover:text-[#00C4DF] cursor-pointer flex items-center gap-1.5 transition-colors">
+            <li className="hover:text-[#059669] dark:hover:text-[#10B981] cursor-pointer flex items-center gap-1.5 transition-colors">
               <UserCheck className="w-3.5 h-3.5 text-hearth-taupe" />
               <span>Personal details, name, and registered phone</span>
             </li>
-            <li className="hover:text-[#008BA3] dark:hover:text-[#00C4DF] cursor-pointer flex items-center gap-1.5 transition-colors">
+            <li className="hover:text-[#059669] dark:hover:text-[#10B981] cursor-pointer flex items-center gap-1.5 transition-colors">
               <Lock className="w-3.5 h-3.5 text-hearth-taupe" />
               <span>Login security & two-factor SMS OTP</span>
             </li>
-            <li className="hover:text-[#008BA3] dark:hover:text-[#00C4DF] cursor-pointer flex items-center gap-1.5 transition-colors">
+            <li className="hover:text-[#059669] dark:hover:text-[#10B981] cursor-pointer flex items-center gap-1.5 transition-colors">
               <MapPin className="w-3.5 h-3.5 text-hearth-taupe" />
               <span>Manage delivery addresses</span>
             </li>
-            <li className="hover:text-[#008BA3] dark:hover:text-[#00C4DF] cursor-pointer flex items-center gap-1.5 transition-colors">
+            <li className="hover:text-[#059669] dark:hover:text-[#10B981] cursor-pointer flex items-center gap-1.5 transition-colors">
               <CreditCard className="w-3.5 h-3.5 text-hearth-taupe" />
               <span>Payment methods & UPI autopay mandate</span>
             </li>
@@ -364,23 +364,23 @@ export const AmazonStyleAccountHub: React.FC = () => {
           <ul className="space-y-2 text-hearth-umber">
             <li
               onClick={() => setActiveTab('AGREEMENTS_ESIGN')}
-              className="hover:text-[#008BA3] dark:hover:text-[#00C4DF] cursor-pointer flex items-center gap-1.5 transition-colors"
+              className="hover:text-[#059669] dark:hover:text-[#10B981] cursor-pointer flex items-center gap-1.5 transition-colors"
             >
               <FileSignature className="w-3.5 h-3.5 text-hearth-taupe" />
               <span>Standard Residential Rental Agreement (2026 Edition)</span>
             </li>
-            <li className="hover:text-[#008BA3] dark:hover:text-[#00C4DF] cursor-pointer flex items-center gap-1.5 transition-colors">
+            <li className="hover:text-[#059669] dark:hover:text-[#10B981] cursor-pointer flex items-center gap-1.5 transition-colors">
               <ShieldCheck className="w-3.5 h-3.5 text-hearth-taupe" />
               <span>Deposit Protection & Refund Safety Charter</span>
             </li>
             <li
               onClick={() => setActiveTab('THREE_WAY_INSPECTION')}
-              className="hover:text-[#008BA3] dark:hover:text-[#00C4DF] cursor-pointer flex items-center gap-1.5 transition-colors"
+              className="hover:text-[#059669] dark:hover:text-[#10B981] cursor-pointer flex items-center gap-1.5 transition-colors"
             >
               <RotateCcw className="w-3.5 h-3.5 text-hearth-taupe" />
               <span>3-Way Doorstep Photo Verification</span>
             </li>
-            <li className="hover:text-[#008BA3] dark:hover:text-[#00C4DF] cursor-pointer flex items-center gap-1.5 transition-colors">
+            <li className="hover:text-[#059669] dark:hover:text-[#10B981] cursor-pointer flex items-center gap-1.5 transition-colors">
               <Briefcase className="w-3.5 h-3.5 text-hearth-taupe" />
               <span>Commercial Corporate Lease Terms</span>
             </li>
@@ -395,20 +395,20 @@ export const AmazonStyleAccountHub: React.FC = () => {
           <ul className="space-y-2 text-hearth-umber">
             <li
               onClick={() => setActiveTab('SUPPORT_DISPUTES')}
-              className="hover:text-[#008BA3] dark:hover:text-[#00C4DF] cursor-pointer flex items-center gap-1.5 transition-colors"
+              className="hover:text-[#059669] dark:hover:text-[#10B981] cursor-pointer flex items-center gap-1.5 transition-colors"
             >
               <Headphones className="w-3.5 h-3.5 text-hearth-taupe" />
               <span>Contact KaroRent Concierge (Phone / WhatsApp)</span>
             </li>
-            <li className="hover:text-[#008BA3] dark:hover:text-[#00C4DF] cursor-pointer flex items-center gap-1.5 transition-colors">
+            <li className="hover:text-[#059669] dark:hover:text-[#10B981] cursor-pointer flex items-center gap-1.5 transition-colors">
               <Wrench className="w-3.5 h-3.5 text-hearth-taupe" />
               <span>Book periodic maintenance or AC servicing</span>
             </li>
-            <li className="hover:text-[#008BA3] dark:hover:text-[#00C4DF] cursor-pointer flex items-center gap-1.5 transition-colors">
+            <li className="hover:text-[#059669] dark:hover:text-[#10B981] cursor-pointer flex items-center gap-1.5 transition-colors">
               <MessageSquareWarning className="w-3.5 h-3.5 text-hearth-taupe" />
               <span>Escalate an unresolved deposit deduction</span>
             </li>
-            <li className="hover:text-[#008BA3] dark:hover:text-[#00C4DF] cursor-pointer flex items-center gap-1.5 transition-colors">
+            <li className="hover:text-[#059669] dark:hover:text-[#10B981] cursor-pointer flex items-center gap-1.5 transition-colors">
               <Home className="w-3.5 h-3.5 text-hearth-taupe" />
               <span>Request annual home relocation</span>
             </li>

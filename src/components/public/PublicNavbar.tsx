@@ -197,7 +197,7 @@ export const PublicNavbar: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-white/95 dark:bg-[#111315]/95 backdrop-blur-md border-b border-slate-200 dark:border-[#242B33] shadow-sm select-none transition-colors duration-300">
+    <header className="sticky top-0 z-40 w-full bg-white/95 dark:bg-[#061712]/95 backdrop-blur-md border-b border-slate-200 dark:border-[#1E4E40] shadow-sm select-none transition-colors duration-300">
       {/* 1. Main Navbar Header Row */}
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-[74px] flex items-center justify-between gap-3 sm:gap-6">
         {/* Left Side: Logo & Primary Top Links (RENT, FOR BUSINESS) */}
@@ -210,15 +210,15 @@ export const PublicNavbar: React.FC = () => {
             }}
             className="flex items-center gap-2.5 text-left group focus:outline-none"
           >
-            <div className="w-10 h-10 rounded-2xl bg-[#00C4DF] text-black flex items-center justify-center font-serif font-bold text-2xl shadow-sm group-hover:bg-[#00B2D6] transition-all">
+            <div className="w-10 h-10 rounded-2xl bg-[#10B981] text-emerald-950 flex items-center justify-center font-serif font-bold text-2xl shadow-sm group-hover:bg-[#059669] group-hover:text-white transition-all">
               K
             </div>
             <div>
-              <div className="font-serif text-2xl font-bold tracking-tight text-slate-900 dark:text-white group-hover:text-[#009BB5] dark:group-hover:text-[#00C4DF] transition-colors leading-none">
+              <div className="font-serif text-2xl font-bold tracking-tight text-slate-900 dark:text-white group-hover:text-[#059669] dark:group-hover:text-[#10B981] transition-colors leading-none">
                 KaroRent
               </div>
-              <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400 tracking-wider uppercase mt-0.5 hidden sm:block">
-                Slate Minimalist
+              <div className="text-[10px] font-medium text-emerald-700 dark:text-emerald-400 tracking-wider uppercase mt-0.5 hidden sm:block">
+                Royal Emerald Boutique
               </div>
             </div>
           </button>
@@ -235,8 +235,8 @@ export const PublicNavbar: React.FC = () => {
                 onClick={() => openSectionCatalog('Living Room')}
                 className={`py-3 flex items-center gap-1.5 transition-colors ${
                   isRentHovered || (activeTab === 'MARKETPLACE' && publicPageMode === 'SECTION')
-                    ? 'text-[#009BB5] dark:text-[#00C4DF] font-extrabold border-b-2 border-[#00C4DF]'
-                    : 'text-slate-700 dark:text-slate-300 hover:text-[#009BB5] dark:hover:text-[#00C4DF]'
+                    ? 'text-[#059669] dark:text-[#10B981] font-extrabold border-b-2 border-[#10B981]'
+                    : 'text-slate-700 dark:text-slate-300 hover:text-[#059669] dark:hover:text-[#10B981]'
                 }`}
               >
                 <span>RENT</span>
@@ -250,16 +250,16 @@ export const PublicNavbar: React.FC = () => {
                   onMouseEnter={handleRentMouseEnter}
                   onMouseLeave={handleRentMouseLeave}
                 >
-                  <div className="w-[820px] bg-white dark:bg-[#16181B] rounded-3xl border border-slate-200 dark:border-[#242B33] shadow-2xl p-6 grid grid-cols-5 gap-4 transition-colors">
+                  <div className="w-[820px] bg-white dark:bg-[#0C231C] rounded-3xl border border-slate-200 dark:border-[#1E4E40] shadow-2xl p-6 grid grid-cols-5 gap-4 transition-colors">
                     {RENT_MEGA_COLUMNS.map((col, idx) => (
-                      <div key={idx} className="space-y-2 border-r border-slate-100 dark:border-[#242B33]/60 last:border-0 pr-2">
+                      <div key={idx} className="space-y-2 border-r border-slate-100 dark:border-[#1E4E40]/60 last:border-0 pr-2">
                         {/* Column Header */}
                         <button
                           onClick={() => {
                             openSectionCatalog(col.section);
                             setIsRentHovered(false);
                           }}
-                          className="font-serif font-bold text-xs text-[#008BA3] dark:text-[#00C4DF] hover:underline block text-left"
+                          className="font-serif font-bold text-xs text-[#059669] dark:text-[#10B981] hover:underline block text-left"
                         >
                           {col.title}
                         </button>
@@ -273,7 +273,7 @@ export const PublicNavbar: React.FC = () => {
                                 openSectionCatalog(col.section, item);
                                 setIsRentHovered(false);
                               }}
-                              className="w-full text-left hover:text-[#009BB5] dark:hover:text-[#00C4DF] hover:font-semibold py-0.5 block truncate transition-colors"
+                              className="w-full text-left hover:text-[#059669] dark:hover:text-[#10B981] hover:font-semibold py-0.5 block truncate transition-colors"
                             >
                               {item}
                             </button>
@@ -291,8 +291,8 @@ export const PublicNavbar: React.FC = () => {
               onClick={() => handleNavClick('FOR_BUSINESS')}
               className={`py-3 flex items-center gap-1.5 transition-colors ${
                 activeTab === 'FOR_BUSINESS'
-                  ? 'text-[#009BB5] dark:text-[#00C4DF] font-extrabold border-b-2 border-[#00C4DF]'
-                  : 'text-slate-700 dark:text-slate-300 hover:text-[#009BB5] dark:hover:text-[#00C4DF]'
+                  ? 'text-[#059669] dark:text-[#10B981] font-extrabold border-b-2 border-[#10B981]'
+                  : 'text-slate-700 dark:text-slate-300 hover:text-[#059669] dark:hover:text-[#10B981]'
               }`}
             >
               <Briefcase className="w-3.5 h-3.5 text-slate-400" />
@@ -304,9 +304,9 @@ export const PublicNavbar: React.FC = () => {
           <div className="relative hidden xl:block" ref={locationDropdownRef}>
             <button
               onClick={() => setShowLocationDropdown(!showLocationDropdown)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-pill bg-slate-100 hover:bg-slate-200 dark:bg-[#16181B] dark:hover:bg-[#1E2328] border border-slate-200 dark:border-[#242B33] text-xs text-slate-800 dark:text-white transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-pill bg-slate-100 hover:bg-slate-200 dark:bg-[#0C231C] dark:hover:bg-[#13332A] border border-slate-200 dark:border-[#1E4E40] text-xs text-slate-800 dark:text-white transition-all"
             >
-              <MapPin className="w-3.5 h-3.5 text-[#009BB5] dark:text-[#00C4DF] shrink-0" />
+              <MapPin className="w-3.5 h-3.5 text-[#059669] dark:text-[#10B981] shrink-0" />
               <div className="text-left">
                 <span className="text-[10px] text-slate-500 dark:text-slate-400 block leading-none">
                   Deliver to
@@ -319,7 +319,7 @@ export const PublicNavbar: React.FC = () => {
             </button>
 
             {showLocationDropdown && (
-              <div className="absolute left-0 mt-2 w-72 rounded-2xl bg-white dark:bg-[#16181B] border border-slate-200 dark:border-[#242B33] shadow-2xl p-3 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="absolute left-0 mt-2 w-72 rounded-2xl bg-white dark:bg-[#0C231C] border border-slate-200 dark:border-[#1E4E40] shadow-2xl p-3 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                 <div className="text-xs font-bold text-slate-900 dark:text-white mb-2">
                   Enter Delivery Pincode
                 </div>
@@ -330,7 +330,7 @@ export const PublicNavbar: React.FC = () => {
                     value={customPincodeInput}
                     onChange={(e) => setCustomPincodeInput(e.target.value.replace(/\D/g, ''))}
                     placeholder="e.g. 560038"
-                    className="flex-1 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-[#1E2328] border border-slate-200 dark:border-[#242B33] text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#00C4DF]"
+                    className="flex-1 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-[#13332A] border border-slate-200 dark:border-[#1E4E40] text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#10B981]"
                   />
                   <button
                     onClick={() => {
@@ -340,7 +340,7 @@ export const PublicNavbar: React.FC = () => {
                       }
                     }}
                     disabled={customPincodeInput.length !== 6}
-                    className="px-3 py-1.5 rounded-xl bg-[#00C4DF] hover:bg-[#00B2D6] disabled:opacity-40 text-black text-xs font-bold transition-all"
+                    className="px-3 py-1.5 rounded-xl bg-[#10B981] hover:bg-[#059669] disabled:opacity-40 text-emerald-950 font-bold text-xs transition-all"
                   >
                     Apply
                   </button>
@@ -359,8 +359,8 @@ export const PublicNavbar: React.FC = () => {
                       }}
                       className={`px-2 py-1.5 rounded-lg text-xs font-mono text-center transition-all ${
                         currentPincode === pin
-                          ? 'bg-[#00C4DF]/20 text-[#008BA3] dark:text-[#00C4DF] font-bold border border-[#00C4DF]/40'
-                          : 'hover:bg-slate-100 dark:hover:bg-[#1E2328] text-slate-700 dark:text-slate-300 border border-transparent'
+                          ? 'bg-[#10B981]/20 text-[#059669] dark:text-[#10B981] font-bold border border-[#10B981]/40'
+                          : 'hover:bg-slate-100 dark:hover:bg-[#13332A] text-slate-700 dark:text-slate-300 border border-transparent'
                       }`}
                     >
                       {pin}
@@ -380,7 +380,7 @@ export const PublicNavbar: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search sofa, washing machine, split AC, double bed, wardrobe..."
-              className="w-full pl-9 pr-9 py-2 rounded-full bg-slate-100/90 hover:bg-slate-100 focus:bg-white dark:bg-[#16181B] border border-slate-200 dark:border-[#242B33] focus:border-[#00C4DF] focus:ring-2 focus:ring-[#00C4DF]/20 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-sm transition-all"
+              className="w-full pl-9 pr-9 py-2 rounded-full bg-slate-100/90 hover:bg-slate-100 focus:bg-white dark:bg-[#0C231C] border border-slate-200 dark:border-[#1E4E40] focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/20 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-sm transition-all"
             />
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             {searchQuery && (
@@ -399,7 +399,7 @@ export const PublicNavbar: React.FC = () => {
           {/* Dark Mode Toggle */}
           <button
             onClick={toggleDarkMode}
-            className="p-2 rounded-pill bg-slate-100 hover:bg-slate-200 dark:bg-[#16181B] dark:hover:bg-[#1E2328] border border-slate-200 dark:border-[#242B33] text-slate-700 dark:text-slate-300 transition-all"
+            className="p-2 rounded-pill bg-slate-100 hover:bg-slate-200 dark:bg-[#0C231C] dark:hover:bg-[#13332A] border border-slate-200 dark:border-[#1E4E40] text-slate-700 dark:text-slate-300 transition-all"
             title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           >
             {darkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
@@ -409,7 +409,7 @@ export const PublicNavbar: React.FC = () => {
           <div className="relative hidden md:block" ref={demoDropdownRef}>
             <button
               onClick={() => setShowDemoRoleMenu(!showDemoRoleMenu)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-pill bg-[#00C4DF]/10 hover:bg-[#00C4DF]/20 border border-[#00C4DF]/40 text-xs font-mono font-bold text-[#008BA3] dark:text-[#00C4DF] shadow-sm transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-pill bg-[#10B981]/15 hover:bg-[#10B981]/25 border border-[#10B981]/40 text-xs font-mono font-bold text-[#059669] dark:text-[#10B981] shadow-sm transition-all"
             >
               <Sparkles className="w-3.5 h-3.5" />
               <span>Demo Role</span>
@@ -417,8 +417,8 @@ export const PublicNavbar: React.FC = () => {
             </button>
 
             {showDemoRoleMenu && (
-              <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-white dark:bg-[#16181B] border border-slate-200 dark:border-[#242B33] shadow-2xl p-2 z-50">
-                <div className="px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-[#242B33]">
+              <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-white dark:bg-[#0C231C] border border-slate-200 dark:border-[#1E4E40] shadow-2xl p-2 z-50">
+                <div className="px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-[#1E4E40]">
                   Quick Demo Persona Switcher
                 </div>
                 <div className="space-y-1 pt-1.5 max-h-72 overflow-y-auto">
@@ -431,8 +431,8 @@ export const PublicNavbar: React.FC = () => {
                       }}
                       className={`w-full text-left px-3 py-2 rounded-xl text-xs transition-all flex items-center justify-between ${
                         activePersona.id === p.id && isAuthenticated
-                          ? 'bg-[#E0F2FE] dark:bg-[#1E252D] text-[#008BA3] dark:text-[#00C4DF] font-bold'
-                          : 'hover:bg-slate-100 dark:hover:bg-[#1E2328] text-slate-700 dark:text-slate-300'
+                          ? 'bg-emerald-50 dark:bg-[#13332A] text-[#059669] dark:text-[#10B981] font-bold'
+                          : 'hover:bg-slate-100 dark:hover:bg-[#13332A] text-slate-700 dark:text-slate-300'
                       }`}
                     >
                       <div>
@@ -442,7 +442,7 @@ export const PublicNavbar: React.FC = () => {
                         </div>
                       </div>
                       {activePersona.id === p.id && isAuthenticated && (
-                        <span className="text-[#008BA3] dark:text-[#00C4DF] font-bold text-xs">✓</span>
+                        <span className="text-[#059669] dark:text-[#10B981] font-bold text-xs">✓</span>
                       )}
                     </button>
                   ))}
@@ -456,17 +456,17 @@ export const PublicNavbar: React.FC = () => {
             {!isAuthenticated ? (
               <button
                 onClick={() => setIsLoginModalOpen(true)}
-                className="spring-btn flex items-center gap-2 px-4 py-1.5 rounded-pill bg-slate-100 hover:bg-slate-200 dark:bg-[#16181B] dark:hover:bg-[#1E2328] border border-slate-200 dark:border-[#242B33] hover:border-[#00C4DF] text-slate-800 dark:text-slate-200 hover:text-[#009BB5] dark:hover:text-[#00C4DF] text-xs font-bold shadow-sm transition-all"
+                className="spring-btn flex items-center gap-2 px-4 py-1.5 rounded-pill bg-slate-100 hover:bg-slate-200 dark:bg-[#0C231C] dark:hover:bg-[#13332A] border border-slate-200 dark:border-[#1E4E40] hover:border-[#10B981] text-slate-800 dark:text-slate-200 hover:text-[#059669] dark:hover:text-[#10B981] text-xs font-bold shadow-sm transition-all"
               >
-                <LogIn className="w-3.5 h-3.5 text-[#009BB5] dark:text-[#00C4DF]" />
+                <LogIn className="w-3.5 h-3.5 text-[#059669] dark:text-[#10B981]" />
                 <span>Sign In</span>
               </button>
             ) : (
               <button
                 onClick={() => setShowAccountDropdown(!showAccountDropdown)}
-                className="flex items-center gap-2 px-3.5 py-1.5 rounded-pill bg-slate-100 hover:bg-slate-200 dark:bg-[#16181B] dark:hover:bg-[#1E2328] border border-slate-200 dark:border-[#242B33] text-xs text-slate-900 dark:text-white transition-all shadow-sm"
+                className="flex items-center gap-2 px-3.5 py-1.5 rounded-pill bg-slate-100 hover:bg-slate-200 dark:bg-[#0C231C] dark:hover:bg-[#13332A] border border-slate-200 dark:border-[#1E4E40] text-xs text-slate-900 dark:text-white transition-all shadow-sm"
               >
-                <div className="w-7 h-7 rounded-full bg-[#00C4DF] text-black flex items-center justify-center font-bold text-xs">
+                <div className="w-7 h-7 rounded-full bg-[#10B981] text-emerald-950 flex items-center justify-center font-bold text-xs">
                   {activePersona.name.charAt(0)}
                 </div>
                 <div className="text-left hidden sm:block">
@@ -483,8 +483,8 @@ export const PublicNavbar: React.FC = () => {
 
             {/* Authenticated Amazon "Account & Lists" Mega Dropdown */}
             {isAuthenticated && showAccountDropdown && (
-              <div className="absolute right-0 mt-2 w-80 rounded-3xl bg-white dark:bg-[#16181B] border border-slate-200 dark:border-[#242B33] shadow-2xl p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-150 space-y-3">
-                <div className="p-3.5 rounded-2xl bg-slate-100 dark:bg-[#1E2328] border border-slate-200 dark:border-[#242B33] flex items-center justify-between gap-2">
+              <div className="absolute right-0 mt-2 w-80 rounded-3xl bg-white dark:bg-[#0C231C] border border-slate-200 dark:border-[#1E4E40] shadow-2xl p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-150 space-y-3">
+                <div className="p-3.5 rounded-2xl bg-slate-100 dark:bg-[#13332A] border border-slate-200 dark:border-[#1E4E40] flex items-center justify-between gap-2">
                   <div>
                     <div className="font-serif font-bold text-sm text-slate-900 dark:text-white">
                       {activePersona.name}
@@ -495,7 +495,7 @@ export const PublicNavbar: React.FC = () => {
                   </div>
                   <button
                     onClick={() => handleNavClick('YOUR_ACCOUNT')}
-                    className="px-2.5 py-1 rounded-pill bg-[#00C4DF] text-black text-[10px] font-bold shadow-sm hover:bg-[#00B2D6]"
+                    className="px-2.5 py-1 rounded-pill bg-[#10B981] text-emerald-950 text-[10px] font-bold shadow-sm hover:bg-[#059669] hover:text-white"
                   >
                     Your Account
                   </button>
@@ -504,9 +504,9 @@ export const PublicNavbar: React.FC = () => {
                 <div className="space-y-1 text-xs">
                   <button
                     onClick={() => handleNavClick('YOUR_ACCOUNT')}
-                    className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#1E2328] flex items-center gap-2.5 font-bold text-slate-900 dark:text-white"
+                    className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#13332A] flex items-center gap-2.5 font-bold text-slate-900 dark:text-white"
                   >
-                    <LayoutGrid className="w-4 h-4 text-[#009BB5] dark:text-[#00C4DF]" />
+                    <LayoutGrid className="w-4 h-4 text-[#059669] dark:text-[#10B981]" />
                     <span>Your Account Hub (Amazon Layout)</span>
                   </button>
 
@@ -516,7 +516,7 @@ export const PublicNavbar: React.FC = () => {
                       setPublicPageMode('HOME');
                       setShowAccountDropdown(false);
                     }}
-                    className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#1E2328] flex items-center gap-2.5 font-medium text-slate-700 dark:text-slate-300"
+                    className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#13332A] flex items-center gap-2.5 font-medium text-slate-700 dark:text-slate-300"
                   >
                     <Home className="w-4 h-4 text-slate-400" />
                     <span>Explore Public Catalog</span>
@@ -528,14 +528,14 @@ export const PublicNavbar: React.FC = () => {
                     <>
                       <button
                         onClick={() => handleNavClick('MY_RENTALS')}
-                        className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#1E2328] flex items-center justify-between font-medium text-slate-700 dark:text-slate-300"
+                        className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#13332A] flex items-center justify-between font-medium text-slate-700 dark:text-slate-300"
                       >
                         <div className="flex items-center gap-2.5">
                           <Package className="w-4 h-4 text-slate-400" />
                           <span>Your Orders & Rentals</span>
                         </div>
                         {activeRentalsCount > 0 && (
-                          <span className="px-2 py-0.5 rounded-pill bg-[#00C4DF]/20 text-[#008BA3] dark:text-[#00C4DF] font-mono text-[10px] font-bold">
+                          <span className="px-2 py-0.5 rounded-pill bg-[#10B981]/20 text-[#059669] dark:text-[#10B981] font-mono text-[10px] font-bold">
                             {activeRentalsCount} Active
                           </span>
                         )}
@@ -543,7 +543,7 @@ export const PublicNavbar: React.FC = () => {
 
                       <button
                         onClick={() => handleNavClick('INVOICES_DEPOSITS')}
-                        className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#1E2328] flex items-center gap-2.5 font-medium text-slate-700 dark:text-slate-300"
+                        className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#13332A] flex items-center gap-2.5 font-medium text-slate-700 dark:text-slate-300"
                       >
                         <ReceiptIndianRupee className="w-4 h-4 text-slate-400" />
                         <span>Invoices & Refundable Deposits</span>
@@ -551,7 +551,7 @@ export const PublicNavbar: React.FC = () => {
 
                       <button
                         onClick={() => handleNavClick('AGREEMENTS_ESIGN')}
-                        className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#1E2328] flex items-center gap-2.5 font-medium text-slate-700 dark:text-slate-300"
+                        className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#13332A] flex items-center gap-2.5 font-medium text-slate-700 dark:text-slate-300"
                       >
                         <FileSignature className="w-4 h-4 text-slate-400" />
                         <span>Rental Agreements & E-Sign</span>
@@ -564,7 +564,7 @@ export const PublicNavbar: React.FC = () => {
                     <>
                       <button
                         onClick={() => handleNavClick('VENDOR_PORTAL')}
-                        className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#1E2328] flex items-center gap-2.5 font-medium text-slate-700 dark:text-slate-300"
+                        className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#13332A] flex items-center gap-2.5 font-medium text-slate-700 dark:text-slate-300"
                       >
                         <Building2 className="w-4 h-4 text-slate-400" />
                         <span>Showroom & Inventory Stock</span>
@@ -572,7 +572,7 @@ export const PublicNavbar: React.FC = () => {
 
                       <button
                         onClick={() => handleNavClick('ASSIGN_DELIVERIES')}
-                        className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#1E2328] flex items-center gap-2.5 font-medium text-slate-700 dark:text-slate-300"
+                        className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#13332A] flex items-center gap-2.5 font-medium text-slate-700 dark:text-slate-300"
                       >
                         <Truck className="w-4 h-4 text-slate-400" />
                         <span>Assign Deliveries & Pickups</span>
@@ -580,7 +580,7 @@ export const PublicNavbar: React.FC = () => {
 
                       <button
                         onClick={() => handleNavClick('SETTLEMENTS_FINANCE')}
-                        className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#1E2328] flex items-center gap-2.5 font-medium text-slate-700 dark:text-slate-300"
+                        className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#13332A] flex items-center gap-2.5 font-medium text-slate-700 dark:text-slate-300"
                       >
                         <ReceiptIndianRupee className="w-4 h-4 text-slate-400" />
                         <span>Partner Payouts & Escrow</span>
@@ -593,7 +593,7 @@ export const PublicNavbar: React.FC = () => {
                     <>
                       <button
                         onClick={() => handleNavClick('FIELD_OPERATIONS')}
-                        className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#1E2328] flex items-center gap-2.5 font-medium text-slate-700 dark:text-slate-300"
+                        className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#13332A] flex items-center gap-2.5 font-medium text-slate-700 dark:text-slate-300"
                       >
                         <Wrench className="w-4 h-4 text-slate-400" />
                         <span>My Assigned Field Tasks</span>
@@ -601,7 +601,7 @@ export const PublicNavbar: React.FC = () => {
 
                       <button
                         onClick={() => handleNavClick('THREE_WAY_INSPECTION')}
-                        className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#1E2328] flex items-center gap-2.5 font-medium text-slate-700 dark:text-slate-300"
+                        className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#13332A] flex items-center gap-2.5 font-medium text-slate-700 dark:text-slate-300"
                       >
                         <Truck className="w-4 h-4 text-slate-400" />
                         <span>Doorstep Photo Inspections</span>
@@ -614,7 +614,7 @@ export const PublicNavbar: React.FC = () => {
                     <>
                       <button
                         onClick={() => handleNavClick('ADMIN_GOVERNANCE')}
-                        className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#1E2328] flex items-center gap-2.5 font-medium text-slate-700 dark:text-slate-300"
+                        className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#13332A] flex items-center gap-2.5 font-medium text-slate-700 dark:text-slate-300"
                       >
                         <ShieldCheck className="w-4 h-4 text-slate-400" />
                         <span>Governance & Catalog Approvals</span>
@@ -622,7 +622,7 @@ export const PublicNavbar: React.FC = () => {
 
                       <button
                         onClick={() => handleNavClick('BLACKLIST_REGISTRY')}
-                        className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#1E2328] flex items-center gap-2.5 font-medium text-slate-700 dark:text-slate-300"
+                        className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#13332A] flex items-center gap-2.5 font-medium text-slate-700 dark:text-slate-300"
                       >
                         <ShieldAlert className="w-4 h-4 text-slate-400" />
                         <span>Unified Blacklist Registry</span>
@@ -632,13 +632,13 @@ export const PublicNavbar: React.FC = () => {
                 </div>
 
                 {/* Sign Out Button */}
-                <div className="pt-2 border-t border-slate-100 dark:border-[#242B33]">
+                <div className="pt-2 border-t border-slate-100 dark:border-[#1E4E40]">
                   <button
                     onClick={() => {
                       logoutUser();
                       setShowAccountDropdown(false);
                     }}
-                    className="w-full py-2 px-3 rounded-xl bg-slate-100 hover:bg-rose-50 dark:bg-[#1E2328] dark:hover:bg-rose-950/40 text-slate-700 hover:text-rose-600 dark:text-slate-300 dark:hover:text-rose-400 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all"
+                    className="w-full py-2 px-3 rounded-xl bg-slate-100 hover:bg-rose-50 dark:bg-[#13332A] dark:hover:bg-rose-950/40 text-slate-700 hover:text-rose-600 dark:text-slate-300 dark:hover:text-rose-400 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all"
                   >
                     <LogOut className="w-3.5 h-3.5" />
                     <span>Sign Out (Return to Guest Browsing)</span>
@@ -651,7 +651,7 @@ export const PublicNavbar: React.FC = () => {
       </div>
 
       {/* 2. Sub-Header: Section Shortcuts & Trust Signals */}
-      <div className="bg-slate-50/95 dark:bg-[#111315]/95 border-t border-slate-200 dark:border-[#1E252C] px-4 sm:px-6 lg:px-8 py-2 overflow-x-auto transition-colors duration-300">
+      <div className="bg-slate-50/95 dark:bg-[#061712]/95 border-t border-slate-200 dark:border-[#1E4E40] px-4 sm:px-6 lg:px-8 py-2 overflow-x-auto transition-colors duration-300">
         <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-4 text-xs">
           {/* Section Quick Chips */}
           <div className="flex items-center gap-1.5 shrink-0 overflow-x-auto py-0.5 no-scrollbar">
@@ -662,8 +662,8 @@ export const PublicNavbar: React.FC = () => {
               }}
               className={`px-3 py-1 rounded-pill text-xs font-bold transition-all shrink-0 ${
                 activeTab === 'MARKETPLACE' && publicPageMode === 'HOME'
-                  ? 'bg-[#00C4DF] text-black shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/70 dark:text-slate-400 dark:hover:text-white dark:hover:bg-[#1E2328]'
+                  ? 'bg-[#10B981] text-emerald-950 shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/70 dark:text-slate-400 dark:hover:text-white dark:hover:bg-[#13332A]'
               }`}
             >
               Featured Home
@@ -679,8 +679,8 @@ export const PublicNavbar: React.FC = () => {
                   onClick={() => openSectionCatalog(tab)}
                   className={`px-3 py-1 rounded-pill text-xs font-semibold transition-all shrink-0 ${
                     active
-                      ? 'bg-[#00C4DF] text-black shadow-sm'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/70 dark:text-slate-400 dark:hover:text-white dark:hover:bg-[#1E2328]'
+                      ? 'bg-[#10B981] text-emerald-950 shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/70 dark:text-slate-400 dark:hover:text-white dark:hover:bg-[#13332A]'
                   }`}
                 >
                   {tab}

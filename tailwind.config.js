@@ -14,20 +14,20 @@ export default {
           ink: 'var(--text-ink)',
           umber: 'var(--text-umber)',
           taupe: 'var(--text-taupe)',
-          terracotta: '#00C4DF', // Bright Electric Cyan Primary Accent
-          kiln: '#00B2D6',       // Electric Cyan Hover
-          clay: '#008B9E',       // Cyan Dark Accent
+          terracotta: '#10B981', // Radiant Jewel Emerald Primary Accent
+          kiln: '#059669',       // Deep Jewel Emerald Hover
+          clay: '#047857',       // Forest Emerald Dark Accent
           apricot: 'var(--bg-apricot)',
           sage: '#F59E0B',       // Warm Golden-Yellow Secondary Accent
           sageLight: 'var(--bg-sage-tint)',
-          gold: '#F59E0B',       // Warm Golden-Yellow for Pricing
+          gold: '#F59E0B',       // Warm Champagne Gold for Pricing
           goldWarm: '#FBBF24',
-          cyan: '#00C4DF',
-          cyanHover: '#00B2D6',
-          cyanDark: '#008B9E',
-          slateCard: '#16181B',
-          slateBg: '#111315',
-          slateBorder: '#242B33',
+          cyan: '#10B981',
+          cyanHover: '#059669',
+          cyanDark: '#047857',
+          slateCard: '#0C231C',  // Deep Emerald Slate Card Fill
+          slateBg: '#061712',    // Deep Jewel Emerald Canvas
+          slateBorder: '#1E4E40', // Antique Emerald Brass/Slate Border
         },
       },
       fontFamily: {

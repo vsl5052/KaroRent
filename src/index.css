@@ -3,31 +3,31 @@
 @tailwind utilities;
 
 :root {
-  /* Charcoal & Cyan / Slate Minimalist — Light Mode ("Cool Slate Minimalist") */
-  --bg-surface-0: #F8FAFC; /* Crisp cool slate canvas */
-  --bg-surface-1: #FFFFFF; /* Pure brilliant white card fill */
-  --bg-surface-2: #F1F5F9; /* Slate mist elevation */
-  --bg-surface-3: #E2E8F0; /* Soft slate accent surface */
-  --border-sandstone: #E2E8F0; /* Crisp slate border */
-  --text-ink: #0F172A; /* Deep slate charcoal headlines */
-  --text-umber: #334155; /* Refined slate supporting copy */
-  --text-taupe: #64748B; /* Balanced muted slate metadata */
-  --bg-apricot: #E0F2FE; /* Pale ice-cyan tint */
-  --bg-sage-tint: #ECFEFF; /* Soft cyan ambient glow */
+  /* Jewel Emerald & Champagne Gold — Light Mode ("Porcelain & Jewel Emerald") */
+  --bg-surface-0: #F4F8F5; /* Soft alabaster mint canvas */
+  --bg-surface-1: #FFFFFF; /* Pure brilliant card white */
+  --bg-surface-2: #EAF3EE; /* Soft sage mist elevation */
+  --bg-surface-3: #DDEEE5; /* Muted emerald accent surface */
+  --border-sandstone: #D4E6DC; /* Crisp sage-emerald border */
+  --text-ink: #07261E; /* Deep forest emerald headlines */
+  --text-umber: #1B4538; /* Refined dark pine supporting copy */
+  --text-taupe: #4D7365; /* Balanced muted sage metadata */
+  --bg-apricot: #D1FAE5; /* Pale emerald glow tint */
+  --bg-sage-tint: #ECFDF5; /* Ambient mint shimmer */
 }
 
 .dark {
-  /* Charcoal & Cyan / Slate Minimalist — Dark Mode ("Dark Slate Minimalist") */
-  --bg-surface-0: #111315; /* Deep charcoal / matte off-black */
-  --bg-surface-1: #16181B; /* Matte dark card fill */
-  --bg-surface-2: #1E2328; /* Slate blue-gray elevation */
-  --bg-surface-3: #14171A; /* Surface dark backing */
-  --border-sandstone: #242B33; /* Muted steel slate border */
-  --text-ink: #FFFFFF; /* Crisp white headlines */
-  --text-umber: #CBD5E1; /* Soft slate-gray supporting copy */
-  --text-taupe: #94A3B8; /* Muted slate-gray */
-  --bg-apricot: #1A242D; /* Slate blue accent fill */
-  --bg-sage-tint: #0B2228; /* Electric cyan glow tint */
+  /* Jewel Emerald & Champagne Gold — Dark Mode ("Royal Jewel Emerald") */
+  --bg-surface-0: #061712; /* Deep jewel emerald off-black / forest midnight */
+  --bg-surface-1: #0C231C; /* Rich deep emerald card fill */
+  --bg-surface-2: #13332A; /* Elevated jewel emerald slate */
+  --bg-surface-3: #1B4438; /* Dark pine surface backing */
+  --border-sandstone: #1E4E40; /* Antique emerald brass/slate border */
+  --text-ink: #F7FAF8; /* Crisp diamond white headlines */
+  --text-umber: #A7C7BC; /* Soft jade-slate supporting copy */
+  --text-taupe: #6E9689; /* Muted jade metadata */
+  --bg-apricot: #143D31; /* Deep emerald accent backing */
+  --bg-sage-tint: #0D2C23; /* Jewel emerald ambient glow */
 }
 
 @layer base {
