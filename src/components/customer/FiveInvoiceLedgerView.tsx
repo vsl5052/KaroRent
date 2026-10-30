@@ -456,23 +456,61 @@ export const FiveInvoiceLedgerView: React.FC = () => {
                               {inv.title}
                             </div>
 
-                            {/* Legal Notice Action Button if Notice exists */}
-                            {booking?.defaultNotices && booking.defaultNotices.length > 0 && (
-                              <div className="pt-0.5">
-                                <button
-                                  onClick={() => {
-                                    const match =
-                                      booking.defaultNotices?.find((n) => n.invoiceId === inv.id) ||
-                                      booking.defaultNotices?.[booking.defaultNotices.length - 1];
-                                    if (match) setSelectedNoticeModal(match);
-                                  }}
-                                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-pill bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-[10px] font-semibold transition-colors"
-                                >
-                                  <FileText className="w-3 h-3 text-rose-600" />
-                                  <span>View Legal Notice</span>
-                                </button>
-                              </div>
-                            )}
+                            {/* Legal Notice Action Buttons matching default stages */}
+                            {(() => {
+                              const invoiceNotices = (booking?.defaultNotices || []).filter(
+                                (n) => n.invoiceId === inv.id || n.bookingId === inv.bookingId
+                              );
+
+                              if (invoiceNotices.length === 0) return null;
+
+                              return (
+                                <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                                  {invoiceNotices.map((n) => {
+                                    const isCurrentStage = inv.overdueStage
+                                      ? n.noticeType === inv.overdueStage
+                                      : n.id === invoiceNotices[invoiceNotices.length - 1].id;
+                                    return (
+                                      <button
+                                        key={n.id}
+                                        type="button"
+                                        onClick={() => setSelectedNoticeModal(n)}
+                                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-pill text-[10px] font-semibold transition-all ${
+                                          isCurrentStage
+                                            ? n.noticeType === 'NOTICE_3'
+                                              ? 'bg-red-700 hover:bg-red-800 text-white shadow-sm ring-1 ring-red-400 font-bold'
+                                              : n.noticeType === 'NOTICE_2'
+                                              ? 'bg-rose-100 hover:bg-rose-200 text-rose-900 border border-rose-300 font-bold shadow-sm'
+                                              : 'bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 font-bold shadow-sm'
+                                            : 'bg-hearth-oat hover:bg-rose-50 text-hearth-umber border border-hearth-border'
+                                        }`}
+                                        title={`Click to view ${n.noticeTitle}`}
+                                      >
+                                        <FileText
+                                          className={`w-3 h-3 ${
+                                            isCurrentStage && n.noticeType === 'NOTICE_3'
+                                              ? 'text-white'
+                                              : isCurrentStage && n.noticeType === 'NOTICE_2'
+                                              ? 'text-rose-700'
+                                              : isCurrentStage
+                                              ? 'text-amber-700'
+                                              : 'text-rose-600'
+                                          }`}
+                                        />
+                                        <span>
+                                          {n.noticeType === 'NOTICE_1'
+                                            ? 'Notice 1 (T+1)'
+                                            : n.noticeType === 'NOTICE_2'
+                                            ? 'Notice 2 (T+5)'
+                                            : 'Notice 3 (T+11)'}
+                                          {isCurrentStage ? ' • Current' : ''}
+                                        </span>
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              );
+                            })()}
                             <div className="text-[11px] text-hearth-taupe">
                               Due: {inv.dueDate}
                               {inv.paidAt && ` • Paid on ${inv.paidAt}`}
@@ -582,6 +620,56 @@ export const FiveInvoiceLedgerView: React.FC = () => {
                 <X className="w-4 h-4" />
               </button>
             </div>
+
+            {/* Multi-Stage Notice Switcher Tabs */}
+            {(() => {
+              const modalBooking = bookings.find(
+                (b) =>
+                  b.id === selectedNoticeModal.bookingId ||
+                  b.defaultNotices?.some((n) => n.id === selectedNoticeModal.id)
+              );
+              const allBookingNotices = (modalBooking?.defaultNotices || []).filter(
+                (n) =>
+                  n.invoiceId === selectedNoticeModal.invoiceId ||
+                  n.bookingId === selectedNoticeModal.bookingId
+              );
+
+              if (allBookingNotices.length <= 1) return null;
+
+              return (
+                <div className="flex items-center gap-2 px-6 py-2.5 bg-hearth-oat/90 border-b border-hearth-border overflow-x-auto">
+                  <span className="text-[11px] font-semibold text-hearth-taupe whitespace-nowrap">
+                    Switch Notice Stage:
+                  </span>
+                  {allBookingNotices.map((n) => {
+                    const isSelected = selectedNoticeModal.id === n.id;
+                    return (
+                      <button
+                        key={n.id}
+                        type="button"
+                        onClick={() => setSelectedNoticeModal(n)}
+                        className={`px-3 py-1 rounded-pill text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                          isSelected
+                            ? 'bg-rose-700 text-white shadow-sm ring-2 ring-rose-400 font-bold'
+                            : 'bg-white hover:bg-rose-50 text-hearth-ink border border-hearth-border'
+                        }`}
+                      >
+                        <span>
+                          {n.noticeType === 'NOTICE_1'
+                            ? 'Notice 1 (T+1 Reminder)'
+                            : n.noticeType === 'NOTICE_2'
+                            ? 'Notice 2 (T+5 Formal Default)'
+                            : 'Notice 3 (T+11 Repossession)'}
+                        </span>
+                        {isSelected && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              );
+            })()}
 
             {/* Notice Summary Metrics */}
             <div className="grid grid-cols-3 gap-3 p-4 bg-hearth-oat border-b border-hearth-border text-xs">

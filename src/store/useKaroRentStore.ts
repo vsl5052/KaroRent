@@ -3119,6 +3119,9 @@ export const useKaroRentStore = create<KaroRentState>()(
         const customer = state.customers.find((c) => c.id === booking.customerId);
         const customerMobile = customer?.verifiedMobile || '+91 98860 12345';
         const customerEmail = customer?.email || 'customer@example.com';
+        const rawPrincipal = invoice.lateFeeAssessed
+          ? invoice.totalPayable - invoice.lateFeeAssessed
+          : invoice.totalPayable;
 
         let newRecord: DefaultNoticeRecord;
         let noticeStage: DefaultNoticeStage;
@@ -3143,9 +3146,9 @@ export const useKaroRentStore = create<KaroRentState>()(
             invoiceId: invoice.id,
             issuedAt: nowIST(),
             dueOrCureDeadline: 'Within 3 business days',
-            principalAmount: invoice.totalPayable,
+            principalAmount: rawPrincipal,
             lateFeeAmount: 0,
-            totalPayable: invoice.totalPayable,
+            totalPayable: rawPrincipal,
             subject: content.subject,
             fullNoticeText: content.body,
           };
@@ -3154,7 +3157,7 @@ export const useKaroRentStore = create<KaroRentState>()(
           toastDesc = `Sent courteous payment reminder for invoice ${invoice.id} to ${booking.customerName}.`;
         } else if (targetStage === 2) {
           noticeStage = 'NOTICE_2';
-          lateFeeToAdd = 500;
+          lateFeeToAdd = invoice.lateFeeAssessed ? 0 : 500;
           const content = generateNotice2({
             booking,
             invoice,
@@ -3171,9 +3174,9 @@ export const useKaroRentStore = create<KaroRentState>()(
             invoiceId: invoice.id,
             issuedAt: nowIST(),
             dueOrCureDeadline: 'Within 5 business days',
-            principalAmount: invoice.totalPayable,
+            principalAmount: rawPrincipal,
             lateFeeAmount: 500,
-            totalPayable: invoice.totalPayable + 500,
+            totalPayable: rawPrincipal + 500,
             subject: content.subject,
             fullNoticeText: content.body,
           };
@@ -3185,12 +3188,13 @@ export const useKaroRentStore = create<KaroRentState>()(
           const authCode = `REPO-AUTH-${booking.id.slice(-4)}-${Math.floor(1000 + Math.random() * 9000)}`;
           const repoDate = scheduledRepossessionDate || '2026-10-31';
           const repoWindow = scheduledRepossessionTimeWindow || '10:00 AM – 02:00 PM IST';
+          const assessedFee = invoice.lateFeeAssessed || 500;
           const content = generateNotice3({
             booking,
             invoice,
             customerMobile,
             customerEmail,
-            lateFeeAmount: invoice.lateFeeAssessed || 500,
+            lateFeeAmount: assessedFee,
             cureDeadlineDate: 'IMMEDIATE SURRENDER',
             repossessionDate: repoDate,
             repossessionTimeWindow: repoWindow,
@@ -3204,9 +3208,9 @@ export const useKaroRentStore = create<KaroRentState>()(
             invoiceId: invoice.id,
             issuedAt: nowIST(),
             dueOrCureDeadline: 'Immediate Surrender',
-            principalAmount: invoice.totalPayable,
-            lateFeeAmount: invoice.lateFeeAssessed || 500,
-            totalPayable: invoice.totalPayable + (invoice.lateFeeAssessed ? 0 : 500),
+            principalAmount: rawPrincipal,
+            lateFeeAmount: assessedFee,
+            totalPayable: rawPrincipal + assessedFee,
             agentAuthCode: authCode,
             scheduledRepossessionDate: repoDate,
             scheduledRepossessionTimeWindow: repoWindow,
@@ -3226,17 +3230,20 @@ export const useKaroRentStore = create<KaroRentState>()(
             return {
               ...inv,
               overdueStage: noticeStage,
-              lateFeeAssessed: lateFeeToAdd > 0 ? (inv.lateFeeAssessed || 0) + lateFeeToAdd : inv.lateFeeAssessed,
+              lateFeeAssessed: lateFeeToAdd > 0 ? (inv.lateFeeAssessed || 0) + lateFeeToAdd : (inv.lateFeeAssessed || (targetStage >= 2 ? 500 : undefined)),
               totalPayable: inv.totalPayable + lateFeeToAdd,
               baseAmount: inv.baseAmount + lateFeeToAdd,
             };
           }),
           bookings: s.bookings.map((b) => {
             if (b.id !== bookingId) return b;
+            const existingNotices = (b.defaultNotices || []).filter(
+              (n) => !(n.invoiceId === invoiceId && n.noticeType === noticeStage)
+            );
             return {
               ...b,
               status: newBookingStatus,
-              defaultNotices: [...(b.defaultNotices || []), newRecord],
+              defaultNotices: [...existingNotices, newRecord],
             };
           }),
           customers: s.customers.map((c) => {
@@ -3310,6 +3317,7 @@ export const useKaroRentStore = create<KaroRentState>()(
                   paymentState: 'Successful',
                   paidAt: nowIST(),
                   providerReference: providerRef,
+                  overdueStage: undefined,
                 }
               : inv
           ),
@@ -3860,7 +3868,7 @@ export const useKaroRentStore = create<KaroRentState>()(
       },
     }),
     {
-      name: 'karorent-live-platform-v12',
+      name: 'karorent-live-platform-v13',
       partialize: (state) => ({
         darkMode: state.darkMode,
         personas: state.personas,
