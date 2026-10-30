@@ -51,7 +51,7 @@ interface AccountTile {
   badgeVariant?: 'terracotta' | 'green' | 'amber' | 'blue';
 }
 
-export const AmazonStyleAccountHub: React.FC = () => {
+export const AccountHub: React.FC = () => {
   const {
     activePersona,
     setActiveTab,
@@ -263,7 +263,7 @@ export const AmazonStyleAccountHub: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Grid: Amazon-Style Large Tile Cards (Matching Attached Screenshot) */}
+      {/* Main Grid: Large Tile Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {currentTiles.map((tile, idx) => (
           <button
@@ -329,7 +329,7 @@ export const AmazonStyleAccountHub: React.FC = () => {
         </div>
       </div>
 
-      {/* Sub-sections (Matching Bottom of Amazon "Your Account" Page) */}
+      {/* Sub-sections */}
       <div className="pt-6 border-t border-hearth-border grid grid-cols-1 md:grid-cols-3 gap-8 text-xs">
         {/* Column 1: Account & Security */}
         <div className="space-y-3">

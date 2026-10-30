@@ -481,7 +481,7 @@ export const PublicNavbar: React.FC = () => {
               </button>
             )}
 
-            {/* Authenticated Amazon "Account & Lists" Mega Dropdown */}
+            {/* Authenticated "Account & Lists" Mega Dropdown */}
             {isAuthenticated && showAccountDropdown && (
               <div className="absolute right-0 mt-2 w-80 rounded-3xl bg-white dark:bg-[#0C231C] border border-slate-200 dark:border-[#1E4E40] shadow-2xl p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-150 space-y-3">
                 <div className="p-3.5 rounded-2xl bg-slate-100 dark:bg-[#13332A] border border-slate-200 dark:border-[#1E4E40] flex items-center justify-between gap-2">
@@ -507,7 +507,7 @@ export const PublicNavbar: React.FC = () => {
                     className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#13332A] flex items-center gap-2.5 font-bold text-slate-900 dark:text-white"
                   >
                     <LayoutGrid className="w-4 h-4 text-[#059669] dark:text-[#10B981]" />
-                    <span>Your Account Hub (Amazon Layout)</span>
+                    <span>Your Account Hub</span>
                   </button>
 
                   <button

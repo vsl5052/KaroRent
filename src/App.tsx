@@ -6,7 +6,7 @@ import { SectionCatalogView } from './components/public/SectionCatalogView';
 import { ProductDetailModal } from './components/public/ProductDetailModal';
 import { PublicFooter } from './components/public/PublicFooter';
 import { LoginModal } from './components/public/LoginModal';
-import { AmazonStyleAccountHub } from './components/account/AmazonStyleAccountHub';
+import { AccountHub } from './components/account/AccountHub';
 import { WorkspaceSidebar } from './components/layout/WorkspaceSidebar';
 import { BreadcrumbStrip } from './components/layout/BreadcrumbStrip';
 import { ToastContainer } from './components/layout/ToastContainer';
@@ -33,7 +33,7 @@ export const App: React.FC = () => {
     document.documentElement.classList.toggle('dark', darkMode);
   }, [darkMode]);
 
-  // 1. PUBLIC STOREFRONT (Catalog without any login - Furlenco / RentoMojo Style)
+  // 1. PUBLIC STOREFRONT (Catalog without any login)
   if (activeTab === 'MARKETPLACE') {
     return (
       <div className="min-h-screen flex flex-col bg-hearth-canvas text-hearth-ink">
@@ -51,13 +51,13 @@ export const App: React.FC = () => {
     );
   }
 
-  // 2. YOUR ACCOUNT HUB (Amazon "Your Account" Layout matching user image)
+  // 2. YOUR ACCOUNT HUB (Central Account Layout)
   if (activeTab === 'YOUR_ACCOUNT') {
     return (
       <div className="min-h-screen flex flex-col bg-hearth-canvas text-hearth-ink">
         <PublicNavbar />
         <main className="flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-          <AmazonStyleAccountHub />
+          <AccountHub />
         </main>
         <PublicFooter />
         <LoginModal />
