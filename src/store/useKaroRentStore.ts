@@ -3189,7 +3189,7 @@ export const useKaroRentStore = create<KaroRentState>()(
           name: newTech.fullName,
           role: 'FIELD_PERSONNEL',
           roleBadge: 'Field Technician',
-          subtitle: `${vendor.displayName} • ${newTech.serviceAreas[0] || 'Bengaluru'}`,
+          subtitle: `${vendor.displayName} • ${newTech.serviceAreas[0] || 'Metro Hub'}`,
           email: `${newTech.fullName.toLowerCase().replace(/[^a-z0-9]/g, '.')}@karorent.in`,
           phone: newTech.phone,
           vendorId: vendor.id,
@@ -3788,7 +3788,7 @@ export const useKaroRentStore = create<KaroRentState>()(
               id: `NTF-${Date.now()}`,
               eventCode: 'Repossession Completed',
               title: `Asset Successfully Recovered: ${booking.productTitle}`,
-              message: `Field technician has completed doorstep repossession with photographic evidence (FR-RET-002). Equipment returned to partner warehouse.`,
+              message: `Field technician has completed doorstep repossession with photographic evidence. Equipment returned to partner warehouse.`,
               recipientRole: 'VENDOR_OWNER',
               category: 'Fulfilment & Pickup',
               priority: 'high',
@@ -3809,7 +3809,7 @@ export const useKaroRentStore = create<KaroRentState>()(
               affectedRecordId: booking.id,
               priorValue: `Status: Asset Recovery — Repossession Scheduled`,
               newValue: `Status: Returned & Closed (Handover Verified)`,
-              mandatoryReason: 'Doorstep recovery photo verified under FR-RET-002.',
+              mandatoryReason: 'Doorstep recovery photo verified and confirmed.',
             },
             ...s.auditLogs,
           ],
@@ -3844,14 +3844,14 @@ export const useKaroRentStore = create<KaroRentState>()(
           categoryReason: 'Asset Recovery — Hostile Retention',
           triggeringCaseOrBookingId: booking.id,
           effectiveTimestamp: nowIST(),
-          enrolledByActor: 'System Automatic Enrollment (EX-035)',
+          enrolledByActor: 'Automated Risk Enrollment',
           outstandingDuesAmount: booking.monthlyRentRate,
-          evidenceSummary: `Doorstep repossession obstructed for booking ${booking.id}. Customer refused to surrender asset: "${refusalReason}". Mandatory police assistance and section 406 IPC recovery initiated.`,
+          evidenceSummary: `Doorstep repossession obstructed for booking ${booking.id}. Customer refused to surrender asset: "${refusalReason}". Mandatory recovery procedures initiated.`,
           matchedIdentifiers: {
             phone: customer?.verifiedMobile || '+91 98860 12345',
             email: customer?.email || 'customer@example.com',
             bankOrPaymentFingerprint: customer?.paymentFingerprint || 'FP_HASH_9824',
-            addressSnippet: booking.deliveryAddress || 'Bengaluru',
+            addressSnippet: booking.deliveryAddress || 'Metro Area',
           },
           blockedAttemptsCount: 0,
         };
@@ -3884,8 +3884,8 @@ export const useKaroRentStore = create<KaroRentState>()(
             {
               id: `NTF-${Date.now()}`,
               eventCode: 'Hostile Retention Alert',
-              title: `CRITICAL: Repossession Obstructed (EX-035)`,
-              message: `Customer ${booking.customerName} refused to surrender equipment (${booking.productTitle}). Covertly blacklisted. Section 406 IPC recovery dossier prepared.`,
+              title: `CRITICAL: Repossession Obstructed`,
+              message: `Customer ${booking.customerName} refused to surrender equipment (${booking.productTitle}). Enrolled in Blacklist Registry. Asset recovery procedures initiated.`,
               recipientRole: 'PLATFORM_ADMIN',
               category: 'Blacklist Alert',
               priority: 'critical',
@@ -3902,7 +3902,7 @@ export const useKaroRentStore = create<KaroRentState>()(
               actorName: s.activePersona.name,
               actorRole: s.activePersona.roleBadge,
               moduleCode: 'Risk & Blacklist',
-              actionSummary: `Flagged Hostile Retention (EX-035) for booking ${booking.id}. Enrolled ${booking.customerName} in Blacklist Registry.`,
+              actionSummary: `Flagged Hostile Retention for booking ${booking.id}. Enrolled ${booking.customerName} in Blacklist Registry.`,
               affectedRecordId: booking.id,
               priorValue: `Status: Asset Recovery — Repossession Scheduled`,
               newValue: `Status: Asset Recovery — Hostile Retention • Enrolled in Blacklist`,
@@ -3914,7 +3914,7 @@ export const useKaroRentStore = create<KaroRentState>()(
 
         get().addToast({
           title: 'Obstruction Escalated: Hostile Retention',
-          description: `Order flagged under EX-035. Customer covertly enrolled in Blacklist Registry.`,
+          description: `Order flagged for hostile retention. Customer enrolled in Blacklist Registry.`,
           variant: 'error',
         });
       },
@@ -3952,7 +3952,7 @@ export const useKaroRentStore = create<KaroRentState>()(
         let createdBlacklistEntry: BlacklistEntry | null = null;
 
         if (outcome === 'SURPLUS_REFUND') {
-          refundScheduledDate = 'Within 14 business days (FR-DEP-006)';
+          refundScheduledDate = 'Within 14 business days';
         } else {
           const deficitAmount = Math.abs(netBalance);
           deficitInvoiceId = `INV-ADJ-${booking.id.slice(4)}-${Math.floor(100 + Math.random() * 900)}`;
@@ -3988,7 +3988,7 @@ export const useKaroRentStore = create<KaroRentState>()(
               phone: customer?.verifiedMobile || '+91 98860 12345',
               email: customer?.email || 'customer@example.com',
               bankOrPaymentFingerprint: customer?.paymentFingerprint || 'FP_HASH_9824',
-              addressSnippet: booking.deliveryAddress || 'Bengaluru',
+              addressSnippet: booking.deliveryAddress || 'Metro Area',
             },
             blockedAttemptsCount: 0,
           };
@@ -4077,7 +4077,7 @@ export const useKaroRentStore = create<KaroRentState>()(
               affectedRecordId: booking.id,
               priorValue: `Deposit: ₹${originalDeposit.toLocaleString('en-IN')}`,
               newValue: `Outcome: ${outcome} • Net: ₹${netBalance.toLocaleString('en-IN')} • Liabilities: ₹${totalLiabilities.toLocaleString('en-IN')}`,
-              mandatoryReason: 'Final reconciliation of security deposit pursuant to Section 6.2 BR-033.',
+              mandatoryReason: 'Final reconciliation of security deposit pursuant to statutory recovery guidelines.',
             },
             ...s.auditLogs,
           ],
@@ -4145,7 +4145,7 @@ export const useKaroRentStore = create<KaroRentState>()(
               id: `NTF-${Date.now()}`,
               eventCode: 'Run-Off Initiated',
               title: `Voluntary Offboarding: ${vendor.legalBusinessName}`,
-              message: `Vendor entered Run-Off to Expiry (Option A). Public listings delisted. ${count} active customer rentals must be serviced until expiry (BR-034).`,
+              message: `Vendor entered Run-Off to Expiry. Public listings delisted. ${count} active customer rentals must be serviced until expiry.`,
               recipientRole: 'PLATFORM_ADMIN',
               category: 'Inventory Approval',
               priority: 'high',
@@ -4156,8 +4156,8 @@ export const useKaroRentStore = create<KaroRentState>()(
             {
               id: `NTF-${Date.now()}-V`,
               eventCode: 'Run-Off Confirmation',
-              title: `Run-Off to Expiry Active (FR-VEN-009)`,
-              message: `Your voluntary exit has been registered. Public trading is paused. Your portal is scoped to active field servicing for ${count} rentals. Blacklist immunity (BR-035) applies upon completion.`,
+              title: `Run-Off to Expiry Active`,
+              message: `Your voluntary exit has been registered. Public trading is paused. Your portal is scoped to active field servicing for ${count} rentals. Clean standing applies upon completion.`,
               recipientRole: 'VENDOR_OWNER',
               category: 'Inventory Approval',
               priority: 'high',
@@ -4173,13 +4173,13 @@ export const useKaroRentStore = create<KaroRentState>()(
               timestamp: nowIST(),
               actorName: s.activePersona.name,
               actorRole: s.activePersona.roleBadge,
-              moduleCode: 'FR-VEN-009',
-              actionSummary: `Initiated Voluntary Offboarding (Option A: Run-Off to Expiry) for ${vendor.legalBusinessName}`,
+              moduleCode: 'Vendor Governance',
+              actionSummary: `Initiated Voluntary Offboarding (Run-Off to Expiry) for ${vendor.legalBusinessName}`,
               affectedRecordId: vendor.id,
               priorValue: `Status: ${vendor.status}`,
               newValue: `Status: Offboarding - Run-Off • Active Rentals: ${count} • Completion: ${targetCompletion}`,
               mandatoryReason:
-                'Vendor-initiated voluntary contract exit pursuant to Section 7.1 FR-VEN-009.',
+                'Vendor-initiated voluntary contract exit and fulfillment schedule.',
             },
             ...s.auditLogs,
           ],
@@ -4187,7 +4187,7 @@ export const useKaroRentStore = create<KaroRentState>()(
 
         get().addToast({
           title: 'Voluntary Offboarding Initiated',
-          description: `Public listings delisted. Run-Off to Expiry active for ${count} remaining rentals (BR-034).`,
+          description: `Public listings delisted. Run-Off to Expiry active for ${count} remaining rentals.`,
           variant: 'warning',
         });
       },
@@ -4199,7 +4199,7 @@ export const useKaroRentStore = create<KaroRentState>()(
       }) => {
         set({
           isSimulatingLatency: true,
-          latencyActionLabel: 'Executing Emergency Breach Takeover (EX-036)...',
+          latencyActionLabel: 'Executing Emergency Breach Takeover...',
         });
         await simulateLatency(350);
 
@@ -4222,8 +4222,8 @@ export const useKaroRentStore = create<KaroRentState>()(
           ledgerType: 'VENDOR_BLACKLIST',
           entityId: vendor.id,
           entityName: vendor.legalBusinessName,
-          categoryReason: 'Run-Off Service Abandonment (EX-036)',
-          triggeringCaseOrBookingId: 'EX-036 / BREACH-TAKEOVER',
+          categoryReason: 'Run-Off Service Abandonment',
+          triggeringCaseOrBookingId: 'BREACH-TAKEOVER',
           matchedIdentifiers: {
             phone: vendor.registeredPhone,
             email: vendor.email,
@@ -4235,12 +4235,12 @@ export const useKaroRentStore = create<KaroRentState>()(
           },
           evidenceSummary:
             justification ||
-            'Vendor initiated voluntary offboarding but abandoned field servicing/return obligations (BR-034). Payout reserve forfeited and emergency fleet dispatched.',
+            'Vendor initiated voluntary offboarding but abandoned field servicing/return obligations. Payout reserve forfeited and emergency fleet dispatched.',
           outstandingDuesAmount: heldReserve,
           blockedAttemptsCount: 1,
           status: 'Active Blacklist',
           effectiveTimestamp: nowIST(),
-          enrolledByActor: 'Platform Super Administrator (EX-036)',
+          enrolledByActor: 'Platform Super Administrator',
         };
 
         set((s) => ({
@@ -4275,7 +4275,7 @@ export const useKaroRentStore = create<KaroRentState>()(
             {
               id: `NTF-${Date.now()}`,
               eventCode: 'Breach Takeover',
-              title: `CRITICAL: Vendor Breach Takeover (EX-036)`,
+              title: `CRITICAL: Vendor Breach Takeover`,
               message: `Material breach executed against ${vendor.legalBusinessName}. Reserve ₹${heldReserve.toLocaleString('en-IN')} forfeited. Field operations reassigned to ${partnerName}.`,
               recipientRole: 'PLATFORM_ADMIN',
               category: 'Blacklist Alert',
@@ -4292,7 +4292,7 @@ export const useKaroRentStore = create<KaroRentState>()(
               timestamp: nowIST(),
               actorName: s.activePersona.name,
               actorRole: s.activePersona.roleBadge,
-              moduleCode: 'EX-036',
+              moduleCode: 'Breach Takeover',
               actionSummary: `Executed Emergency Breach Takeover against ${vendor.legalBusinessName}`,
               affectedRecordId: vendor.id,
               priorValue: `Status: ${vendor.status}`,
@@ -4314,7 +4314,7 @@ export const useKaroRentStore = create<KaroRentState>()(
         set({
           isSimulatingLatency: true,
           latencyActionLabel:
-            'Finalizing Amicable Account Closure (FR-VEN-015)...',
+            'Finalizing Amicable Account Closure...',
         });
         await simulateLatency(350);
 
@@ -4348,7 +4348,7 @@ export const useKaroRentStore = create<KaroRentState>()(
               id: `NTF-${Date.now()}`,
               eventCode: 'Amicable Closure',
               title: `Vendor Amicably Closed: ${vendor.legalBusinessName}`,
-              message: `All customer rentals cleared. Reserve ₹${remainingReserve.toLocaleString('en-IN')} released to vendor bank account. Blacklist immunity affirmed (BR-035).`,
+              message: `All customer rentals cleared. Reserve ₹${remainingReserve.toLocaleString('en-IN')} released to vendor bank account. Clean partner standing affirmed.`,
               recipientRole: 'PLATFORM_ADMIN',
               category: 'Inventory Approval',
               priority: 'normal',
@@ -4359,7 +4359,7 @@ export const useKaroRentStore = create<KaroRentState>()(
             {
               id: `NTF-${Date.now()}-V`,
               eventCode: 'Amicable Closure',
-              title: `Account Formally Closed (FR-VEN-015)`,
+              title: `Account Formally Closed`,
               message: `Congratulations! All rentals and return checks are formally cleared. Remaining payout balance of ₹${remainingReserve.toLocaleString('en-IN')} has been disbursed.`,
               recipientRole: 'VENDOR_OWNER',
               category: 'Inventory Approval',
@@ -4376,13 +4376,13 @@ export const useKaroRentStore = create<KaroRentState>()(
               timestamp: nowIST(),
               actorName: s.activePersona.name,
               actorRole: s.activePersona.roleBadge,
-              moduleCode: 'FR-VEN-015',
+              moduleCode: 'Vendor Offboarding',
               actionSummary: `Completed Amicable Account Closure for ${vendor.legalBusinessName}`,
               affectedRecordId: vendor.id,
               priorValue: `Status: ${vendor.status}`,
               newValue: `Status: Closed / Offboarded • Disbursed Reserve: ₹${remainingReserve.toLocaleString('en-IN')} • Blacklist Immunity: True`,
               mandatoryReason:
-                'All active rentals completed and verified without default pursuant to BR-035.',
+                'All active rentals completed and verified without default.',
             },
             ...s.auditLogs,
           ],
@@ -4390,7 +4390,7 @@ export const useKaroRentStore = create<KaroRentState>()(
 
         get().addToast({
           title: 'Final Amicable Closure Completed',
-          description: `Vendor marked Closed / Offboarded. Payout reserve disbursed. Blacklist immunity granted (BR-035).`,
+          description: `Vendor marked Closed / Offboarded. Payout reserve disbursed. Clean standing granted.`,
           variant: 'success',
         });
       },

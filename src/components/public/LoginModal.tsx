@@ -1,14 +1,8 @@
 import React, { useState } from 'react';
 import {
-  Building2,
-  CheckCircle2,
   KeyRound,
   LogIn,
   Phone,
-  ShieldCheck,
-  Sparkles,
-  UserCheck,
-  Wrench,
   X,
 } from 'lucide-react';
 import { useKaroRentStore } from '../../store/useKaroRentStore';
@@ -41,48 +35,6 @@ export const LoginModal: React.FC = () => {
       setErrorMessage(res.message);
     }
   };
-
-  const handleQuickLogin = (phone: string) => {
-    setPhoneInput(phone);
-    setErrorMessage(null);
-    loginWithMobile(phone);
-  };
-
-  // Demo accounts for quick 1-click testing of each authorized role
-  const demoAccounts = [
-    {
-      role: 'Customer',
-      name: 'Ananya Sharma',
-      phone: '+91 98450 11223',
-      badge: 'Customer',
-      icon: <UserCheck className="w-4 h-4 text-[#059669] dark:text-[#10B981]" />,
-      desc: 'Active rentals, deposit ledger & e-sign contracts',
-    },
-    {
-      role: 'Partner Vendor',
-      name: 'CoolBreeze Living',
-      phone: '+91 80411 22334',
-      badge: 'Vendor Partner',
-      icon: <Building2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />,
-      desc: 'Onboarded by platform admin • Showroom & inventory',
-    },
-    {
-      role: 'Field Technician',
-      name: 'Rajan Kumar',
-      phone: '+91 97400 55667',
-      badge: 'Field Staff',
-      icon: <Wrench className="w-4 h-4 text-amber-600 dark:text-amber-400" />,
-      desc: 'Onboarded by partner vendor • Delivery & inspection tasks',
-    },
-    {
-      role: 'Platform Admin',
-      name: 'Siddharth Rao',
-      phone: '+91 99000 88776',
-      badge: 'Platform Operator',
-      icon: <ShieldCheck className="w-4 h-4 text-purple-600 dark:text-purple-400" />,
-      desc: 'Governance console, vendor onboarding & rate cards',
-    },
-  ];
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
@@ -173,45 +125,6 @@ export const LoginModal: React.FC = () => {
               <span>Verify & Continue to Account</span>
             </button>
           </form>
-
-          {/* Quick 1-Click Role Testing */}
-          <div className="pt-3 border-t border-slate-200 dark:border-[#1E4E40]">
-            <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-[#059669] dark:text-[#10B981]" />
-              <span>Quick 1-Click Test Sign-In by Role</span>
-            </div>
-
-            <div className="space-y-2">
-              {demoAccounts.map((acc, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => handleQuickLogin(acc.phone)}
-                  className="w-full p-2.5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-[#13332A]/70 dark:hover:bg-[#13332A] border border-slate-200 dark:border-[#1E4E40] text-left transition-all flex items-center justify-between group"
-                >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="p-2 rounded-xl bg-white dark:bg-[#0C231C] border border-slate-200 dark:border-[#1E4E40] shrink-0">
-                      {acc.icon}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-[#059669] dark:group-hover:text-[#10B981] flex items-center gap-1.5 truncate">
-                        <span>{acc.name}</span>
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-pill bg-white dark:bg-[#0C231C] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-[#1E4E40] shrink-0">
-                          {acc.badge}
-                        </span>
-                      </div>
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
-                        {acc.phone} • {acc.desc}
-                      </div>
-                    </div>
-                  </div>
-                  <span className="text-[10px] font-bold text-[#059669] dark:text-[#10B981] shrink-0 group-hover:underline ml-2">
-                    Sign In →
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
 
         {/* Modal Bottom Footer */}

@@ -257,7 +257,7 @@ export const FieldServiceView: React.FC = () => {
         });
       }
 
-      // D) Asset Repossession Task (FR-REC-001)
+      // D) Asset Repossession Task
       if (
         b.repossessionAssignment ||
         b.status === 'Terminated — Payment Default' ||
@@ -342,7 +342,7 @@ export const FieldServiceView: React.FC = () => {
       customerName: st.customerName,
       deliveryAddress:
         stBooking?.deliveryAddress ||
-        'Customer Registered Address (Indiranagar, Bengaluru)',
+        'Customer Registered Address (Indiranagar)',
       serviceLocation: stBooking?.serviceLocation || 'Indiranagar',
       status: st.status,
       vendorId: st.vendorId,
@@ -933,7 +933,7 @@ export const FieldServiceView: React.FC = () => {
                     <div className="p-3 rounded-xl bg-red-100 border border-red-300 text-red-900 text-xs space-y-1">
                       <div className="font-bold flex items-center gap-1.5">
                         <AlertCircle className="w-4 h-4 text-red-700" />
-                        <span>Obstruction Incident Logged (EX-035)</span>
+                        <span>Obstruction Incident Logged</span>
                       </div>
                       <p>"{activeTask.booking.repossessionObstructionNotes}"</p>
                       <p className="text-[10px] text-red-700">
@@ -950,7 +950,7 @@ export const FieldServiceView: React.FC = () => {
                           <span>Doorstep Repossession Completed & Verified</span>
                         </div>
                         <p className="text-[11px] text-green-800 mt-0.5">
-                          Photo verified at {activeTask.booking.repossessionAssignment.completedAt} (FR-RET-002).
+                          Photo verified at {activeTask.booking.repossessionAssignment.completedAt}.
                         </p>
                       </div>
                       <img
@@ -974,7 +974,7 @@ export const FieldServiceView: React.FC = () => {
                           className="px-3.5 py-1.5 rounded-pill bg-[#FEE2E2] hover:bg-rose-200 text-[#991B1B] border border-[#FECACA] text-xs font-semibold flex items-center gap-1.5 transition-colors"
                         >
                           <AlertCircle className="w-3.5 h-3.5" />
-                          <span>Report Refusal / Obstruction (EX-035)</span>
+                          <span>Report Refusal / Obstruction</span>
                         </button>
 
                         <button
@@ -1014,7 +1014,7 @@ export const FieldServiceView: React.FC = () => {
             </div>
 
             <p className="text-hearth-taupe text-[11px] leading-relaxed">
-              Pursuant to <strong>FR-RET-002</strong>, a verified doorstep handover photograph of the retrieved asset is mandatory before custody is confirmed.
+              A verified doorstep handover photograph of the retrieved asset is mandatory before custody is confirmed.
             </p>
 
             <div className="space-y-3">
@@ -1041,7 +1041,7 @@ export const FieldServiceView: React.FC = () => {
                   />
                   <div className="text-[11px] text-hearth-taupe">
                     <span className="font-semibold text-hearth-ink block">Evidence Preview</span>
-                    Exif Timestamp: Verified • Geotag: Bengaluru Customer Premise
+                    Exif Timestamp: Verified • Geotag: Verified Delivery Location
                   </div>
                 </div>
               )}
@@ -1086,7 +1086,7 @@ export const FieldServiceView: React.FC = () => {
         </div>
       )}
 
-      {/* Report Repossession Obstruction Modal (EX-035) */}
+      {/* Report Repossession Obstruction Modal */}
       {obstructionModalBookingId && (
         <div className="fixed inset-0 z-50 bg-[#1C1917]/55 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="w-full max-w-lg rounded-3xl bg-hearth-parchment border border-rose-300 shadow-hearth-lg p-6 space-y-4 text-xs">
@@ -1094,7 +1094,7 @@ export const FieldServiceView: React.FC = () => {
               <div className="flex items-center gap-2">
                 <AlertCircle className="w-5 h-5 text-red-600" />
                 <h3 className="font-serif text-base font-bold text-hearth-ink">
-                  Report Obstruction / Hostile Retention (EX-035)
+                  Report Obstruction / Hostile Retention
                 </h3>
               </div>
               <button
@@ -1108,7 +1108,7 @@ export const FieldServiceView: React.FC = () => {
             <div className="p-3 rounded-2xl bg-red-100 border border-red-300 text-red-950 text-xs space-y-1">
               <p className="font-bold">CRITICAL RISK INCIDENT</p>
               <p className="text-[11px] leading-relaxed">
-                Reporting refusal will immediately categorize this order under <strong>EX-035: Asset Recovery — Hostile Retention</strong>, covertly enroll the customer in the platform Blacklist Registry, and prepare a Section 406 IPC recovery dossier.
+                Reporting refusal will immediately categorize this order under <strong>Asset Recovery — Hostile Retention</strong>, enroll the customer in the platform Blacklist Registry, and prepare a Section 406 IPC recovery dossier.
               </p>
             </div>
 

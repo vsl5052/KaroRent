@@ -115,7 +115,7 @@ export const AssignDeliveriesView: React.FC = () => {
         b.status === 'Return Requested')
   );
 
-  // 4. Asset Repossession Requests (FR-REC-001)
+  // 4. Asset Repossession Requests
   const pendingRepossessions = vendorBookings.filter(
     (b) =>
       b.status === 'Terminated — Payment Default' ||
@@ -864,7 +864,7 @@ export const AssignDeliveriesView: React.FC = () => {
                         </div>
                         {b.repossessionObstructionNotes && (
                           <div className="text-[11px] text-red-800 font-semibold bg-red-100 p-2 rounded-xl mt-1 border border-red-200">
-                            Obstruction Logged (EX-035): "{b.repossessionObstructionNotes}"
+                            Obstruction Logged: "{b.repossessionObstructionNotes}"
                           </div>
                         )}
                       </div>
@@ -884,7 +884,7 @@ export const AssignDeliveriesView: React.FC = () => {
 
                     <div className="pt-2 border-t border-hearth-border flex items-center justify-between">
                       <span className="text-[10px] text-hearth-taupe">
-                        Mandatory Doorstep Photo (FR-RET-002)
+                        Mandatory Doorstep Photo Handover
                       </span>
                       <button
                         onClick={() =>

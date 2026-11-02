@@ -48,7 +48,7 @@ export const AdminGovernanceView: React.FC = () => {
     'KaroRent Rapid Response Fleet'
   );
   const [breachJustification, setBreachJustification] = useState<string>(
-    'Vendor abandoned field servicing / return pickup obligations during run-off (BR-034). Platform emergency fleet reassigned and settlement reserve forfeited.'
+    'Vendor abandoned field servicing / return pickup obligations during run-off. Platform emergency fleet reassigned and settlement reserve forfeited.'
   );
 
   // Inventory Decision State
@@ -190,7 +190,7 @@ export const AdminGovernanceView: React.FC = () => {
                     </span>
                   </h2>
                   <p className="text-xs text-hearth-umber">
-                    Simulate real-time progression: Notice 1 (T+1 Reminder) → Notice 2 (T+5 Default & ₹500 Late Fee) → Notice 3 (T+11 Termination & Repossession).
+                    Track and issue statutory progression notices: Notice 1 (T+1 Reminder) → Notice 2 (T+5 Default & ₹500 Late Fee) → Notice 3 (T+11 Termination & Repossession).
                   </p>
                 </div>
               </div>
@@ -316,10 +316,10 @@ export const AdminGovernanceView: React.FC = () => {
                   >
                     <div className="flex items-center gap-1.5 font-bold text-xs">
                       <XCircle className="w-3.5 h-3.5 text-purple-700" />
-                      <span>Report Refusal (EX-035)</span>
+                      <span>Report Refusal / Non-Compliance</span>
                     </div>
                     <div className="text-[10px] text-purple-800">
-                      Enforce Hostile Retention Blacklist
+                      Enforce Hostile Retention Penalty
                     </div>
                   </button>
 
@@ -349,7 +349,7 @@ export const AdminGovernanceView: React.FC = () => {
         );
       })()}
 
-      {/* SECTION: Vendor Voluntary Offboarding & Run-Off Governance (Workflow WF-14 & Option A) */}
+      {/* SECTION: Vendor Voluntary Offboarding & Run-Off Governance */}
       {(() => {
         const simVendor =
           vendors.find((v) => v.id === simVendorId) || vendors[0];
@@ -380,11 +380,11 @@ export const AdminGovernanceView: React.FC = () => {
                   <h2 className="font-serif text-lg font-bold text-hearth-ink flex items-center gap-2">
                     <span>Vendor Voluntary Offboarding & Run-Off Governance</span>
                     <span className="px-2 py-0.5 rounded-pill bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-mono font-bold">
-                      Workflow WF-14 / Option A
+                      Protocol Supervised
                     </span>
                   </h2>
                   <p className="text-xs text-hearth-umber">
-                    Simulate & supervise "Run-Off to Expiry" (FR-VEN-009), Scoped Operations Mode (FR-VEN-011), Emergency Breach Takeover (EX-036), and Amicable Closure (FR-VEN-015).
+                    Supervise "Run-Off to Expiry", Scoped Operations Mode, Emergency Breach Takeover, and Amicable Closure.
                   </p>
                 </div>
               </div>
@@ -443,9 +443,9 @@ export const AdminGovernanceView: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Simulator Action Triggers */}
+                {/* Operations Action Triggers */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-                  {/* Action 1: WF-14 Initiate Run-Off */}
+                  {/* Action 1: Initiate Run-Off */}
                   <button
                     disabled={isSimulatingLatency || isRunOff || isClosed}
                     onClick={() => initiateVendorVoluntaryOffboarding(simVendor.id)}
@@ -457,14 +457,14 @@ export const AdminGovernanceView: React.FC = () => {
                   >
                     <div className="flex items-center gap-1.5 font-bold text-xs">
                       <LogOut className="w-4 h-4 text-amber-700" />
-                      <span>1. Initiate Run-Off to Expiry (WF-14)</span>
+                      <span>1. Initiate Run-Off to Expiry</span>
                     </div>
                     <p className="text-[11px] leading-relaxed">
-                      Delist public catalog immediately (FR-VEN-010) & restrict portal to scoped operations mode (FR-VEN-011).
+                      Delist public catalog immediately & restrict portal to scoped operations mode.
                     </p>
                   </button>
 
-                  {/* Action 2: EX-036 Breach Takeover */}
+                  {/* Action 2: Breach Takeover */}
                   <button
                     disabled={isSimulatingLatency || !isRunOff}
                     onClick={() => setShowBreachModal(true)}
@@ -476,14 +476,14 @@ export const AdminGovernanceView: React.FC = () => {
                   >
                     <div className="flex items-center gap-1.5 font-bold text-xs">
                       <AlertOctagon className="w-4 h-4 text-rose-700" />
-                      <span>2. Emergency Breach Takeover (EX-036)</span>
+                      <span>2. Emergency Breach Takeover</span>
                     </div>
                     <p className="text-[11px] leading-relaxed">
-                      Reassign emergency fleet for field servicing, forfeit held reserve, and enroll partner into Blacklist (FR-BLK-002).
+                      Reassign emergency fleet for field servicing, forfeit held reserve, and enroll partner into Blacklist.
                     </p>
                   </button>
 
-                  {/* Action 3: FR-VEN-015 Amicable Closure */}
+                  {/* Action 3: Amicable Closure */}
                   <button
                     disabled={isSimulatingLatency || !isRunOff}
                     onClick={() => completeVendorAmicableOffboarding(simVendor.id)}
@@ -495,10 +495,10 @@ export const AdminGovernanceView: React.FC = () => {
                   >
                     <div className="flex items-center gap-1.5 font-bold text-xs">
                       <CheckCircle2 className="w-4 h-4 text-emerald-700" />
-                      <span>3. Finalize Amicable Closure (FR-VEN-015)</span>
+                      <span>3. Finalize Amicable Closure</span>
                     </div>
                     <p className="text-[11px] leading-relaxed">
-                      Disburse segregated settlement reserve, close vendor account, and confirm Blacklist Immunity (BR-035).
+                      Disburse segregated settlement reserve, close vendor account, and confirm clean partner standing.
                     </p>
                   </button>
                 </div>
@@ -996,18 +996,18 @@ export const AdminGovernanceView: React.FC = () => {
           </div>
         </div>
       )}
-      {/* EX-036 Emergency Breach Takeover Modal */}
+      {/* Emergency Breach Takeover Modal */}
       {showBreachModal && (
         <div className="fixed inset-0 z-50 bg-[#1C1917]/55 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="w-full max-w-lg rounded-3xl bg-hearth-parchment border-2 border-red-500 p-6 shadow-hearth-lg space-y-4">
             <div className="flex items-center gap-2 text-[#991B1B]">
               <AlertOctagon className="w-5 h-5 text-red-600" />
               <h3 className="font-serif text-lg font-bold">
-                Emergency Breach Takeover (EX-036)
+                Emergency Breach Takeover
               </h3>
             </div>
             <p className="text-xs text-hearth-umber leading-relaxed">
-              Execute emergency fleet takeover for <strong>{simVendorId}</strong>. This will immediately forfeit the segregated settlement reserve and enroll the vendor and registered tax credentials into the Unified Blacklist (FR-BLK-002).
+              Execute emergency fleet takeover for <strong>{simVendorId}</strong>. This will forfeit the segregated settlement reserve and enroll the vendor and registered tax credentials into the Unified Blacklist.
             </p>
             <div className="space-y-3 text-xs">
               <div>

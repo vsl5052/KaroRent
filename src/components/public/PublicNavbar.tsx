@@ -145,7 +145,6 @@ export const PublicNavbar: React.FC = () => {
 
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [showAccountDropdown, setShowAccountDropdown] = useState(false);
-  const [showDemoRoleMenu, setShowDemoRoleMenu] = useState(false);
   const [isRentHovered, setIsRentHovered] = useState(false);
 
   const currentPincode =
@@ -155,7 +154,6 @@ export const PublicNavbar: React.FC = () => {
 
   const accountDropdownRef = useRef<HTMLDivElement>(null);
   const locationDropdownRef = useRef<HTMLDivElement>(null);
-  const demoDropdownRef = useRef<HTMLDivElement>(null);
   const rentMenuTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Close dropdowns on outside click
@@ -166,9 +164,6 @@ export const PublicNavbar: React.FC = () => {
       }
       if (locationDropdownRef.current && !locationDropdownRef.current.contains(e.target as Node)) {
         setShowLocationDropdown(false);
-      }
-      if (demoDropdownRef.current && !demoDropdownRef.current.contains(e.target as Node)) {
-        setShowDemoRoleMenu(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -433,52 +428,6 @@ export const PublicNavbar: React.FC = () => {
           >
             {darkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
           </button>
-
-          {/* Quick Demo Persona Switcher */}
-          <div className="relative hidden md:block" ref={demoDropdownRef}>
-            <button
-              onClick={() => setShowDemoRoleMenu(!showDemoRoleMenu)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-pill bg-[#10B981]/15 hover:bg-[#10B981]/25 border border-[#10B981]/40 text-xs font-mono font-bold text-[#059669] dark:text-[#10B981] shadow-sm transition-all"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Demo Role</span>
-              <ChevronDown className="w-3 h-3 ml-0.5" />
-            </button>
-
-            {showDemoRoleMenu && (
-              <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-white dark:bg-[#0C231C] border border-slate-200 dark:border-[#1E4E40] shadow-2xl p-2 z-50">
-                <div className="px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-[#1E4E40]">
-                  Quick Demo Persona Switcher
-                </div>
-                <div className="space-y-1 pt-1.5 max-h-72 overflow-y-auto">
-                  {personas.map((p) => (
-                    <button
-                      key={p.id}
-                      onClick={() => {
-                        switchPersona(p.id);
-                        setShowDemoRoleMenu(false);
-                      }}
-                      className={`w-full text-left px-3 py-2 rounded-xl text-xs transition-all flex items-center justify-between ${
-                        activePersona.id === p.id && isAuthenticated
-                          ? 'bg-emerald-50 dark:bg-[#13332A] text-[#059669] dark:text-[#10B981] font-bold'
-                          : 'hover:bg-slate-100 dark:hover:bg-[#13332A] text-slate-700 dark:text-slate-300'
-                      }`}
-                    >
-                      <div>
-                        <div className="font-semibold text-slate-900 dark:text-white">{p.name}</div>
-                        <div className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">
-                          {p.roleBadge} • {p.subtitle.split(',')[0]}
-                        </div>
-                      </div>
-                      {activePersona.id === p.id && isAuthenticated && (
-                        <span className="text-[#059669] dark:text-[#10B981] font-bold text-xs">✓</span>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
 
           {/* Sign In / Account & Lists Button */}
           <div className="relative" ref={accountDropdownRef}>

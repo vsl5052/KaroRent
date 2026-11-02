@@ -7,7 +7,7 @@
 import { BookingOrder, VirtualInventoryItem, PlatformMasterProduct } from '../types/srs';
 
 export const DEFAULT_BUFFER_TURNAROUND_DAYS = 2; // 48-Hour Mandatory Operational Quarantine
-export const CHECKOUT_LOCK_DURATION_MS = 15 * 60 * 1000; // 15 Minutes Distributed Hold (SET NX EX 900)
+export const CHECKOUT_LOCK_DURATION_MS = 15 * 60 * 1000; // 15 Minutes Hold
 
 export interface BlockedDateInterval {
   bookingId: string;
@@ -206,7 +206,7 @@ export function calculateNextAvailableDate(
 }
 
 /**
- * Tenure Extension Collision Check (WF-06):
+ * Tenure Extension Collision Check:
  * Checks if the specific unit or inventory has an existing downstream booking
  * starting within [Current_End, New_End + Buffer].
  */

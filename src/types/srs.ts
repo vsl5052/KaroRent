@@ -674,6 +674,7 @@ export interface BlacklistEntry {
     | 'Extreme Policy Violation / Fraud'
     | 'Asset Retention & Unrecovered Balance Enforcement'
     | 'Asset Recovery — Hostile Retention'
+    | 'Run-Off Service Abandonment'
     | 'Run-Off Service Abandonment (EX-036)';
   triggeringCaseOrBookingId: string;
   matchedIdentifiers: {

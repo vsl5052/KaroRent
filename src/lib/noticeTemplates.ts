@@ -140,7 +140,7 @@ Authorized field recovery agents from KaroRent / ${booking.fulfillingVendorName}
   Pickup Time Window: ${repossessionTimeWindow}
   Recovery Team Authorization Code: ${agentAuthCode}
 
-You are legally obligated to provide immediate, unhindered access to the equipment, including all components, accessories, power cords, and manuals. Our technicians will conduct a mandatory on-site inspection and photograph the equipment condition at handover pursuant to requirement FR-RET-002.
+You are legally obligated to provide immediate, unhindered access to the equipment, including all components, accessories, power cords, and manuals. Our technicians will conduct a mandatory on-site inspection and photograph the equipment condition at handover.
 
 SECURITY DEPOSIT OFFSET DISCLOSURE:
 In accordance with Clause 16 of your executed agreement, KaroRent shall exercise its statutory right of set-off against your INR ${depositBalance.toLocaleString('en-IN')} Security Deposit to satisfy:
@@ -151,7 +151,7 @@ In accordance with Clause 16 of your executed agreement, KaroRent shall exercise
 
 NOTICE OF CRIMINAL & CIVIL PROCEEDINGS:
 If you refuse surrender, deny entry to our recovery personnel, or fail to hand over the asset:
-- Your identity, corporate credentials, tax ID, and contact data will be permanently registered on the Platform Customer Blacklist (FR-BLK-004), preventing any future marketplace commerce.
+- Your identity, corporate credentials, tax ID, and contact data will be permanently registered on the Unified Customer Blacklist, preventing any future marketplace commerce.
 - A police complaint for Criminal Breach of Trust, Conversion, and Misappropriation of Movable Property will be lodged with local law enforcement.
 - Formal legal proceedings will be initiated in the court of competent jurisdiction to recover the physical asset, outstanding dues, and associated legal costs.
 

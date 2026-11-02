@@ -104,11 +104,11 @@ export const ProductDetailModal: React.FC = () => {
 
   if (!product || !inv) return null;
 
-  // Spatial Serviceability Evaluation (<50ms resolver)
+  // Postal Serviceability Evaluation
   const serviceabilityResult = evaluateVendorServiceability(pincode, vendor);
   const targetCentroid = getPostalCentroid(pincode);
 
-  // Temporal Calendar & Operational Quarantine Calculations
+  // Availability Schedule & Operational Quarantine Calculations
   const blockedIntervals = getProductBlockedIntervals(product.id, bookings);
   const isStartDateBlocked = isDateBlocked(selectedStartDate, product.id, bookings, inv.declaredQuantity);
   const nextAvailableDateInfo = calculateNextAvailableDate(product.id, inv, bookings);
@@ -142,7 +142,7 @@ export const ProductDetailModal: React.FC = () => {
       setIsLoginModalOpen(true);
       addToast({
         title: 'Sign In to Proceed',
-        description: 'Please sign in or select a demo role to complete digital KYC & e-sign.',
+        description: 'Please sign in with your mobile number to complete digital KYC and booking.',
         variant: 'info',
       });
     } else {
@@ -293,12 +293,12 @@ export const ProductDetailModal: React.FC = () => {
               </div>
             </div>
 
-            {/* Tenure Selector Tabs with Per-SKU Constraints */}
+            {/* Tenure Selector Tabs with Duration Constraints */}
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold text-slate-900 dark:text-white">Choose Rental Duration:</span>
                 <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-pill bg-[#10B981]/15 text-[#059669] dark:text-[#10B981]">
-                  SKU Constraint: {minRentalDays}–{maxRentalDays} Days
+                  Duration: {Math.round(minRentalDays / 30)}–{Math.round(maxRentalDays / 30)} Mos ({minRentalDays}–{maxRentalDays} Days)
                 </span>
               </div>
               <div className="grid grid-cols-5 gap-1.5">
@@ -357,7 +357,7 @@ export const ProductDetailModal: React.FC = () => {
               </button>
             </div>
 
-            {/* Dynamic Date Picker & Turnaround Quarantine Buffer (Gap B) */}
+            {/* Dynamic Date Picker & Turnaround Quarantine Buffer */}
             <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-[#061712] border border-slate-200 dark:border-[#1E4E40] space-y-2.5">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
@@ -390,7 +390,7 @@ export const ProductDetailModal: React.FC = () => {
                     <span>Selected Date Blocked (0 Units Available)</span>
                   </div>
                   <p>
-                    Units are locked under active leases or mandatory 48h turnaround quarantine. Next available date:{' '}
+                    Units are reserved under active rentals or mandatory 48h turnaround quarantine. Next available date:{' '}
                     <strong className="underline cursor-pointer" onClick={() => setSelectedStartDate(nextAvailableDate)}>
                       {nextAvailableDate}
                     </strong>
@@ -404,13 +404,13 @@ export const ProductDetailModal: React.FC = () => {
                   </div>
                   <div className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
                     <Clock className="w-3 h-3 text-slate-400" />
-                    <span>48h Operational Buffer: Day 1 Reverse Transit • Day 2 3-Way Sanitization</span>
+                    <span>48h Operational Buffer: Day 1 Return Transit • Day 2 Sanitization</span>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Spatial Delivery & Reverse Pickup Pincode Checker (Gap A) */}
+            {/* Delivery & Reverse Pickup Pincode Checker */}
             <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-[#061712] border border-slate-200 dark:border-[#1E4E40] space-y-2">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
@@ -435,7 +435,7 @@ export const ProductDetailModal: React.FC = () => {
                     placeholder="Enter 6-digit Pincode"
                     className="w-36 px-3 py-1.5 rounded-xl bg-white dark:bg-[#0C231C] border border-slate-200 dark:border-[#1E4E40] text-xs font-mono font-bold text-slate-900 dark:text-white"
                   />
-                  <span className="text-xs text-slate-500 dark:text-slate-400">&lt;50ms Spatial Match</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">Postal Area Match</span>
                 </div>
               ) : (
                 <div className="space-y-1.5">

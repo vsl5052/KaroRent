@@ -294,7 +294,7 @@ export const FiveInvoiceLedgerView: React.FC = () => {
                 )}
               </div>
 
-              {/* 4-Tier Waterfall Security Deposit Drawdown Card (Section 6.2 BR-033) */}
+              {/* 4-Tier Security Deposit Settlement Card */}
               {booking?.waterfallSettlement && (
                 <div className="p-6 bg-gradient-to-r from-amber-500/10 via-rose-500/10 to-orange-500/10 border-b border-hearth-border space-y-4">
                   <div className="flex flex-wrap items-center justify-between gap-3">
@@ -304,10 +304,10 @@ export const FiveInvoiceLedgerView: React.FC = () => {
                       </div>
                       <div>
                         <h4 className="font-serif text-sm font-bold text-hearth-ink">
-                          Statutory 4-Tier Security Deposit Drawdown (BR-033)
+                          Statutory 4-Tier Security Deposit Settlement
                         </h4>
                         <p className="text-[11px] text-hearth-taupe">
-                          Settled on {booking.waterfallSettlement.settledAt} pursuant to Section 6.2 recovery priority.
+                          Settled on {booking.waterfallSettlement.settledAt} pursuant to recovery priority guidelines.
                         </p>
                       </div>
                     </div>
@@ -320,8 +320,8 @@ export const FiveInvoiceLedgerView: React.FC = () => {
                       }`}
                     >
                       {booking.waterfallSettlement.outcome === 'SURPLUS_REFUND'
-                        ? 'Scenario A: Surplus Refund Approved'
-                        : 'Scenario B: Deficit Forfeit & Adjustment Invoice Issued'}
+                        ? 'Surplus Refund Approved'
+                        : 'Deficit Forfeit & Adjustment Invoice Issued'}
                     </span>
                   </div>
 
@@ -355,7 +355,7 @@ export const FiveInvoiceLedgerView: React.FC = () => {
                       <div className="font-ledger font-bold text-[#991B1B] text-sm">
                         -₹{booking.waterfallSettlement.contractualLateFees.toLocaleString('en-IN')}
                       </div>
-                      <div className="text-[10px] text-hearth-taupe">Priority Tier 4 (BR-032)</div>
+                      <div className="text-[10px] text-hearth-taupe">Priority Tier 4 (Contractual)</div>
                     </div>
 
                     <div className="col-span-2 md:col-span-1 border-t md:border-t-0 md:border-l border-hearth-border pt-2 md:pt-0 md:pl-3">
@@ -680,7 +680,7 @@ export const FiveInvoiceLedgerView: React.FC = () => {
                 </div>
               </div>
               <div>
-                <div className="text-[10px] text-hearth-taupe font-semibold uppercase">Late Fee (BR-032)</div>
+                <div className="text-[10px] text-hearth-taupe font-semibold uppercase">Contractual Late Fee</div>
                 <div className="font-ledger font-bold text-[#991B1B]">
                   ₹{selectedNoticeModal.lateFeeAmount.toLocaleString('en-IN')}
                 </div>

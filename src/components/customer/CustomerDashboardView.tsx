@@ -713,7 +713,7 @@ export const CustomerDashboardView: React.FC = () => {
         </div>
       )}
 
-      {/* Interactive Tenure Extension Modal (Collision Check WF-06) */}
+      {/* Interactive Tenure Extension Modal */}
       {extensionModalBooking && (
         <TenureExtensionModal
           booking={extensionModalBooking}

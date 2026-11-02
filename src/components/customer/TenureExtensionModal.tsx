@@ -58,7 +58,7 @@ export const TenureExtensionModal: React.FC<TenureExtensionModalProps> = ({
             </div>
             <div>
               <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#059669] dark:text-[#10B981]">
-                WF-06 • Lease Amendment
+                Lease Extension
               </span>
               <h3 className="font-serif text-lg font-bold">
                 Extend Rental Tenancy
@@ -116,12 +116,12 @@ export const TenureExtensionModal: React.FC<TenureExtensionModalProps> = ({
             </div>
           </div>
 
-          {/* Temporal Interval Calculation Preview */}
+          {/* Schedule Window Preview */}
           <div className="p-4 rounded-2xl bg-[#061712] border border-[#1E4E40] text-white space-y-3 shadow-inner">
             <div className="flex items-center justify-between text-[11px] font-mono text-emerald-400">
-              <span>Collision Check Window: [Current_End, New_End + 48h Buffer]</span>
-              <span className="text-[10px] bg-[#10B981]/20 px-2 py-0.5 rounded-pill">
-                Mathematical Match
+              <span>Schedule & Turnaround Buffer Window</span>
+              <span className="text-[10px] bg-[#10B981]/20 px-2 py-0.5 rounded-pill font-sans font-semibold">
+                Verified Availability
               </span>
             </div>
 
@@ -139,7 +139,7 @@ export const TenureExtensionModal: React.FC<TenureExtensionModalProps> = ({
                 </span>
               </div>
               <div className="p-2 rounded-xl bg-[#0C231C]">
-                <span className="text-[10px] text-slate-400 block">Buffer Quarantine</span>
+                <span className="text-[10px] text-slate-400 block">48h Buffer Release</span>
                 <span className="font-mono font-bold text-[#F59E0B] text-xs">
                   {collisionResult.bufferEndDate}
                 </span>
@@ -147,7 +147,7 @@ export const TenureExtensionModal: React.FC<TenureExtensionModalProps> = ({
             </div>
           </div>
 
-          {/* Collision Diagnostic Feedback Card */}
+          {/* Availability Feedback Card */}
           <div
             className={`p-4 rounded-2xl border-2 space-y-2 transition-all ${
               !collisionResult.hasCollision
@@ -168,10 +168,10 @@ export const TenureExtensionModal: React.FC<TenureExtensionModalProps> = ({
                 )}
                 <span>
                   {!collisionResult.hasCollision
-                    ? 'Extension Cleanly Verified (0 Schedule Collisions)'
+                    ? 'Extension Available (0 Schedule Conflicts)'
                     : collisionResult.shieldActivated
-                    ? 'Downstream Conflict Shielded via Cascading Stock'
-                    : 'Tenancy Extension Blocked (Fleet Saturated)'}
+                    ? 'Seamless Extension (Protected by Buffer Stock)'
+                    : 'Tenancy Extension Currently Unavailable'}
                 </span>
               </div>
 
@@ -184,7 +184,11 @@ export const TenureExtensionModal: React.FC<TenureExtensionModalProps> = ({
                     : 'bg-rose-600 text-white'
                 }`}
               >
-                {collisionResult.resolutionType}
+                {!collisionResult.hasCollision
+                  ? 'Approved'
+                  : collisionResult.shieldActivated
+                  ? 'Buffer Stock Active'
+                  : 'Unavailable'}
               </span>
             </div>
 

@@ -171,12 +171,12 @@ export const BlacklistRegistryView: React.FC = () => {
                     </span>
                     {entry.categoryReason === 'Asset Recovery — Hostile Retention' && (
                       <span className="px-2.5 py-0.5 rounded-pill bg-red-800 text-white font-mono text-[10px] font-bold">
-                        EX-035 Hostile Retention
+                        Hostile Retention
                       </span>
                     )}
                     {entry.categoryReason === 'Asset Retention & Unrecovered Balance Enforcement' && (
                       <span className="px-2.5 py-0.5 rounded-pill bg-amber-600 text-white font-mono text-[10px] font-bold">
-                        FR-BLK-009 Deficit Recovery
+                        Deposit Deficit
                       </span>
                     )}
                   </div>

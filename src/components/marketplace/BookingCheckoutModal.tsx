@@ -44,7 +44,7 @@ export const BookingCheckoutModal: React.FC = () => {
   const [recipientPhone, setRecipientPhone] = useState(customer.verifiedMobile);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
-  // 15-Minute Checkout Distributed Lock (SET NX EX 900)
+  // 15-Minute Checkout Reservation Lock
   const [secondsRemaining, setSecondsRemaining] = useState(900); // 15 mins
   const [lockAcquired, setLockAcquired] = useState(false);
 
@@ -152,7 +152,7 @@ export const BookingCheckoutModal: React.FC = () => {
           </button>
         </div>
 
-        {/* 15-Minute Distributed Checkout Lock Banner (SET NX EX 900) */}
+        {/* 15-Minute Dedicated Reservation Hold */}
         <div className="px-6 py-3 bg-[#061712] border-b border-[#1E4E40] text-white flex flex-wrap items-center justify-between gap-3 shadow-inner">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg bg-[#10B981]/20 border border-[#10B981]/40 text-[#10B981] flex items-center justify-center">
@@ -161,14 +161,14 @@ export const BookingCheckoutModal: React.FC = () => {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-white">
-                  Distributed Checkout Lock Active
+                  Inventory Held Exclusively for You
                 </span>
                 <span className="px-2 py-0.5 rounded-pill bg-[#10B981]/20 text-[#10B981] font-mono text-[10px] font-bold">
-                  SET NX EX 900
+                  15-Min Hold
                 </span>
               </div>
               <p className="text-[11px] text-slate-300">
-                Unit reserved exclusively for 15 mins. Auto-released if checkout is abandoned.
+                Unit reserved exclusively for 15 minutes while you complete your booking.
               </p>
             </div>
           </div>

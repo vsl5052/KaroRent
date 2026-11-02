@@ -509,11 +509,11 @@ export const VendorGeoServiceabilityPanel: React.FC<VendorGeoServiceabilityPanel
             <div className="flex items-center gap-2">
               <RotateCcw className="w-4 h-4 text-[#059669] dark:text-[#10B981]" />
               <h3 className="font-serif font-bold text-base text-slate-900 dark:text-white">
-                Reverse Pickup Guarantee Protocol (Hard Gate)
+                Reverse Pickup Guarantee Protocol
               </h3>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Strict protocol requiring confirmed reverse pickup courier/fleet capability before customer can book (BR-REV-001).
+              Requires confirmed reverse pickup courier/fleet capability before customer can book.
             </p>
           </div>
 
@@ -526,7 +526,7 @@ export const VendorGeoServiceabilityPanel: React.FC<VendorGeoServiceabilityPanel
             />
             <div className="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-[#10B981]"></div>
             <span className="ml-2 text-xs font-bold text-slate-800 dark:text-slate-200">
-              {reversePickupSupported ? 'Hard Gate Enforced' : 'Gate Bypassed'}
+              {reversePickupSupported ? 'Verification Active' : 'Verification Disabled'}
             </span>
           </label>
         </div>
@@ -555,7 +555,7 @@ export const VendorGeoServiceabilityPanel: React.FC<VendorGeoServiceabilityPanel
           <div className="p-3 rounded-2xl bg-slate-50 dark:bg-[#061712] border border-slate-200 dark:border-[#1E4E40] text-xs space-y-1 text-slate-600 dark:text-slate-300">
             <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
               <ShieldCheck className="w-3.5 h-3.5 text-[#059669] dark:text-[#10B981]" />
-              <span>Customer PDP Protection Guarantee</span>
+              <span>Customer Protection Guarantee</span>
             </div>
             <p className="text-[11px] leading-relaxed">
               If an address lacks confirmed return transit coverage, checkout is locked with a transparent courier-status prompt to protect security deposits.
@@ -564,24 +564,24 @@ export const VendorGeoServiceabilityPanel: React.FC<VendorGeoServiceabilityPanel
         </div>
       </div>
 
-      {/* Real-Time Spatial Match Simulator (<50ms Resolver) */}
+      {/* Real-Time Pincode Serviceability Check */}
       <div className="p-6 rounded-3xl bg-slate-50 dark:bg-[#061712] border border-slate-200 dark:border-[#1E4E40] space-y-4">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-2">
             <Zap className="w-4 h-4 text-amber-500 fill-amber-500" />
             <h3 className="font-serif font-bold text-base text-slate-900 dark:text-white">
-              Real-Time Spatial Match Simulator (&lt;50ms Response)
+              Pincode Serviceability Verification
             </h3>
           </div>
           <span className="text-[11px] font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
-            Latency Benchmark: &lt;1.2ms (Synchronous Centroid Match)
+            Real-Time Postal Verification
           </span>
         </div>
 
         <div className="flex items-center gap-3">
           <div className="flex-1 max-w-xs">
             <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
-              Test Customer Pincode:
+              Verify Customer Pincode:
             </label>
             <input
               type="text"

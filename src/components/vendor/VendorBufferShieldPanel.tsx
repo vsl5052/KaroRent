@@ -107,7 +107,7 @@ export const VendorBufferShieldPanel: React.FC<VendorBufferShieldPanelProps> = (
                   Late Return Cascading Buffer Shield & Operational Quarantine
                 </h2>
                 <span className="px-2.5 py-0.5 rounded-pill bg-[#10B981]/20 border border-[#10B981]/40 text-[#10B981] font-mono text-[10px] font-bold">
-                  BR-BUFFER-48H Active
+                  Operational Buffer Active
                 </span>
               </div>
               <p className="text-xs text-emerald-200/80 mt-0.5">
@@ -157,32 +157,32 @@ export const VendorBufferShieldPanel: React.FC<VendorBufferShieldPanelProps> = (
         </div>
       </div>
 
-      {/* Interval Overlap Formula Banner */}
+      {/* Operational Schedule Window Banner */}
       <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between gap-4 flex-wrap text-xs text-amber-800 dark:text-amber-200">
         <div className="flex items-center gap-2">
           <Calendar className="w-4 h-4 text-amber-500 shrink-0" />
           <span>
-            <strong>Interval Overlap Formula:</strong>{' '}
-            <code className="font-mono bg-white dark:bg-[#061712] px-2 py-0.5 rounded border border-amber-500/30 font-bold">
-              Blocked_Interval = [Start_Date, End_Date + {DEFAULT_BUFFER_TURNAROUND_DAYS} Days]
-            </code>
+            <strong>Operational Buffer Schedule:</strong>{' '}
+            <span className="font-sans text-amber-900 dark:text-amber-200">
+              Automatic 48-hour quarantine block added to every concluded rental before subsequent customer dispatch.
+            </span>
           </span>
         </div>
         <span className="text-[11px] text-amber-700 dark:text-amber-300">
-          Enforced across all Confirmed, Dispatched, Active, & QC_Pending units
+          Enforced across all active, scheduled, & turnaround units
         </span>
       </div>
 
-      {/* Interactive Late Return Cascading Buffer Shield Simulator */}
+      {/* Customer Return Buffer Capacity & Cascading Reassignment Panel */}
       <div className="p-6 rounded-3xl bg-white dark:bg-[#0C231C] border border-slate-200 dark:border-[#1E4E40] shadow-sm space-y-5">
         <div className="flex items-center justify-between border-b border-slate-200 dark:border-[#1E4E40] pb-3">
           <div>
             <h3 className="font-serif font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-[#059669] dark:text-[#10B981]" />
-              <span>Simulate Customer Late Return & Shield Absorption</span>
+              <span>Customer Return Buffer Absorption & Reassignment</span>
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Test how the 48-hour quarantine window absorbs minor customer delays, and how delays &gt;48h trigger cascading reassignment.
+              48-hour quarantine window absorbs minor customer delays, while delays &gt;48h automatically initiate stock reassignment.
             </p>
           </div>
         </div>
@@ -207,7 +207,7 @@ export const VendorBufferShieldPanel: React.FC<VendorBufferShieldPanelProps> = (
 
           <div className="sm:col-span-4">
             <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Simulated Return Delay:
+              Customer Delay Window:
             </label>
             <div className="grid grid-cols-3 gap-1.5">
               {[24, 48, 72].map((hours) => (
@@ -246,8 +246,8 @@ export const VendorBufferShieldPanel: React.FC<VendorBufferShieldPanelProps> = (
                 {isSimulatingLatency
                   ? 'Processing...'
                   : delayHours <= 48
-                  ? 'Test Buffer Absorption'
-                  : 'Trigger Cascading Reassignment'}
+                  ? 'Evaluate Buffer Capacity'
+                  : 'Trigger Stock Reassignment'}
               </span>
             </button>
           </div>

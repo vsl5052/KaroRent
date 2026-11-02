@@ -182,13 +182,13 @@ export const ThreeWayInspectionView: React.FC = () => {
     }
   }, [returnBookings, selectedBookingId]);
 
-  // Statutory 4-Tier Waterfall Settlement State (BR-033)
+  // Statutory 4-Tier Security Deposit Settlement State
   const [wfUnpaidRent, setWfUnpaidRent] = useState<number>(0);
   const [wfLogisticsFee, setWfLogisticsFee] = useState<number>(1200);
   const [wfVerifiedDamage, setWfVerifiedDamage] = useState<number>(0);
   const [wfLateFees, setWfLateFees] = useState<number>(0);
   const [wfMediatorNotes, setWfMediatorNotes] = useState<string>(
-    'Final statutory waterfall deposit drawdown executed pursuant to Section 6.2 BR-033.'
+    'Final statutory deposit settlement executed pursuant to recovery priority guidelines.'
   );
 
   // Warehouse Inspection Form State
@@ -818,14 +818,14 @@ export const ThreeWayInspectionView: React.FC = () => {
                 </button>
               </div>
 
-              {/* Statutory 4-Tier Security Deposit Waterfall Settlement Panel (BR-033) */}
+              {/* Statutory 4-Tier Security Deposit Settlement Panel */}
               <div className="rounded-3xl bg-hearth-card border border-rose-300 p-6 shadow-hearth space-y-4">
                 <div className="flex items-center justify-between border-b border-hearth-border pb-3">
                   <div className="flex items-center gap-2">
                     <Layers className="w-5 h-5 text-hearth-terracotta" />
                     <div>
                       <h3 className="font-serif text-base font-bold text-hearth-ink">
-                        Statutory 4-Tier Deposit Drawdown (BR-033)
+                        Statutory 4-Tier Deposit Settlement
                       </h3>
                       <p className="text-[11px] text-hearth-taupe">
                         Strict statutory priority drawdown from collected 4-month deposit.
@@ -879,7 +879,7 @@ export const ThreeWayInspectionView: React.FC = () => {
 
                   <div>
                     <label className="block text-[11px] font-semibold text-hearth-ink mb-1">
-                      4. Late Fees (BR-032) (₹)
+                      4. Late Fees (₹)
                     </label>
                     <input
                       type="number"
@@ -891,7 +891,7 @@ export const ThreeWayInspectionView: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Live Drawdown Calculation Preview */}
+                {/* Live Settlement Calculation Preview */}
                 {(() => {
                   const totalDeductions = wfUnpaidRent + wfLogisticsFee + wfVerifiedDamage + wfLateFees;
                   const netBalance = originalDeposit - totalDeductions;
@@ -931,14 +931,14 @@ export const ThreeWayInspectionView: React.FC = () => {
                           {isSurplus ? <CheckCircle2 className="w-4 h-4" /> : <ShieldAlert className="w-4 h-4" />}
                           <span>
                             {isSurplus
-                              ? 'Scenario A: Surplus Release within 14 Days'
-                              : 'Scenario B: Deficit Forfeit + Adjustment Invoice'}
+                              ? 'Surplus Release within 14 Days'
+                              : 'Deficit Forfeit & Adjustment Invoice'}
                           </span>
                         </div>
                         <p className="text-[11px] leading-relaxed">
                           {isSurplus
-                            ? `Surplus ₹${netBalance.toLocaleString('en-IN')} will be scheduled for vault release to customer within 14 business days (FR-DEP-006).`
-                            : `Total deposit of ₹${originalDeposit.toLocaleString('en-IN')} forfeited. Ancillary adjustment invoice for ₹${Math.abs(netBalance).toLocaleString('en-IN')} will be generated with 7-day payment window, and customer enrolled in Blacklist Registry (FR-BLK-009).`}
+                            ? `Surplus ₹${netBalance.toLocaleString('en-IN')} will be scheduled for vault release to customer within 14 business days.`
+                            : `Total deposit of ₹${originalDeposit.toLocaleString('en-IN')} forfeited. Ancillary adjustment invoice for ₹${Math.abs(netBalance).toLocaleString('en-IN')} will be generated with a 7-day payment window, and customer enrolled in Blacklist Registry.`}
                         </p>
                       </div>
 
