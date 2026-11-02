@@ -225,6 +225,18 @@ export const INITIAL_VENDORS: VendorRecord[] = [
     commissionRatePercent: 12,
     submittedAt: '2026-02-24',
     decisionNotes: 'Verified warehouse in Domlur, GSTIN & ISO appliance care certified.',
+    serviceMode: 'RADIUS_KM',
+    warehouseCoordinates: {
+      lat: 12.9609,
+      lng: 77.6387,
+      address: 'Domlur Main Logistics Hub, Bengaluru',
+      postalCode: '560071',
+    },
+    serviceRadiusKm: 25,
+    explicitPincodes: ['560038', '560001', '560034', '560095', '560102', '560042', '560076', '560029'],
+    excludedPincodes: ['560067'], // Excluded delivery pocket (toll/waterway barrier)
+    reversePickupSupported: true,
+    reversePickupFleetPartner: 'KaroRent Fleet & Shadowfax Reverse Courier',
   },
   {
     id: 'VEN-202',
@@ -250,6 +262,18 @@ export const INITIAL_VENDORS: VendorRecord[] = [
     commissionRatePercent: 12,
     submittedAt: '2026-03-10',
     decisionNotes: 'Approved partner vendor for solid wood furniture and purifiers.',
+    serviceMode: 'EXPLICIT_PINCODES',
+    warehouseCoordinates: {
+      lat: 12.9344,
+      lng: 77.6101,
+      address: 'Koramangala Artisan Depot, Bengaluru',
+      postalCode: '560034',
+    },
+    serviceRadiusKm: 20,
+    explicitPincodes: ['560038', '560034', '560095', '560102', '560001', '560004', '560076'],
+    excludedPincodes: ['560100', '560067'],
+    reversePickupSupported: true,
+    reversePickupFleetPartner: 'Oak & Loom White-Glove Fleet',
   },
   {
     id: 'VEN-203',

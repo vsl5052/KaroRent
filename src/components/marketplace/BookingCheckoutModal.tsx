@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   AlertTriangle,
   Ruler,
   ShieldCheck,
   X,
+  Lock,
+  Clock,
+  CheckCircle2,
 } from 'lucide-react';
 import { useKaroRentStore } from '../../store/useKaroRentStore';
 import { bookingCheckoutSchema } from '../../lib/validation';
@@ -21,6 +24,8 @@ export const BookingCheckoutModal: React.FC = () => {
     setActiveTab,
     setActiveAgreementModalBookingId,
     isSimulatingLatency,
+    acquireCheckoutLock,
+    releaseCheckoutLock,
   } = useKaroRentStore();
 
   const product = masterProducts.find((p) => p.id === activeCheckoutProductId);
@@ -34,10 +39,44 @@ export const BookingCheckoutModal: React.FC = () => {
   const [selectedAddress, setSelectedAddress] = useState(
     customer.addresses[0]
       ? `${customer.addresses[0].line1}, ${customer.addresses[0].area}, ${customer.addresses[0].city} ${customer.addresses[0].pinCode}`
-      : 'Flat 302, Terracotta Courtyards, Indiranagar, Bengaluru 560038'
+      : 'Flat 302, Terracotta Courtyards, Indiranagar, 560038'
   );
   const [recipientPhone, setRecipientPhone] = useState(customer.verifiedMobile);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+
+  // 15-Minute Checkout Distributed Lock (SET NX EX 900)
+  const [secondsRemaining, setSecondsRemaining] = useState(900); // 15 mins
+  const [lockAcquired, setLockAcquired] = useState(false);
+
+  useEffect(() => {
+    if (!product) return;
+    acquireCheckoutLock(product.id);
+    setLockAcquired(true);
+
+    const timer = setInterval(() => {
+      setSecondsRemaining((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      clearInterval(timer);
+      releaseCheckoutLock(product.id);
+    };
+  }, [product?.id, acquireCheckoutLock, releaseCheckoutLock]);
+
+  const mins = Math.floor(secondsRemaining / 60);
+  const secs = secondsRemaining % 60;
+  const formattedTime = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+
+  const handleCancel = () => {
+    if (product) releaseCheckoutLock(product.id);
+    setActiveCheckoutProductId(null);
+  };
 
   if (!product || !inv) return null;
 
@@ -106,11 +145,40 @@ export const BookingCheckoutModal: React.FC = () => {
             </h2>
           </div>
           <button
-            onClick={() => setActiveCheckoutProductId(null)}
+            onClick={handleCancel}
             className="p-2 rounded-pill bg-hearth-card hover:bg-hearth-apricot border border-hearth-border"
           >
             <X className="w-4 h-4" />
           </button>
+        </div>
+
+        {/* 15-Minute Distributed Checkout Lock Banner (SET NX EX 900) */}
+        <div className="px-6 py-3 bg-[#061712] border-b border-[#1E4E40] text-white flex flex-wrap items-center justify-between gap-3 shadow-inner">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-[#10B981]/20 border border-[#10B981]/40 text-[#10B981] flex items-center justify-center">
+              <Lock className="w-3.5 h-3.5 text-[#10B981]" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-white">
+                  Distributed Checkout Lock Active
+                </span>
+                <span className="px-2 py-0.5 rounded-pill bg-[#10B981]/20 text-[#10B981] font-mono text-[10px] font-bold">
+                  SET NX EX 900
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-300">
+                Unit reserved exclusively for 15 mins. Auto-released if checkout is abandoned.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 bg-[#0C231C] px-3 py-1.5 rounded-xl border border-[#1E4E40]">
+            <Clock className="w-4 h-4 text-[#F59E0B]" />
+            <span className="font-mono font-bold text-sm text-[#F59E0B]">
+              {secondsRemaining > 0 ? formattedTime : 'EXPIRED'}
+            </span>
+          </div>
         </div>
 
         {/* Scrollable Body */}
@@ -306,18 +374,20 @@ export const BookingCheckoutModal: React.FC = () => {
           <div className="pt-4 border-t border-hearth-border flex items-center justify-end gap-2.5">
             <button
               type="button"
-              onClick={() => setActiveCheckoutProductId(null)}
+              onClick={handleCancel}
               className="px-4 py-2 rounded-pill bg-hearth-oat hover:bg-hearth-card border border-hearth-border text-xs font-medium text-hearth-umber"
             >
               Cancel
             </button>
             <button
               type="submit"
-              disabled={isSimulatingLatency}
+              disabled={isSimulatingLatency || secondsRemaining <= 0}
               className="spring-btn px-6 py-2.5 rounded-pill bg-hearth-terracotta hover:bg-hearth-kiln text-white text-xs font-semibold shadow-sm disabled:opacity-50"
             >
               {isSimulatingLatency
                 ? 'Processing...'
+                : secondsRemaining <= 0
+                ? 'Lock Expired (Release Unit)'
                 : isMultiStep
                 ? `Book Home Visit (₹${product.siteVisitFee})`
                 : 'Confirm & Continue'}

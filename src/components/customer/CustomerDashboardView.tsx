@@ -14,6 +14,8 @@ import {
   Wrench,
 } from 'lucide-react';
 import { useKaroRentStore } from '../../store/useKaroRentStore';
+import { BookingOrder } from '../../types/srs';
+import { TenureExtensionModal } from './TenureExtensionModal';
 
 export const CustomerDashboardView: React.FC = () => {
   const {
@@ -36,6 +38,7 @@ export const CustomerDashboardView: React.FC = () => {
   );
   const [returnModalBookingId, setReturnModalBookingId] = useState<string | null>(null);
   const [serviceModalBookingId, setServiceModalBookingId] = useState<string | null>(null);
+  const [extensionModalBooking, setExtensionModalBooking] = useState<BookingOrder | null>(null);
   const [serviceIssueText, setServiceIssueText] = useState('');
   const [requestSwap, setRequestSwap] = useState(false);
   const [expandedRateBookingId, setExpandedRateBookingId] = useState<string | null>(null);
@@ -572,11 +575,11 @@ export const CustomerDashboardView: React.FC = () => {
                   {booking.status === 'Active Rental' && (
                     <div className="flex flex-wrap items-center gap-2">
                       <button
-                        onClick={() => requestRentalRenewal(booking.id, 3)}
-                        className="px-3 py-1.5 rounded-pill bg-hearth-apricot hover:bg-hearth-terracotta hover:text-white border border-hearth-terracotta/30 text-hearth-terracotta text-xs font-semibold flex items-center gap-1 transition-colors"
+                        onClick={() => setExtensionModalBooking(booking)}
+                        className="px-3.5 py-1.5 rounded-pill bg-[#10B981]/15 hover:bg-[#10B981] hover:text-emerald-950 border border-[#10B981]/40 text-[#059669] dark:text-[#10B981] text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm"
                       >
                         <CalendarPlus className="w-3.5 h-3.5" />
-                        <span>Extend Plan (+3M)</span>
+                        <span>Extend Plan (Collision Check)</span>
                       </button>
 
                       <button
@@ -708,6 +711,14 @@ export const CustomerDashboardView: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Interactive Tenure Extension Modal (Collision Check WF-06) */}
+      {extensionModalBooking && (
+        <TenureExtensionModal
+          booking={extensionModalBooking}
+          onClose={() => setExtensionModalBooking(null)}
+        />
       )}
     </div>
   );

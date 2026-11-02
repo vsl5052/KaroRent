@@ -12,9 +12,14 @@ import {
   ShieldAlert,
   ShieldCheck,
   X,
+  Compass,
+  Shield,
+  Layers,
 } from 'lucide-react';
 import { useKaroRentStore } from '../../store/useKaroRentStore';
 import { ProductCategory } from '../../types/srs';
+import { VendorGeoServiceabilityPanel } from './VendorGeoServiceabilityPanel';
+import { VendorBufferShieldPanel } from './VendorBufferShieldPanel';
 
 const PRODUCT_CATEGORIES: ProductCategory[] = [
   'Living Room',
@@ -75,6 +80,11 @@ export const VendorPortalView: React.FC = () => {
     (i) => i.owningVendorId === currentVendor.id
   );
 
+  // Sub-Navigation Tab State
+  const [vendorSubTab, setVendorSubTab] = useState<
+    'INVENTORY' | 'GEO_SERVICEABILITY' | 'BUFFER_SHIELD'
+  >('INVENTORY');
+
   // Voluntary Offboarding Modal State
   const [showOffboardingModal, setShowOffboardingModal] = useState(false);
   const [offboardingAffirmation, setOffboardingAffirmation] = useState(false);
@@ -101,7 +111,7 @@ export const VendorPortalView: React.FC = () => {
     'Brand New' | 'Certified Mint' | 'Good — Refurbished'
   >('Brand New');
   const [newLocation, setNewLocation] = useState(
-    'Indiranagar & East Bengaluru Hub'
+    'Indiranagar & East Hub'
   );
   const [newImageUrl, setNewImageUrl] = useState(
     'https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=900&q=85'
@@ -244,6 +254,61 @@ export const VendorPortalView: React.FC = () => {
         </div>
       </div>
 
+      {/* Sub-Navigation Tabs */}
+      <div className="flex items-center gap-2 border-b border-hearth-border dark:border-[#1E4E40] pb-2 overflow-x-auto">
+        <button
+          onClick={() => setVendorSubTab('INVENTORY')}
+          className={`px-4 py-2 rounded-pill text-xs font-bold transition-all flex items-center gap-2 ${
+            vendorSubTab === 'INVENTORY'
+              ? 'bg-[#10B981] text-emerald-950 shadow-md'
+              : 'bg-hearth-card dark:bg-[#061712] text-hearth-umber dark:text-slate-300 hover:bg-hearth-oat border border-hearth-border dark:border-[#1E4E40]'
+          }`}
+        >
+          <Layers className="w-3.5 h-3.5" />
+          <span>Product Catalog & Stock ({vendorInventory.length})</span>
+        </button>
+
+        <button
+          onClick={() => setVendorSubTab('GEO_SERVICEABILITY')}
+          className={`px-4 py-2 rounded-pill text-xs font-bold transition-all flex items-center gap-2 ${
+            vendorSubTab === 'GEO_SERVICEABILITY'
+              ? 'bg-[#10B981] text-emerald-950 shadow-md'
+              : 'bg-hearth-card dark:bg-[#061712] text-hearth-umber dark:text-slate-300 hover:bg-hearth-oat border border-hearth-border dark:border-[#1E4E40]'
+          }`}
+        >
+          <Compass className="w-3.5 h-3.5" />
+          <span>Geographic Serviceability Engine (Spatial Match)</span>
+          <span className="px-2 py-0.5 rounded-pill bg-[#10B981]/20 font-mono text-[10px]">
+            {currentVendor.serviceMode || 'RADIUS_KM'}
+          </span>
+        </button>
+
+        <button
+          onClick={() => setVendorSubTab('BUFFER_SHIELD')}
+          className={`px-4 py-2 rounded-pill text-xs font-bold transition-all flex items-center gap-2 ${
+            vendorSubTab === 'BUFFER_SHIELD'
+              ? 'bg-[#10B981] text-emerald-950 shadow-md'
+              : 'bg-hearth-card dark:bg-[#061712] text-hearth-umber dark:text-slate-300 hover:bg-hearth-oat border border-hearth-border dark:border-[#1E4E40]'
+          }`}
+        >
+          <Shield className="w-3.5 h-3.5" />
+          <span>Late Return Cascading Buffer Shield</span>
+          <span className="px-2 py-0.5 rounded-pill bg-amber-500/20 text-amber-800 dark:text-amber-300 font-mono text-[10px]">
+            48h Window
+          </span>
+        </button>
+      </div>
+
+      {vendorSubTab === 'GEO_SERVICEABILITY' && (
+        <VendorGeoServiceabilityPanel vendor={currentVendor} />
+      )}
+
+      {vendorSubTab === 'BUFFER_SHIELD' && (
+        <VendorBufferShieldPanel vendor={currentVendor} />
+      )}
+
+      {vendorSubTab === 'INVENTORY' && (
+        <div className="space-y-7">
       {/* Voluntary Offboarding Run-Off to Expiry Banner (FR-VEN-009 / FR-VEN-011) */}
       {isRunOffVendor && (
         <div className="p-5 rounded-3xl bg-amber-50 dark:bg-amber-950/40 border-2 border-amber-400 text-amber-950 dark:text-amber-100 space-y-2.5 shadow-sm">
@@ -610,6 +675,8 @@ export const VendorPortalView: React.FC = () => {
           </div>
         )}
       </div>
+      </div>
+      )}
 
       {/* Register New Product Modal */}
       {showNewProductModal && (

@@ -447,14 +447,15 @@ export const SectionCatalogView: React.FC = () => {
                         {/* Delivery Badge at bottom of image */}
                         <div className="absolute bottom-2 left-2.5 px-2.5 py-1 rounded-pill bg-black/60 backdrop-blur-md text-white text-[10px] flex items-center gap-1">
                           <Truck className="w-3 h-3 text-[#10B981]" />
-                          <span>Prompt Delivery</span>
+                          <span>Reverse Pickup Guaranteed</span>
                         </div>
                       </div>
 
                       {/* Card Content */}
                       <div className="p-4 space-y-1.5">
-                        <div className="text-[10px] uppercase font-bold text-[#059669] dark:text-[#10B981] tracking-wider">
-                          {product.category}
+                        <div className="flex items-center justify-between text-[10px] uppercase font-bold text-[#059669] dark:text-[#10B981] tracking-wider">
+                          <span>{product.category}</span>
+                          <span className="font-mono text-slate-400">Min {product.min_rental_days || 30}d</span>
                         </div>
 
                         <h3 className="font-serif font-bold text-base text-slate-900 dark:text-white group-hover:text-[#059669] dark:group-hover:text-[#10B981] transition-colors line-clamp-1">

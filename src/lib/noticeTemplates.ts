@@ -96,7 +96,7 @@ If full payment is not reconciled by ${cureDeadlineDate}:
 Sincerely,  
 Risk & Legal Recoveries Division  
 KaroRent Platform  
-Indiranagar, Bengaluru, Karnataka 560038`;
+Indiranagar, Karnataka 560038`;
 
   return { subject, body };
 }

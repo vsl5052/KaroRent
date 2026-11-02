@@ -30,10 +30,12 @@ import {
   Briefcase,
   Flame,
   ArrowRight,
+  Zap,
 } from 'lucide-react';
 import { useKaroRentStore } from '../../store/useKaroRentStore';
 import { ProductCategory, NavigationTab } from '../../types/srs';
 import { SECTION_TABS } from './SectionCatalogView';
+import { getPostalCentroid } from '../../lib/geoServiceability';
 
 const DEFAULT_PINCODES = [
   '560038',
@@ -300,11 +302,11 @@ export const PublicNavbar: React.FC = () => {
             </button>
           </nav>
 
-          {/* Delivery Pincode Selector */}
+          {/* Delivery Pincode Selector (Top-Header Pincode First / <50ms Spatial Match) */}
           <div className="relative hidden xl:block" ref={locationDropdownRef}>
             <button
               onClick={() => setShowLocationDropdown(!showLocationDropdown)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-pill bg-slate-100 hover:bg-slate-200 dark:bg-[#0C231C] dark:hover:bg-[#13332A] border border-slate-200 dark:border-[#1E4E40] text-xs text-slate-800 dark:text-white transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-pill bg-slate-100 hover:bg-slate-200 dark:bg-[#0C231C] dark:hover:bg-[#13332A] border border-slate-200 dark:border-[#1E4E40] text-xs text-slate-800 dark:text-white transition-all shadow-sm"
             >
               <MapPin className="w-3.5 h-3.5 text-[#059669] dark:text-[#10B981] shrink-0" />
               <div className="text-left">
@@ -319,11 +321,18 @@ export const PublicNavbar: React.FC = () => {
             </button>
 
             {showLocationDropdown && (
-              <div className="absolute left-0 mt-2 w-72 rounded-2xl bg-white dark:bg-[#0C231C] border border-slate-200 dark:border-[#1E4E40] shadow-2xl p-3 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                <div className="text-xs font-bold text-slate-900 dark:text-white mb-2">
-                  Enter Delivery Pincode
+              <div className="absolute left-0 mt-2 w-80 rounded-2xl bg-white dark:bg-[#0C231C] border border-slate-200 dark:border-[#1E4E40] shadow-2xl p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-150 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="text-xs font-bold text-slate-900 dark:text-white">
+                    Delivery Pincode (Spatial Match)
+                  </div>
+                  <span className="text-[10px] font-mono text-[#059669] dark:text-[#10B981] font-bold flex items-center gap-0.5">
+                    <Zap className="w-3 h-3" />
+                    <span>&lt;50ms Match</span>
+                  </span>
                 </div>
-                <div className="flex items-center gap-1.5 mb-3">
+
+                <div className="flex items-center gap-1.5">
                   <input
                     type="text"
                     maxLength={6}
@@ -340,32 +349,52 @@ export const PublicNavbar: React.FC = () => {
                       }
                     }}
                     disabled={customPincodeInput.length !== 6}
-                    className="px-3 py-1.5 rounded-xl bg-[#10B981] hover:bg-[#059669] disabled:opacity-40 text-emerald-950 font-bold text-xs transition-all"
+                    className="px-3.5 py-1.5 rounded-xl bg-[#10B981] hover:bg-[#059669] disabled:opacity-40 text-emerald-950 hover:text-white font-bold text-xs transition-all shadow-sm"
                   >
                     Apply
                   </button>
                 </div>
-                <div className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 mb-1">
-                  Popular Pincodes
-                </div>
-                <div className="grid grid-cols-3 gap-1 pt-0.5">
-                  {DEFAULT_PINCODES.map((pin) => (
-                    <button
-                      key={pin}
-                      onClick={() => {
-                        setSelectedLocation(pin);
-                        setCustomPincodeInput(pin);
-                        setShowLocationDropdown(false);
-                      }}
-                      className={`px-2 py-1.5 rounded-lg text-xs font-mono text-center transition-all ${
-                        currentPincode === pin
-                          ? 'bg-[#10B981]/20 text-[#059669] dark:text-[#10B981] font-bold border border-[#10B981]/40'
-                          : 'hover:bg-slate-100 dark:hover:bg-[#13332A] text-slate-700 dark:text-slate-300 border border-transparent'
-                      }`}
-                    >
-                      {pin}
-                    </button>
-                  ))}
+
+                {/* Resolved Centroid & Reverse Pickup Guarantee */}
+                {(() => {
+                  const centroid = getPostalCentroid(currentPincode);
+                  return (
+                    <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-[#061712] border border-slate-200 dark:border-[#1E4E40] space-y-1 text-[11px]">
+                      <div className="flex items-center justify-between text-slate-700 dark:text-slate-300">
+                        <span className="font-semibold">{centroid.areaName}</span>
+                        <span className="font-mono text-[10px] text-slate-400">{centroid.zone}</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-[#059669] dark:text-[#10B981] font-bold text-[10px]">
+                        <ShieldCheck className="w-3 h-3" />
+                        <span>Doorstep Delivery & Reverse Pickup Guaranteed</span>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 mb-1">
+                    Popular Serviced Pincodes
+                  </div>
+                  <div className="grid grid-cols-3 gap-1 pt-0.5">
+                    {DEFAULT_PINCODES.map((pin) => (
+                      <button
+                        key={pin}
+                        onClick={() => {
+                          setSelectedLocation(pin);
+                          setCustomPincodeInput(pin);
+                          setShowLocationDropdown(false);
+                        }}
+                        className={`px-2 py-1.5 rounded-lg text-xs font-mono text-center transition-all ${
+                          currentPincode === pin
+                            ? 'bg-[#10B981]/20 text-[#059669] dark:text-[#10B981] font-bold border border-[#10B981]/40'
+                            : 'hover:bg-slate-100 dark:hover:bg-[#13332A] text-slate-700 dark:text-slate-300 border border-transparent'
+                        }`}
+                      >
+                        {pin}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}

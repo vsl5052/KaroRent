@@ -49,6 +49,16 @@ import {
   INITIAL_VENDORS,
   INITIAL_VIRTUAL_INVENTORY,
 } from '../data/mockData';
+import {
+  CHECKOUT_LOCK_DURATION_MS,
+  DEFAULT_BUFFER_TURNAROUND_DAYS,
+  addDaysToDateString,
+  checkTenureExtensionCollision,
+  TenureCollisionResult,
+} from '../lib/temporalCalendar';
+import {
+  evaluateVendorServiceability,
+} from '../lib/geoServiceability';
 import { generateNotice1, generateNotice2, generateNotice3 } from '../lib/noticeTemplates';
 
 export interface ToastMessage {
@@ -177,6 +187,25 @@ interface KaroRentState {
   payInvoiceDocument: (invoiceId: string) => Promise<void>;
   completeDeliveryAndActivate: (bookingId: string, serialNumber: string, photoUrl: string) => Promise<void>;
   requestRentalRenewal: (bookingId: string, additionalMonths: 3 | 6) => Promise<void>;
+  extendRentalWithCollisionCheck: (bookingId: string, additionalMonths: 1 | 3 | 6) => Promise<TenureCollisionResult>;
+  triggerLateReturnCascadingReassignment: (delayedBookingId: string, delayHours: number) => Promise<{ success: boolean; reassignedBookingId?: string; message: string }>;
+  acquireCheckoutLock: (productId: string) => { success: boolean; expiresAt: number };
+  releaseCheckoutLock: (productId: string) => void;
+  updateVendorServiceability: (payload: {
+    vendorId: string;
+    serviceMode: 'RADIUS_KM' | 'EXPLICIT_PINCODES';
+    warehouseCoordinates?: {
+      lat: number;
+      lng: number;
+      address: string;
+      postalCode: string;
+    };
+    serviceRadiusKm?: number;
+    explicitPincodes?: string[];
+    excludedPincodes?: string[];
+    reversePickupSupported?: boolean;
+    reversePickupFleetPartner?: string;
+  }) => void;
   initiateReturnPickupRequest: (bookingId: string, preferredSlot: string) => Promise<void>;
 
   completeCustomerPremisePickupWithPhoto: (payload: {
@@ -631,6 +660,8 @@ export const useKaroRentStore = create<KaroRentState>()(
           tenureMonths,
           startDate,
           endDate,
+          bufferTurnaroundDays: DEFAULT_BUFFER_TURNAROUND_DAYS,
+          quarantineBlockedUntil: addDaysToDateString(endDate, DEFAULT_BUFFER_TURNAROUND_DAYS),
           deliveryAddress,
           status: initialStatus,
           monthlyRentRate: monthlyRentRate * quantity,
@@ -1302,6 +1333,196 @@ export const useKaroRentStore = create<KaroRentState>()(
           description: `Asset ${serialNumber} delivered and acknowledged at customer premises.`,
           variant: 'success',
         });
+      },
+
+      acquireCheckoutLock: (productId: string) => {
+        const expiresAt = Date.now() + CHECKOUT_LOCK_DURATION_MS;
+        return { success: true, expiresAt };
+      },
+
+      releaseCheckoutLock: (_productId: string) => {
+        // Distributed lock release (auto or explicit on exit)
+      },
+
+      updateVendorServiceability: (payload) => {
+        set((s) => ({
+          vendors: s.vendors.map((v) =>
+            v.id === payload.vendorId
+              ? {
+                  ...v,
+                  serviceMode: payload.serviceMode,
+                  warehouseCoordinates: payload.warehouseCoordinates || v.warehouseCoordinates,
+                  serviceRadiusKm: payload.serviceRadiusKm ?? v.serviceRadiusKm,
+                  explicitPincodes: payload.explicitPincodes || v.explicitPincodes,
+                  excludedPincodes: payload.excludedPincodes || v.excludedPincodes,
+                  reversePickupSupported: payload.reversePickupSupported ?? v.reversePickupSupported,
+                  reversePickupFleetPartner: payload.reversePickupFleetPartner || v.reversePickupFleetPartner,
+                }
+              : v
+          ),
+        }));
+
+        get().addToast({
+          title: 'Geographic Serviceability Updated',
+          description: `Updated delivery boundaries, pocket exclusions & reverse courier protocols for ${payload.vendorId}.`,
+          variant: 'success',
+        });
+      },
+
+      extendRentalWithCollisionCheck: async (bookingId, additionalMonths) => {
+        set({ isSimulatingLatency: true, latencyActionLabel: 'Evaluating Mathematical Temporal Calendar & Collision Shield...' });
+        await simulateLatency(350);
+
+        const state = get();
+        const booking = state.bookings.find((b) => b.id === bookingId);
+        if (!booking) {
+          set({ isSimulatingLatency: false, latencyActionLabel: null });
+          return {
+            hasCollision: false,
+            currentEnd: '',
+            requestedNewEnd: '',
+            bufferEndDate: '',
+            collisionDays: 0,
+            shieldActivated: false,
+            resolutionType: 'COLLISION_BLOCKED',
+            message: 'Booking not found.',
+          };
+        }
+
+        const collisionCheck = checkTenureExtensionCollision(
+          booking,
+          additionalMonths,
+          state.bookings,
+          state.virtualInventory,
+          DEFAULT_BUFFER_TURNAROUND_DAYS
+        );
+
+        if (collisionCheck.resolutionType !== 'COLLISION_BLOCKED') {
+          set((s) => ({
+            isSimulatingLatency: false,
+            latencyActionLabel: null,
+            bookings: s.bookings.map((b) => {
+              if (b.id !== bookingId) return b;
+              return {
+                ...b,
+                endDate: collisionCheck.requestedNewEnd,
+                quarantineBlockedUntil: collisionCheck.bufferEndDate,
+              };
+            }),
+            agreements: s.agreements.map((a) =>
+              a.bookingId === bookingId
+                ? {
+                    ...a,
+                    status: 'Amended',
+                    amendments: [
+                      ...a.amendments,
+                      {
+                        id: `AMD-${Date.now()}`,
+                        version: `v1.${a.amendments.length + 1} — Temporal Extension Addendum`,
+                        reason: `Customer requested +${additionalMonths}-month extension. Collision verification: ${collisionCheck.resolutionType}.`,
+                        changedFieldsSummary: `Extended rental to ${collisionCheck.requestedNewEnd}. 48h quarantine buffer locked until ${collisionCheck.bufferEndDate}.`,
+                        createdAt: nowIST(),
+                        signedByCustomer: true,
+                        signedAt: nowIST(),
+                      },
+                    ],
+                  }
+                : a
+            ),
+          }));
+
+          get().addToast({
+            title: `Tenure Extended (+${additionalMonths}M)`,
+            description: collisionCheck.shieldActivated
+              ? `Downstream collision absorbed by Cascading Buffer Shield! Lease extended to ${collisionCheck.requestedNewEnd}.`
+              : `Zero collision. New lease end date: ${collisionCheck.requestedNewEnd}.`,
+            variant: 'success',
+          });
+        } else {
+          set({ isSimulatingLatency: false, latencyActionLabel: null });
+          get().addToast({
+            title: 'Downstream Collision Detected',
+            description: collisionCheck.message,
+            variant: 'warning',
+          });
+        }
+
+        return collisionCheck;
+      },
+
+      triggerLateReturnCascadingReassignment: async (delayedBookingId, delayHours) => {
+        set({ isSimulatingLatency: true, latencyActionLabel: 'Triggering Cascading Buffer Shield Reassignment...' });
+        await simulateLatency(450);
+
+        const state = get();
+        const delayedBooking = state.bookings.find((b) => b.id === delayedBookingId);
+        if (!delayedBooking) {
+          set({ isSimulatingLatency: false, latencyActionLabel: null });
+          return { success: false, message: 'Booking not found.' };
+        }
+
+        // Minor delay (<= 48h) is absorbed by the 48-hour quarantine buffer
+        if (delayHours <= 48) {
+          set({ isSimulatingLatency: false, latencyActionLabel: null });
+          get().addToast({
+            title: 'Late Return Absorbed by Buffer Shield',
+            description: `Delay of ${delayHours}h is within the 48-hour operational quarantine buffer. Downstream customer remains 100% unaffected.`,
+            variant: 'info',
+          });
+          return {
+            success: true,
+            message: `Delay (${delayHours}h) absorbed by mandatory 48-hour buffer window. No downstream disruption.`,
+          };
+        }
+
+        // Delay > 48h: Cascading Buffer Shield activated to reassign downstream booking
+        const downstreamBooking = state.bookings.find(
+          (b) =>
+            b.productId === delayedBooking.productId &&
+            b.id !== delayedBooking.id &&
+            b.status === 'Confirmed'
+        );
+
+        if (downstreamBooking) {
+          set((s) => ({
+            isSimulatingLatency: false,
+            latencyActionLabel: null,
+            bookings: s.bookings.map((b) =>
+              b.id === downstreamBooking.id
+                ? {
+                    ...b,
+                    cascadingReassigned: true,
+                    cascadingOriginalBookingId: delayedBooking.id,
+                    cascadingReassignmentReason: `Preceding unit delayed by ${delayHours}h (>48h buffer). Automated cascading shield reassigned downstream booking to unreserved buffer stock.`,
+                  }
+                : b
+            ),
+          }));
+
+          get().addToast({
+            title: 'Cascading Reassignment Triggered',
+            description: `Downstream booking ${downstreamBooking.id} automatically rerouted to certified buffer stock. Customer delivery on-time guarantee preserved.`,
+            variant: 'success',
+          });
+
+          return {
+            success: true,
+            reassignedBookingId: downstreamBooking.id,
+            message: `Downstream booking ${downstreamBooking.id} safely rerouted to buffer stock.`,
+          };
+        }
+
+        set({ isSimulatingLatency: false, latencyActionLabel: null });
+        get().addToast({
+          title: 'Buffer Shield Active',
+          description: `Logged ${delayHours}h delay. Zero immediate downstream collisions pending for this SKU.`,
+          variant: 'info',
+        });
+
+        return {
+          success: true,
+          message: 'Zero downstream collisions detected for this SKU.',
+        };
       },
 
       requestRentalRenewal: async (bookingId, additionalMonths) => {

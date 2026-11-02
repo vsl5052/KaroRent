@@ -126,6 +126,19 @@ export interface VendorRecord {
   commissionRatePercent: number; // FR-SET-001
   submittedAt: string;
   decisionNotes?: string;
+  // Spatial Serviceability Engine
+  serviceMode?: 'RADIUS_KM' | 'EXPLICIT_PINCODES';
+  warehouseCoordinates?: {
+    lat: number;
+    lng: number;
+    address: string;
+    postalCode: string;
+  };
+  serviceRadiusKm?: number;
+  explicitPincodes?: string[];
+  excludedPincodes?: string[]; // Non-Contiguous Delivery Pocket Blacklist
+  reversePickupSupported?: boolean; // Reverse Pickup Guarantee Protocol
+  reversePickupFleetPartner?: string;
 }
 
 // Section 7.3 & 7.5 — Platform-Controlled Catalogue & Rate Cards (FR-CAT-001 to 007, FR-PRC-001)
@@ -170,6 +183,10 @@ export interface PlatformMasterProduct {
   standardDeliveryFee: number;
   siteVisitFee: number; // e.g., ₹499 for Multi-Step AC (FR-PRC-008)
   installationRateCard: InstallationRateCardItem[];
+  // Mathematical Temporal Constraints (Gap Analysis B)
+  min_rental_days?: number; // Minimum rental tenure days (default 30)
+  max_rental_days?: number; // Maximum rental tenure days (default 730)
+  buffer_turnaround_days?: number; // Mandatory 48-hour operational quarantine (default 2)
 }
 
 // Section 7.4 — Virtual Inventory, Staged Approval & Source Reassignment (FR-INV-001 to 011)
@@ -458,6 +475,13 @@ export interface BookingOrder {
   agreementId: string;
   deliveryCompletedAt?: string;
   deliveryEvidencePhoto?: string;
+  // Concurrency & Cascading Delay Resiliency (Gap Analysis B & D)
+  bufferTurnaroundDays?: number;
+  quarantineBlockedUntil?: string;
+  checkoutLockExpiresAt?: number;
+  cascadingReassigned?: boolean;
+  cascadingOriginalBookingId?: string;
+  cascadingReassignmentReason?: string;
   deliveryAssignment?: DeliveryAssignment;
   returnRecord?: ReturnInspectionRecord;
   defaultNotices?: DefaultNoticeRecord[];

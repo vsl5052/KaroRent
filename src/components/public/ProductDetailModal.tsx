@@ -19,8 +19,20 @@ import {
   FileCheck,
   Check,
   Zap,
+  Clock,
+  ShieldAlert,
 } from 'lucide-react';
 import { useKaroRentStore } from '../../store/useKaroRentStore';
+import {
+  evaluateVendorServiceability,
+  getPostalCentroid,
+} from '../../lib/geoServiceability';
+import {
+  calculateNextAvailableDate,
+  getProductBlockedIntervals,
+  isDateBlocked,
+  DEFAULT_BUFFER_TURNAROUND_DAYS,
+} from '../../lib/temporalCalendar';
 
 export const ProductDetailModal: React.FC = () => {
   const {
@@ -35,17 +47,33 @@ export const ProductDetailModal: React.FC = () => {
     setIsLoginModalOpen,
     setActiveCheckoutProductId,
     addToast,
+    vendors,
+    bookings,
   } = useKaroRentStore();
 
   const product = masterProducts.find((p) => p.id === activeDetailProductId);
   const inv = virtualInventory.find((i) => i.productId === activeDetailProductId);
+  const vendor = vendors.find((v) => v.id === inv?.owningVendorId) || vendors[0];
 
   const [activeImageIdx, setActiveImageIdx] = useState(0);
   const [isCouponApplied, setIsCouponApplied] = useState(false);
   const [isWishlisted, setIsWishlisted] = useState(false);
-  const [pincode, setPincode] = useState('560038');
+  const [pincode, setPincode] = useState(() => {
+    const match = selectedLocation.match(/\d{6}/);
+    return match ? match[0] : '560038';
+  });
   const [isEditingPincode, setIsEditingPincode] = useState(false);
   const [activeTabSpec, setActiveTabSpec] = useState<'SPECS' | 'CARE' | 'ESCROW'>('SPECS');
+
+  // Dynamic Date-Picker state
+  const tomorrowStr = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+  const [selectedStartDate, setSelectedStartDate] = useState(tomorrowStr);
+
+  // Sync pincode if global location changes
+  useEffect(() => {
+    const match = selectedLocation.match(/\d{6}/);
+    if (match) setPincode(match[0]);
+  }, [selectedLocation]);
 
   // Multi-angle photo gallery for this product
   const galleryImages = product
@@ -76,6 +104,28 @@ export const ProductDetailModal: React.FC = () => {
 
   if (!product || !inv) return null;
 
+  // Spatial Serviceability Evaluation (<50ms resolver)
+  const serviceabilityResult = evaluateVendorServiceability(pincode, vendor);
+  const targetCentroid = getPostalCentroid(pincode);
+
+  // Temporal Calendar & Operational Quarantine Calculations
+  const blockedIntervals = getProductBlockedIntervals(product.id, bookings);
+  const isStartDateBlocked = isDateBlocked(selectedStartDate, product.id, bookings, inv.declaredQuantity);
+  const nextAvailableDateInfo = calculateNextAvailableDate(product.id, inv, bookings);
+  const nextAvailableDate = nextAvailableDateInfo.availableDate;
+
+  // Per-SKU Product Tenure Constraints
+  const minRentalDays = product.min_rental_days || 30;
+  const maxRentalDays = product.max_rental_days || 730;
+  const selectedDays = selectedTenureMonths * 30;
+  const isTenureConstraintMet = selectedDays >= minRentalDays && selectedDays <= maxRentalDays;
+
+  const canProceed =
+    serviceabilityResult.isServiceable &&
+    inv.availableQuantity > 0 &&
+    !isStartDateBlocked &&
+    isTenureConstraintMet;
+
   const TENURE_OPTIONS: (1 | 3 | 6 | 12 | 24)[] = [1, 3, 6, 12, 24];
   const multiplier = product.tenureMultipliers[selectedTenureMonths] || 1;
   const rawMonthlyRate = Math.round(product.baseMonthlyRent * multiplier);
@@ -86,6 +136,7 @@ export const ProductDetailModal: React.FC = () => {
   const depositAmount = effectiveMonthlyRate * product.depositMonthsMultiple;
 
   const handleProceedRent = () => {
+    if (!canProceed) return;
     setActiveDetailProductId(null);
     if (!isAuthenticated) {
       setIsLoginModalOpen(true);
@@ -242,28 +293,35 @@ export const ProductDetailModal: React.FC = () => {
               </div>
             </div>
 
-            {/* Tenure Selector Tabs (1, 3, 6, 12, 24 Months) */}
+            {/* Tenure Selector Tabs with Per-SKU Constraints */}
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold text-slate-900 dark:text-white">Choose Rental Duration:</span>
-                <span className="text-[11px] text-[#059669] dark:text-[#10B981] font-semibold">
-                  {selectedTenureMonths >= 12 ? 'Best Value Plan' : 'Flexible Rental'}
+                <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-pill bg-[#10B981]/15 text-[#059669] dark:text-[#10B981]">
+                  SKU Constraint: {minRentalDays}–{maxRentalDays} Days
                 </span>
               </div>
               <div className="grid grid-cols-5 gap-1.5">
-                {TENURE_OPTIONS.map((m) => (
-                  <button
-                    key={m}
-                    onClick={() => setSelectedTenureMonths(m)}
-                    className={`py-2 px-1 rounded-xl text-xs font-semibold border transition-all text-center focus:outline-none ${
-                      selectedTenureMonths === m
-                        ? 'bg-[#10B981] text-emerald-950 border-[#10B981] font-bold shadow-md scale-102'
-                        : 'bg-slate-100 hover:bg-slate-200 dark:bg-[#061712] dark:hover:bg-[#13332A] border-slate-200 dark:border-[#1E4E40] text-slate-700 dark:text-slate-300'
-                    }`}
-                  >
-                    <div>{m} {m === 1 ? 'Month' : 'Mos'}</div>
-                  </button>
-                ))}
+                {TENURE_OPTIONS.map((m) => {
+                  const days = m * 30;
+                  const isAllowed = days >= minRentalDays && days <= maxRentalDays;
+                  return (
+                    <button
+                      key={m}
+                      onClick={() => setSelectedTenureMonths(m)}
+                      disabled={!isAllowed}
+                      className={`py-2 px-1 rounded-xl text-xs font-semibold border transition-all text-center focus:outline-none ${
+                        selectedTenureMonths === m
+                          ? 'bg-[#10B981] text-emerald-950 border-[#10B981] font-bold shadow-md scale-102'
+                          : isAllowed
+                          ? 'bg-slate-100 hover:bg-slate-200 dark:bg-[#061712] dark:hover:bg-[#13332A] border-slate-200 dark:border-[#1E4E40] text-slate-700 dark:text-slate-300'
+                          : 'opacity-40 cursor-not-allowed bg-slate-50 dark:bg-[#061712]/40 border-slate-200 dark:border-[#1E4E40]'
+                      }`}
+                    >
+                      <div>{m} {m === 1 ? 'Month' : 'Mos'}</div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -299,12 +357,65 @@ export const ProductDetailModal: React.FC = () => {
               </button>
             </div>
 
-            {/* Delivery & Pincode Checker */}
+            {/* Dynamic Date Picker & Turnaround Quarantine Buffer (Gap B) */}
+            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-[#061712] border border-slate-200 dark:border-[#1E4E40] space-y-2.5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-[#059669] dark:text-[#10B981]" />
+                  <span>Delivery Date (Real-Time Availability):</span>
+                </span>
+                <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400">
+                  48h Quarantine Shield
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="date"
+                  min={tomorrowStr}
+                  value={selectedStartDate}
+                  onChange={(e) => setSelectedStartDate(e.target.value)}
+                  className={`w-full px-3 py-1.5 rounded-xl border text-xs font-mono font-bold transition-all ${
+                    isStartDateBlocked
+                      ? 'bg-rose-50 dark:bg-rose-950/40 border-rose-400 text-rose-700 dark:text-rose-300'
+                      : 'bg-white dark:bg-[#0C231C] border-slate-200 dark:border-[#1E4E40] text-slate-900 dark:text-white'
+                  }`}
+                />
+              </div>
+
+              {isStartDateBlocked ? (
+                <div className="p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-300 text-rose-800 dark:text-rose-200 text-[11px] space-y-1">
+                  <div className="font-bold flex items-center gap-1">
+                    <ShieldAlert className="w-3.5 h-3.5 text-rose-600" />
+                    <span>Selected Date Blocked (0 Units Available)</span>
+                  </div>
+                  <p>
+                    Units are locked under active leases or mandatory 48h turnaround quarantine. Next available date:{' '}
+                    <strong className="underline cursor-pointer" onClick={() => setSelectedStartDate(nextAvailableDate)}>
+                      {nextAvailableDate}
+                    </strong>
+                  </p>
+                </div>
+              ) : (
+                <div className="p-2.5 rounded-xl bg-[#10B981]/10 border border-[#10B981]/30 text-[11px] text-slate-700 dark:text-slate-300 space-y-1">
+                  <div className="flex items-center justify-between font-semibold text-[#059669] dark:text-[#10B981]">
+                    <span>✓ Available for Delivery on {selectedStartDate}</span>
+                    <span className="font-mono text-[10px]">{inv.availableQuantity} in Stock</span>
+                  </div>
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                    <Clock className="w-3 h-3 text-slate-400" />
+                    <span>48h Operational Buffer: Day 1 Reverse Transit • Day 2 3-Way Sanitization</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Spatial Delivery & Reverse Pickup Pincode Checker (Gap A) */}
             <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-[#061712] border border-slate-200 dark:border-[#1E4E40] space-y-2">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
                   <Truck className="w-3.5 h-3.5 text-[#059669] dark:text-[#10B981]" />
-                  <span>Doorstep Delivery & Assembly</span>
+                  <span>Doorstep Delivery & Reverse Pickup Gate:</span>
                 </span>
                 <button
                   onClick={() => setIsEditingPincode(!isEditingPincode)}
@@ -319,16 +430,45 @@ export const ProductDetailModal: React.FC = () => {
                   <input
                     type="text"
                     value={pincode}
-                    onChange={(e) => setPincode(e.target.value)}
+                    onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
                     maxLength={6}
-                    className="w-32 px-3 py-1 rounded-xl bg-white dark:bg-[#0C231C] border border-slate-200 dark:border-[#1E4E40] text-xs font-mono font-bold text-slate-900 dark:text-white"
+                    placeholder="Enter 6-digit Pincode"
+                    className="w-36 px-3 py-1.5 rounded-xl bg-white dark:bg-[#0C231C] border border-slate-200 dark:border-[#1E4E40] text-xs font-mono font-bold text-slate-900 dark:text-white"
                   />
-                  <span className="text-xs text-slate-500 dark:text-slate-400">Delivery Zone</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">&lt;50ms Spatial Match</span>
                 </div>
               ) : (
-                <div className="text-xs text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-                  <span className="font-mono font-bold text-slate-900 dark:text-white">{pincode}</span>
-                  <span className="text-[#059669] dark:text-[#10B981] font-semibold">• Standard Doorstep Delivery</span>
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-mono font-bold text-slate-900 dark:text-white">
+                      {pincode} — {targetCentroid.areaName}
+                    </span>
+                    <span
+                      className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-pill ${
+                        serviceabilityResult.isServiceable
+                          ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300'
+                          : 'bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300'
+                      }`}
+                    >
+                      {serviceabilityResult.isServiceable
+                        ? serviceabilityResult.distanceKm !== undefined
+                          ? `${serviceabilityResult.distanceKm} km (Serviceable)`
+                          : 'Whitelisted'
+                        : 'Unserviceable'}
+                    </span>
+                  </div>
+
+                  {serviceabilityResult.isServiceable ? (
+                    <div className="flex items-center gap-1.5 text-[11px] text-[#059669] dark:text-[#10B981] font-semibold">
+                      <ShieldCheck className="w-3.5 h-3.5" />
+                      <span>Reverse Pickup Guaranteed by {vendor.reversePickupFleetPartner || 'In-House Crew'}</span>
+                    </div>
+                  ) : (
+                    <div className="p-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-200 text-[10px] font-semibold flex items-center gap-1.5">
+                      <ShieldAlert className="w-3.5 h-3.5 text-rose-600 shrink-0" />
+                      <span>{serviceabilityResult.rejectionReason || 'Pocket unserviceable under reverse pickup protocol'}</span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -349,12 +489,20 @@ export const ProductDetailModal: React.FC = () => {
 
               <button
                 onClick={handleProceedRent}
-                disabled={inv.availableQuantity <= 0}
-                className="flex-1 spring-btn py-3.5 px-6 rounded-pill bg-[#10B981] hover:bg-[#059669] text-emerald-950 hover:text-white text-xs sm:text-sm font-extrabold shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
+                disabled={!canProceed}
+                className="flex-1 spring-btn py-3.5 px-6 rounded-pill bg-[#10B981] hover:bg-[#059669] text-emerald-950 hover:text-white text-xs sm:text-sm font-extrabold shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Zap className="w-4 h-4 text-emerald-950 fill-emerald-950" />
                 <span>
-                  {inv.availableQuantity > 0 ? 'Rent Now (Proceed to Agreement)' : 'Out of Stock'}
+                  {!serviceabilityResult.isServiceable
+                    ? 'Delivery Unserviceable in this Pincode'
+                    : isStartDateBlocked
+                    ? `Date Unavailable (Next: ${nextAvailableDate})`
+                    : inv.availableQuantity <= 0
+                    ? 'Out of Stock'
+                    : !isTenureConstraintMet
+                    ? `Tenure must be ${minRentalDays}–${maxRentalDays} Days`
+                    : 'Rent Now (Proceed to Agreement)'}
                 </span>
               </button>
             </div>
